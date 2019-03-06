@@ -27,11 +27,11 @@ public class MainFragment extends AppCompatActivity {
             finish();
             startActivity(new Intent(MainFragment.this, MainActivity.class));
         }
-        setContentView(R.layout.testlayout);
+        setContentView(R.layout.mainfragment_layout);
 
-        test = (TextView) findViewById(R.id.test);
-
-        test.setText(user.getEmail());
+        test = (TextView) findViewById(R.id.user_Fullname);
+        String fullname = user.getDisplayName();
+        test.setText(fullname);
 
         logout = (Button) findViewById(R.id.logout_btn);
 

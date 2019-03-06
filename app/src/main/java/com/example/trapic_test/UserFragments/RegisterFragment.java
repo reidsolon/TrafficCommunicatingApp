@@ -57,6 +57,8 @@ public class RegisterFragment extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         FirebaseApp.initializeApp(RegisterFragment.this);
+
+
         firebaseAuth = FirebaseAuth.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registerfragment);
@@ -105,7 +107,6 @@ public class RegisterFragment extends AppCompatActivity {
             String id = dbRef.push().getKey();
             user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
             dbRef.child(id).setValue(user);
-
             firebaseAuth.createUserWithEmailAndPassword(email_reg, pw1_reg).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
