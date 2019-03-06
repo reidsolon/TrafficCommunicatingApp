@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "441861747207",
+    "firebase_url": "https://trapic-map.firebaseio.com",
+    "project_id": "trapic-map",
+    "storage_bucket": "trapic-map.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441861747207:android:dca21da57a660c09",
+        "android_client_info": {
+          "package_name": "com.example.trapic_test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441861747207-hngga7tvvthntdf4a3mjtae8rn47ipib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trapic_test",
+            "certificate_hash": "651d565055cb6d310ffdb0d79b4f2e9208208b1b"
+          }
+        },
+        {
+          "client_id": "441861747207-eus8o97epd7c3dm8k8cljblvvgiplvgb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc_Gp82BeSd-wnladxhLw2xCPx8W_jQwk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441861747207-eus8o97epd7c3dm8k8cljblvvgiplvgb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
