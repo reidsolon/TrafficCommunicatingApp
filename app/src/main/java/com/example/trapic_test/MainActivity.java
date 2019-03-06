@@ -20,10 +20,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
+
         if(auth.getCurrentUser() != null){
             finish();
             startActivity(new Intent(MainActivity.this, MainFragment.class));
         }
+
         regBtn = (Button) findViewById(R.id.register_link);
         logBtn = (Button) findViewById(R.id.login_link);
 

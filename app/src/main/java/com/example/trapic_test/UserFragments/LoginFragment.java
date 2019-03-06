@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.trapic_test.MainActivity;
 import com.example.trapic_test.MainFragment;
 import com.example.trapic_test.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -50,14 +51,16 @@ public class LoginFragment extends AppCompatActivity {
         email = (EditText) findViewById(R.id.log_email);
 
         dbRef = FirebaseDatabase.getInstance().getReference("User");
-
+        dialog = new ProgressDialog(LoginFragment.this);
+        dialog.setMessage("Logging in your account...");
         logBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 dialog = new ProgressDialog(getApplicationContext());
 
-                dialog.setMessage("Logging in your account...");
+
+
                 dialog.show();
+                loginValidation();
                 checkUser();
 
             }
@@ -82,10 +85,14 @@ public class LoginFragment extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), MainFragment.class));
 
                     }else{
-                        Toast.makeText(getApplicationContext(), "Login failed" ,Toast.LENGTH_LONG);
+                        dialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "Login failed" ,Toast.LENGTH_LONG).show();
                     }
                 }
             });
+        }else{
+            dialog.dismiss();
+            Toast.makeText(getApplicationContext(), "Login failed" ,Toast.LENGTH_LONG).show();
         }
 
         return false;
