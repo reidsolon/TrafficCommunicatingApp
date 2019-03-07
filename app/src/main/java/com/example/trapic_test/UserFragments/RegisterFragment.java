@@ -3,7 +3,6 @@ package com.example.trapic_test.UserFragments;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,11 +11,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.trapic_test.AccountActivation;
-import com.example.trapic_test.Database.User;
+import com.example.trapic_test.Model.User;
 import com.example.trapic_test.MainFragment;
 import com.example.trapic_test.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,8 +29,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.w3c.dom.Text;
-
 import java.util.regex.Pattern;
 
 public class RegisterFragment extends AppCompatActivity {
@@ -40,7 +36,7 @@ public class RegisterFragment extends AppCompatActivity {
     DatabaseReference dbRef;
     FirebaseAuth firebaseAuth;
     EditText uname, fname, lname, pw1, pw2, email;
-    Button reg_btn;
+    Button reg_btn, log_btn;
 
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
@@ -86,6 +82,14 @@ public class RegisterFragment extends AppCompatActivity {
 
             }
         });
+
+        log_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(new Intent(getApplicationContext(), LoginFragment.class));
+            }
+        });
     }
 
     public void initViews(){
@@ -94,6 +98,8 @@ public class RegisterFragment extends AppCompatActivity {
         pw1 = (EditText) findViewById(R.id.reg_pw1);
         pw2 = (EditText) findViewById(R.id.reg_pw2);
         email = (EditText) findViewById(R.id.reg_email);
+
+        log_btn = (Button) findViewById(R.id.login_link);
         reg_btn = (Button) findViewById(R.id.reg_btn);
     }
 

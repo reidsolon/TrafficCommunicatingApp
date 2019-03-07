@@ -99,7 +99,7 @@
                         android:paddingLeft="10dp"
                         android:fontFamily="@font/mooka"
                         android:layout_marginRight="5dp"
-                        android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+                        android:drawableRight="@drawable/ic_chevron_right_black_24dp22"
                         android:paddingRight="10dp"
                         android:background="@drawable/login_btn"
                         android:layout_height="wrap_content" />
@@ -111,7 +111,7 @@
                         android:textColor="#fff"
                         android:background="@drawable/reg_btn"
                         android:paddingLeft="10dp"
-                        android:drawableRight="@drawable/ic_chevron_right_black_24dp"
+                        android:drawableRight="@drawable/ic_chevron_right_black_24dp22"
                         android:paddingRight="10dp"
                         android:layout_width="wrap_content"
                         android:text="REGISTER AN ACCOUNT"
@@ -133,7 +133,7 @@
                 android:fontFamily="@font/mooka"
                 android:background="@drawable/guest_btn"
                 android:textColor="#fff"
-                android:drawableLeft="@drawable/ic_chevron_right_black_24dp"/>
+                android:drawableLeft="@drawable/ic_chevron_left_black_24dp"/>
         </LinearLayout>
 
     </LinearLayout>

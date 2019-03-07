@@ -25,7 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginFragment extends AppCompatActivity {
-    Button logBtn;
+    Button logBtn, regBtn;
     EditText pw, email;
     FirebaseAuth auth;
     ProgressDialog dialog;
@@ -46,7 +46,7 @@ public class LoginFragment extends AppCompatActivity {
         setContentView(R.layout.loginfragment);
 
         logBtn = (Button) findViewById(R.id.log_btn);
-
+        regBtn = (Button) findViewById(R.id.register_link);
         pw = (EditText) findViewById(R.id.log_pw);
         email = (EditText) findViewById(R.id.log_email);
 
@@ -63,6 +63,14 @@ public class LoginFragment extends AppCompatActivity {
                 loginValidation();
                 checkUser();
 
+            }
+        });
+
+        regBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(new Intent(getApplicationContext(), RegisterFragment.class));
             }
         });
 

@@ -1,47 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical"
+<RelativeLayout android:orientation="vertical"
     android:weightSum="100"
-
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
+        android:id="@+id/signout_section"
         android:weightSum="100"
-        android:layout_marginTop="2dp"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="50dp">
         
         <LinearLayout
-            android:background="@drawable/mainfragment_header"
             android:weightSum="100"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_width="250dp"
+            android:layout_width="300dp"
             android:layout_height="match_parent">
             <LinearLayout
                 android:layout_weight="55"
                 android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="match_parent">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#fff"
-                    android:layout_marginLeft="5dp"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/mooka"
-                    android:textSize="25sp"
-                    android:text="Welcome,"/>
-                <TextView
-                    android:id="@+id/user_Fullname"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="15sp"
-                    android:textColor="#fff"
-                    android:layout_marginLeft="5dp"
-                    android:text="Ray Anthony"/>
+
             </LinearLayout>
             <LinearLayout
                 android:layout_weight="25"
@@ -71,33 +53,37 @@
         </LinearLayout>
     </LinearLayout>
     <RelativeLayout
+        android:layout_below="@+id/signout_section"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
+            android:layout_above="@id/tablayout_holder"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
             </android.support.v4.view.ViewPager>
         </LinearLayout>
         <RelativeLayout
-            android:layout_marginBottom="5dp"
+            android:id="@+id/tablayout_holder"
             android:background="#1111"
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:gravity="center"
             android:layout_height="60dp">
 
-
-
             <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout"
                 android:layout_marginLeft="5dp"
+                android:scrollIndicators="none"
                 android:layout_marginRight="5dp"
+                app:tabIndicatorColor="#1fff"
                 android:layout_width="match_parent"
                 android:background="@drawable/tablayout_style"
-                android:layout_height="60dp">
+                android:layout_height="40dp">
 
             </android.support.design.widget.TabLayout>
 
@@ -105,4 +91,4 @@
     </RelativeLayout>
 
 
-</LinearLayout>
+</RelativeLayout>
