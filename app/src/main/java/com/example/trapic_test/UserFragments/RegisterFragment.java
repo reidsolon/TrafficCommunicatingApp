@@ -98,21 +98,18 @@ public class RegisterFragment extends AppCompatActivity {
         pw1 = (EditText) findViewById(R.id.reg_pw1);
         pw2 = (EditText) findViewById(R.id.reg_pw2);
         email = (EditText) findViewById(R.id.reg_email);
-
         log_btn = (Button) findViewById(R.id.login_link);
         reg_btn = (Button) findViewById(R.id.reg_btn);
     }
 
     public boolean addUser(){
         boolean validate = regValidation();
-        String fname_reg = fname.getText().toString();
-        String lname_reg = lname.getText().toString();
-        String email_reg = email.getText().toString();
-        String pw1_reg = pw1.getText().toString();
+        final String fname_reg = fname.getText().toString();
+        final String lname_reg = lname.getText().toString();
+        final String email_reg = email.getText().toString();
+        final String pw1_reg = pw1.getText().toString();
         if(validate) {
-            String id = dbRef.push().getKey();
-            user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
-            dbRef.child(id).setValue(user);
+
             firebaseAuth.createUserWithEmailAndPassword(email_reg, pw1_reg).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -149,7 +146,9 @@ public class RegisterFragment extends AppCompatActivity {
                         {
                             Log.d("RegisterFragment", "onComplete: " + e.getMessage());
                         }
-
+                        String id = firebaseAuth.getUid();
+                        user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
+                        dbRef.child(id).setValue(user);
 
                         FirebaseUser user = firebaseAuth.getCurrentUser();
                         user.sendEmailVerification();

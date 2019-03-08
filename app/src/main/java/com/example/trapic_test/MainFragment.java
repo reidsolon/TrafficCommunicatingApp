@@ -2,12 +2,14 @@ package com.example.trapic_test;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.trapic_test.Adapters.ViewPagerAdapter;
@@ -18,13 +20,16 @@ import com.example.trapic_test.MainFragments.ProfileFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainFragment extends AppCompatActivity {
     TextView test;
-    Button logout;
+    Button logout, postLink;
     FirebaseAuth auth;
+
     FirebaseDatabase db;
     DatabaseReference dbRefs;
     DataSnapshot dataSnapshot;
@@ -39,18 +44,29 @@ public class MainFragment extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
-
-
         setContentView(R.layout.mainfragment_layout);
         init();
+        String id = auth.getUid();
+        dbRefs = FirebaseDatabase.getInstance().getReference("User").child(id);
 
         if(auth.getCurrentUser() == null){
             finish();
             startActivity(new Intent(MainFragment.this, MainActivity.class));
         }
+
+        dbRefs.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String full_name = dataSnapshot.child("firstname").getValue().toString()+" "+dataSnapshot.child("lastname").getValue().toString();
+                test.setText(full_name);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -74,18 +90,28 @@ public class MainFragment extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
         });
+
+        postLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), PostActivity.class));
+            }
+        });
     }
 
     public void init(){
 
-        logout = (Button) findViewById(R.id.logout_btn);
-        auth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance();
-        dbRefs = db.getReference("User");
-
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        test = (TextView) findViewById(R.id.test);
+        postLink = (Button) findViewById(R.id.post_link);
+        logout = (Button) findViewById(R.id.logout_btn);
 
+
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseDatabase.getInstance();
+
+        dbRefs = db.getReference("User");
         FirebaseUser user = auth.getCurrentUser();
 
     }
