@@ -27,7 +27,9 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainFragment extends AppCompatActivity {
     TextView test;
-    Button logout, postLink;
+    Button logout;
+
+    LinearLayout postLink;
     FirebaseAuth auth;
 
     FirebaseDatabase db;
@@ -58,7 +60,7 @@ public class MainFragment extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String full_name = dataSnapshot.child("firstname").getValue().toString()+" "+dataSnapshot.child("lastname").getValue().toString();
-                test.setText(full_name);
+                test.setText("Hi, "+full_name);
             }
 
             @Override
@@ -94,7 +96,7 @@ public class MainFragment extends AppCompatActivity {
         postLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), PostActivity.class));
+                startActivity(new Intent(getApplicationContext(), SelectEvent.class));
             }
         });
     }
@@ -104,7 +106,7 @@ public class MainFragment extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         test = (TextView) findViewById(R.id.test);
-        postLink = (Button) findViewById(R.id.post_link);
+        postLink = (LinearLayout) findViewById(R.id.post_link);
         logout = (Button) findViewById(R.id.logout_btn);
 
 

@@ -1,35 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
+    android:orientation="vertical"
+    android:background="#f2f2f2"
     android:id="@+id/postevent_layout"
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <LinearLayout
-        android:layout_margin="20dp"
+        android:id="@+id/caption_holder"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="400dp">
-        <EditText
-            android:id="@+id/event_caption"
-            android:layout_width="match_parent"
-            android:hint="Event Caption"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/event_type"
-            android:hint="Event Type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/event_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Event Place"/>
+    <LinearLayout
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
 
-        <Button
-            android:id="@+id/postBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="POST"/>
+        <LinearLayout
+            android:layout_weight="60"
+            android:weightSum="100"
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:orientation="horizontal"
+                    android:weightSum="100"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="5dp"
+                        android:background="#FF000F"
+                        android:layout_height="match_parent">
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:background="#fff"
+                        android:gravity="center"
+                        android:layout_height="match_parent">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_location_on_black_24dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:background="#fff"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/event_location"
+                            android:textSize="15sp"
+                            android:textColor="#111"
+                            android:paddingRight="20dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="My Location Here"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+    <LinearLayout
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+
+        <LinearLayout
+            android:layout_weight="60"
+            android:weightSum="100"
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:orientation="horizontal"
+                    android:weightSum="100"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="5dp"
+                        android:background="#FF000F"
+                        android:layout_height="match_parent">
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:background="#fff"
+                        android:gravity="center"
+                        android:layout_height="match_parent">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_location_on_black_24dp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:background="#fff"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/event_type"
+                            android:textSize="15sp"
+                            android:textColor="#111"
+                            android:paddingRight="20dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Event Category"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_marginLeft="20dp"
+            android:background="#FF000F"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="5dp"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:background="@drawable/postevent_inputholder"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <EditText
+                    android:id="@+id/event_caption"
+                    android:textColor="#111"
+                    android:textColorHint="#111"
+                    android:layout_width="match_parent"
+                    android:hint="Event Caption"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_below="@+id/caption_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="50"
+            android:layout_width="0dp"
+            android:layout_height="200dp">
+            <ImageView
+                android:id="@+id/image_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_weight="50"
+            android:layout_width="0dp"
+            android:layout_height="200dp">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/image_2"/>
+        </LinearLayout>
+    </LinearLayout>
+    <!--Buttons Area-->
+    <LinearLayout
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/post_btn"
+            android:layout_width="50dp"
+            android:gravity="center"
+            android:background="@drawable/camera_designbtn"
+            android:layout_height="50dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:src="@drawable/ic_camera_enhance_black_24dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/camera_btn"
+            android:layout_width="50dp"
+            android:gravity="center"
+            android:background="@drawable/camera_designbtn"
+            android:layout_height="50dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:src="@drawable/ic_camera_enhance_black_24dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

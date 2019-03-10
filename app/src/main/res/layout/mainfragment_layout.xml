@@ -22,17 +22,15 @@
                 android:layout_weight="55"
                 android:orientation="vertical"
                 android:layout_width="0dp"
+                android:gravity="center"
                 android:layout_height="match_parent">
                 <TextView
+                    android:textColor="#111"
                     android:id="@+id/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/app_name"/>
-                <Button
-                    android:id="@+id/post_link"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
+                    android:text="@string/Loading_name"/>
+
             </LinearLayout>
             <LinearLayout
                 android:layout_weight="25"
@@ -65,39 +63,58 @@
         android:layout_below="@+id/signout_section"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_above="@id/tablayout_holder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+
+
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewPager"
+                android:layout_above="@id/tablayout_holder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
             </android.support.v4.view.ViewPager>
-        </LinearLayout>
-        <RelativeLayout
-            android:id="@+id/tablayout_holder"
-            android:background="#1111"
-            android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:layout_height="60dp">
 
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabLayout"
-                android:layout_marginLeft="5dp"
-                android:scrollIndicators="none"
-                android:layout_marginRight="5dp"
-                app:tabIndicatorColor="#1fff"
+
+                <FrameLayout
+                    android:id="@+id/tablayout_holder"
+                    android:background="#1111"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    android:layout_height="60dp">
+
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/tabLayout"
+                        android:scrollIndicators="none"
+                        app:tabIndicatorColor="#1fff"
+                        android:layout_width="match_parent"
+                        android:background="@drawable/tablayout_style"
+                        android:layout_height="match_parent">
+
+                    </android.support.design.widget.TabLayout>
+                </FrameLayout>
+
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:background="@drawable/tablayout_style"
-                android:layout_height="40dp">
-
-            </android.support.design.widget.TabLayout>
+                android:layout_marginBottom="35dp"
+                android:gravity="center"
+                android:layout_alignParentBottom="true"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:id="@+id/post_link"
+                    android:layout_width="70dp"
+                    android:gravity="center"
+                    android:background="@drawable/camera_designbtn"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="60dp">
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_camera_enhance_black_24dp"/>
+                </LinearLayout>
+            </LinearLayout>
 
         </RelativeLayout>
-    </RelativeLayout>
-
 
 </RelativeLayout>
