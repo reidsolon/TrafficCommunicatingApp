@@ -35,7 +35,7 @@ public class SelectEvent extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostActivity.class);
-                intent.putExtra("Category", "Category1_test");
+                intent.putExtra("Category", "Construction Area");
                 startActivity(intent);
             }
         });
@@ -44,7 +44,7 @@ public class SelectEvent extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostActivity.class);
-                intent.putExtra("Category", "Category2_test");
+                intent.putExtra("Category", "Congestion");
                 startActivity(intent);
             }
         });
@@ -53,7 +53,7 @@ public class SelectEvent extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostActivity.class);
-                intent.putExtra("Category", "Category3_test");
+                intent.putExtra("Category", "Traffic Jams");
             }
         });
 
@@ -61,7 +61,7 @@ public class SelectEvent extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostActivity.class);
-                intent.putExtra("Category", "Category4_test");
+                intent.putExtra("Category", "Road Crash");
                 startActivity(intent);
             }
         });

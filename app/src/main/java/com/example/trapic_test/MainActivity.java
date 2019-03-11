@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import com.example.trapic_test.UserFragments.LoginFragment;
 import com.example.trapic_test.UserFragments.RegisterFragment;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FirebaseApp.initializeApp(MainActivity.this);
         auth = FirebaseAuth.getInstance();
 
         if(auth.getCurrentUser() != null){

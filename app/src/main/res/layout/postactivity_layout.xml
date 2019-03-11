@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     android:orientation="vertical"
-    android:background="#f2f2f2"
+    android:background="@drawable/background_postevent"
     android:id="@+id/postevent_layout"
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
+        android:layout_marginTop="40dp"
         android:id="@+id/caption_holder"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -17,7 +18,7 @@
         android:layout_height="70dp">
 
         <LinearLayout
-            android:layout_weight="60"
+            android:layout_weight="100"
             android:weightSum="100"
             android:orientation="horizontal"
             android:layout_width="0dp"
@@ -32,7 +33,7 @@
                     android:layout_marginLeft="20dp"
                     android:orientation="horizontal"
                     android:weightSum="100"
-                    android:layout_width="match_parent"
+                    android:layout_width="300dp"
                     android:layout_height="match_parent">
 
                     <LinearLayout
@@ -210,7 +211,7 @@
 
         <LinearLayout
             android:id="@+id/post_btn"
-            android:layout_width="50dp"
+            android:layout_width="100dp"
             android:gravity="center"
             android:background="@drawable/camera_designbtn"
             android:layout_height="50dp">
@@ -221,7 +222,7 @@
         </LinearLayout>
         <LinearLayout
             android:id="@+id/camera_btn"
-            android:layout_width="50dp"
+            android:layout_width="100dp"
             android:gravity="center"
             android:background="@drawable/camera_designbtn"
             android:layout_height="50dp">

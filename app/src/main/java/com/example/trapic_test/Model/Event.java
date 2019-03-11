@@ -8,16 +8,19 @@ public class Event {
     private String event_caption;
     private String event_type;
     private String event_location;
+    private String event_image;
     private String currentTime = Calendar.getInstance().getTime().toString();
 
     public Event(){
 
     }
 
-    public Event(String caption, String type, String location){
+    public Event(String caption, String type, String location, String image){
         this.event_caption = caption;
         this.event_type = type;
         this.event_location = location;
+        this.event_image = image;
+
     }
 
     public String getEvent_caption() {
@@ -34,5 +37,9 @@ public class Event {
 
     public String getCurrentTime() {
         return currentTime;
+    }
+
+    public String getEvent_image() {
+        return event_image;
     }
 }

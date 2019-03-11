@@ -1,6 +1,7 @@
 package com.example.trapic_test;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,16 +12,20 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.trapic_test.Model.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,6 +34,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -38,10 +48,14 @@ public class PostActivity extends AppCompatActivity {
     //vars
     DatabaseReference dbRefs;
     FirebaseAuth auth;
+    FirebaseUser firebaseUser;
+    FirebaseStorage fireStore;
+    StorageReference storageReference;
+    StorageTask uploadTask;
+
     RelativeLayout layout;
     TextView type, location;
     LinearLayout postBtn, cameraBtn;
-    FirebaseUser firebaseUser;
     EditText caption ;
     ImageView img1,img2;
     Uri uri;
@@ -60,6 +74,7 @@ public class PostActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         firebaseUser = auth.getCurrentUser();
         dbRefs = FirebaseDatabase.getInstance().getReference("PostedEvents");
+        storageReference = FirebaseStorage.getInstance().getReference("postimage");
 
         initView();
 
@@ -69,12 +84,12 @@ public class PostActivity extends AppCompatActivity {
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if(validatePost()){
-//                    dialog.show();
-//                    addEvent();
-//                }else{
-//                    Toast.makeText(getApplicationContext(), "Validation Failed", Toast.LENGTH_LONG).show();
-//                }
+                if(validatePost()){
+                    dialog.show();
+                    addEvent();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Validation Failed", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -82,7 +97,6 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
                 startActivityForResult(intent, CAMERA_RESULT_CODE);
             }
         });
@@ -96,12 +110,7 @@ public class PostActivity extends AppCompatActivity {
         if(requestCode == CAMERA_RESULT_CODE && resultCode == RESULT_OK){
 
             uri = data.getData();
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-
-            Picasso.load(uri).into(img1);
-
-            img1.setImageURI(uri);
-            img2.setImageBitmap(bitmap);
+            Picasso.with(PostActivity.this).load(uri).fit().into(img1);
         }
     }
 
@@ -112,34 +121,37 @@ public class PostActivity extends AppCompatActivity {
         type =  findViewById(R.id.event_type);
         postBtn =  findViewById(R.id.post_btn);
         cameraBtn = findViewById(R.id.camera_btn);
-
         img1 = findViewById(R.id.image_1);
         img2 = findViewById(R.id.image_2);
     }
 
     public void addEvent(){
-        String caption_txt = caption.getText().toString();
-        String type_txt = type.getText().toString();
-        String location_txt = location.getText().toString();
+        final String caption_txt = caption.getText().toString();
+        final String type_txt = type.getText().toString();
+        final String location_txt = location.getText().toString();
+        final StorageReference reference = storageReference.child(System.currentTimeMillis()+"."+getFileExtension(uri));
 
-        Event event = new Event(caption_txt, type_txt, location_txt);
-        String id = auth.getUid();
-        String post_id = dbRefs.push().getKey();
+        uploadTask = reference.putFile(uri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Event event = new Event(caption_txt, type_txt, location_txt, taskSnapshot.getStorage().getDownloadUrl().toString());
+                        String id = auth.getUid();
+                        String post_id = dbRefs.push().getKey();
+                        dbRefs.child(id).child(post_id).setValue(event);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-        dbRefs.child(id).child(post_id).setValue(event).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    dialog.dismiss();
-                    caption.setText("");
-                    location.setText("");
-                    Toast.makeText(getApplicationContext(), "Successfully posted!", Toast.LENGTH_LONG);
-                }else{
-                    dialog.dismiss();
-                    Toast.makeText(getApplicationContext(), "Posting unsuccessful!", Toast.LENGTH_LONG);
-                }
-            }
-        });
+                    }
+                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    }
+                });
+
 
     }
     public boolean validatePost(){
@@ -150,6 +162,7 @@ public class PostActivity extends AppCompatActivity {
 
         boolean caption_bol;
         boolean location_bol;
+        boolean type_bol;
 
         if(caption_txt.equals("")){
             caption.setError("Enter something about the event");
@@ -166,12 +179,28 @@ public class PostActivity extends AppCompatActivity {
             location_bol = true;
         }
 
-        if(caption_bol && location_bol){
+        if(type_txt.equals("")){
+            type.setText("Select type!");
+            type_bol = false;
+        }else{
+            type_bol= true;
+        }
+
+
+
+
+        if(caption_bol && location_bol && type_bol){
             return true;
         }else{
             return false;
         }
 
+    }
+
+    public String getFileExtension(Uri uri){
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
 

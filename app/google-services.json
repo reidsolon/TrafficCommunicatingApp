@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "441861747207-vd1u1np7efigelvhng7elh7cf9qht3on.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trapic_test",
+            "certificate_hash": "6642e9f32e487c388e80325408e7a4d55adf7d22"
+          }
+        },
+        {
           "client_id": "441861747207-eus8o97epd7c3dm8k8cljblvvgiplvgb.apps.googleusercontent.com",
           "client_type": 3
         }
