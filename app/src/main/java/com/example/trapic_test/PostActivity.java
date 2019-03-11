@@ -110,7 +110,7 @@ public class PostActivity extends AppCompatActivity {
         if(requestCode == CAMERA_RESULT_CODE && resultCode == RESULT_OK){
 
             uri = data.getData();
-            Picasso.with(PostActivity.this).load(uri).fit().into(img1);
+
         }
     }
 
@@ -139,6 +139,9 @@ public class PostActivity extends AppCompatActivity {
                         String id = auth.getUid();
                         String post_id = dbRefs.push().getKey();
                         dbRefs.child(id).child(post_id).setValue(event);
+                        dialog.dismiss();
+
+//                        Picasso.with(PostActivity.this).load(uri).fit().into(img1);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

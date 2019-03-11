@@ -10,14 +10,30 @@
         android:id="@+id/signout_section"
         android:weightSum="100"
         android:layout_width="match_parent"
-        android:layout_height="50dp">
-        
+        android:layout_height="60dp">
+
         <LinearLayout
             android:weightSum="100"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_width="300dp"
+            android:layout_width="250dp"
+            android:background="@drawable/mainfragment_nameholder"
+
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
             android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_weight="20"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:src="@drawable/camera_designbtn"
+                    android:layout_height="50dp" />
+
+            </LinearLayout>
             <LinearLayout
                 android:layout_weight="55"
                 android:orientation="vertical"
@@ -25,7 +41,7 @@
                 android:gravity="center"
                 android:layout_height="match_parent">
                 <TextView
-                    android:textColor="#111"
+                    android:textColor="#fff"
                     android:id="@+id/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -37,13 +53,6 @@
                 android:gravity="center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent">
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/profile_pic"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    app:civ_border_color="#fff"
-                    app:civ_border_width="5dp"
-                    />
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
@@ -97,7 +106,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_marginBottom="35dp"
+                android:layout_marginBottom="30dp"
                 android:gravity="center"
                 android:layout_alignParentBottom="true"
                 android:layout_height="wrap_content">
