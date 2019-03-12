@@ -2,6 +2,7 @@ package com.example.trapic_test;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -34,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -43,13 +45,16 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
+
 public class PostActivity extends AppCompatActivity {
 
     //vars
     DatabaseReference dbRefs;
     FirebaseAuth auth;
     FirebaseUser firebaseUser;
-    FirebaseStorage fireStore;
+    FirebaseStorage fireStorage;
+    FirebaseFirestore firestore;
     StorageReference storageReference;
     StorageTask uploadTask;
 
@@ -75,6 +80,8 @@ public class PostActivity extends AppCompatActivity {
         firebaseUser = auth.getCurrentUser();
         dbRefs = FirebaseDatabase.getInstance().getReference("PostedEvents");
         storageReference = FirebaseStorage.getInstance().getReference("postimage");
+        fireStorage = FirebaseStorage.getInstance();
+        firestore = FirebaseFirestore.getInstance();
 
         initView();
 
@@ -109,9 +116,20 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CAMERA_RESULT_CODE && resultCode == RESULT_OK){
 
-            uri = data.getData();
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            uri = getImageUri(this, photo);
+            Picasso.with(PostActivity.this).load(uri).fit().into(img1);
 
         }
+    }
+
+    public Uri getImageUri(Context ctx, Bitmap bmp){
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(ctx.getContentResolver(), bmp, "Title", null);
+        return Uri.parse(path);
+
     }
 
     public void initView(){
@@ -135,13 +153,11 @@ public class PostActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Event event = new Event(caption_txt, type_txt, location_txt, taskSnapshot.getStorage().getDownloadUrl().toString());
-                        String id = auth.getUid();
-                        String post_id = dbRefs.push().getKey();
-                        dbRefs.child(id).child(post_id).setValue(event);
-                        dialog.dismiss();
 
-//                        Picasso.with(PostActivity.this).load(uri).fit().into(img1);
+                        String id = auth.getUid();
+                        Event event = new Event(caption_txt, type_txt, location_txt, taskSnapshot.getStorage().getDownloadUrl().toString(), id);
+
+                    firestore.collection("Posts").document().set(event);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

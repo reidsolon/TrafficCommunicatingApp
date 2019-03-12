@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.trapic_test.AccountActivation;
@@ -18,6 +20,8 @@ import com.example.trapic_test.Model.User;
 import com.example.trapic_test.MainFragment;
 import com.example.trapic_test.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
@@ -28,14 +32,21 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
 
 public class RegisterFragment extends AppCompatActivity {
     ProgressDialog progressBar;
     DatabaseReference dbRef;
     FirebaseAuth firebaseAuth;
+    FirebaseFirestore firestore;
     EditText uname, fname, lname, pw1, pw2, email;
+    LinearLayout layout;
     Button reg_btn, log_btn;
 
     private static final Pattern PASSWORD_PATTERN =
@@ -54,7 +65,7 @@ public class RegisterFragment extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         FirebaseApp.initializeApp(RegisterFragment.this);
 
-
+        firestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registerfragment);
@@ -66,6 +77,7 @@ public class RegisterFragment extends AppCompatActivity {
         }
 
         progressBar = new ProgressDialog(RegisterFragment.this);
+        progressBar.setTitle("Creating your account");
         progressBar.setMessage("Registering User...");
 
         dbRef = FirebaseDatabase.getInstance().getReference("User");
@@ -74,11 +86,8 @@ public class RegisterFragment extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
                 progressBar.show();
-
-                boolean added = addUser();
-
+                addUser();
 
             }
         });
@@ -86,13 +95,16 @@ public class RegisterFragment extends AppCompatActivity {
         log_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 finish();
                 startActivity(new Intent(getApplicationContext(), LoginFragment.class));
+
             }
         });
     }
 
     public void initViews(){
+
         fname = (EditText) findViewById(R.id.reg_fname);
         lname = (EditText) findViewById(R.id.reg_lname);
         pw1 = (EditText) findViewById(R.id.reg_pw1);
@@ -100,19 +112,23 @@ public class RegisterFragment extends AppCompatActivity {
         email = (EditText) findViewById(R.id.reg_email);
         log_btn = (Button) findViewById(R.id.login_link);
         reg_btn = (Button) findViewById(R.id.reg_btn);
+
     }
 
     public boolean addUser(){
+
         boolean validate = regValidation();
         final String fname_reg = fname.getText().toString();
         final String lname_reg = lname.getText().toString();
         final String email_reg = email.getText().toString();
         final String pw1_reg = pw1.getText().toString();
+
         if(validate) {
 
             firebaseAuth.createUserWithEmailAndPassword(email_reg, pw1_reg).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+
                     if (task.isSuccessful()) {
 
                         try
@@ -148,15 +164,27 @@ public class RegisterFragment extends AppCompatActivity {
                         }
                         String id = firebaseAuth.getUid();
                         user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
-                        dbRef.child(id).setValue(user);
+                        firestore.collection("Users").document(id).set(user)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(getApplicationContext(), "Account Registered Successfully", Toast.LENGTH_LONG).show();
+                                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                                        user.sendEmailVerification();
+                                        Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
+                                        activation.putExtra("Email" , email.getText().toString());
+                                        finish();
+                                        startActivity(activation);
+                                        progressBar.dismiss();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
 
-                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                        user.sendEmailVerification();
-                        Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
-                        activation.putExtra("Email" , email.getText().toString());
-                        finish();
-                        startActivity(activation);
-                        progressBar.dismiss();
+                            }
+                        });
+
+
                     } else {
                         progressBar.dismiss();
                         Toast.makeText(RegisterFragment.this, "Not added!", Toast.LENGTH_LONG).show();
@@ -166,6 +194,7 @@ public class RegisterFragment extends AppCompatActivity {
 
             return true;
         }else{
+
             progressBar.dismiss();
             Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
 
