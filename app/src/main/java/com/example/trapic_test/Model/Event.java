@@ -44,4 +44,8 @@ public class Event {
     public String getEvent_image() {
         return event_image;
     }
+
+    public String getUser_id() {
+        return user_id;
+    }
 }

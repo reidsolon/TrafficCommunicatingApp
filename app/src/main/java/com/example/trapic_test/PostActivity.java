@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -60,8 +61,9 @@ public class PostActivity extends AppCompatActivity {
 
     RelativeLayout layout;
     TextView type, location;
-    LinearLayout postBtn, cameraBtn;
+    LinearLayout postBtn, cameraBtn, view;
     EditText caption ;
+
     ImageView img1,img2;
     Uri uri;
     ProgressDialog dialog;
@@ -91,11 +93,22 @@ public class PostActivity extends AppCompatActivity {
         postBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                dialog.show();
+
                 if(validatePost()){
-                    dialog.show();
                     addEvent();
                 }else{
-                    Toast.makeText(getApplicationContext(), "Validation Failed", Toast.LENGTH_LONG).show();
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+
+                            Toast.makeText(getApplicationContext(), "Something is empty!", Toast.LENGTH_LONG).show();
+                        }
+                    }, 2000);
                 }
             }
         });
@@ -157,7 +170,29 @@ public class PostActivity extends AppCompatActivity {
                         String id = auth.getUid();
                         Event event = new Event(caption_txt, type_txt, location_txt, taskSnapshot.getStorage().getDownloadUrl().toString(), id);
 
-                    firestore.collection("Posts").document().set(event);
+                    firestore.collection("Posts").document().set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            dialog.dismiss();
+                            Snackbar.make(layout, "Event Posted Successfully" ,Snackbar.LENGTH_LONG).show();
+
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startActivity(new Intent(getApplicationContext(), MainFragment.class));
+                                       finish();
+                                }
+                            }, 1000);
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            dialog.dismiss();
+                            Toast.makeText(getApplicationContext(), "Failure to post event", Toast.LENGTH_LONG).show();
+                        }
+                    });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -180,6 +215,7 @@ public class PostActivity extends AppCompatActivity {
         String location_txt = location.getText().toString();
 
         boolean caption_bol;
+        boolean uri_bol;
         boolean location_bol;
         boolean type_bol;
 
@@ -205,10 +241,17 @@ public class PostActivity extends AppCompatActivity {
             type_bol= true;
         }
 
+        if(uri == null){
+            Toast.makeText(getApplicationContext(), "You do not have specify the photo!", Toast.LENGTH_LONG).show();
+            uri_bol = false;
+        }else{
+            uri_bol = true;
+        }
 
 
 
-        if(caption_bol && location_bol && type_bol){
+
+        if(caption_bol && location_bol && type_bol && uri_bol){
             return true;
         }else{
             return false;
