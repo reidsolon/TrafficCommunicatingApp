@@ -30,6 +30,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:16.0.1'
 
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
+    implementation 'com.firebaseui:firebase-ui-firestore:4.1.0'
 
     //picasso
     implementation 'com.squareup.picasso:picasso:2.5.2'

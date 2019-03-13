@@ -1,9 +1,7 @@
 package com.example.trapic_test.Adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,51 +10,66 @@ import android.widget.TextView;
 
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-
-public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedImageAdapter> {
-
-    private Context ctx;
-    private List<Event> feed;
-
-    public FeedAdapter(Context ctx, List<Event> feed){
-
-        this.ctx = ctx;
-        this.feed = feed;
-
+public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.FeedHolder> {
+    View v;
+    String name;
+    /**
+     * Create a new RecyclerView adapter that listens to a Firestore Query.  See {@link
+     * FirestoreRecyclerOptions} for configuration options.
+     *
+     * @param options
+     */
+    public FeedAdapter(@NonNull FirestoreRecyclerOptions<Event> options) {
+        super(options);
     }
+
     @NonNull
     @Override
-    public FeedImageAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(ctx).inflate(R.layout.feed_item, parent, false);
-
-        return new FeedImageAdapter(view);
+    public FeedHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+         v = LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item, parent ,false);
+        return new FeedHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FeedImageAdapter holder, int position) {
-        Event event = feed.get(position);
+    protected void onBindViewHolder(@NonNull final FeedHolder holder, int position, @NonNull final Event model) {
 
-        holder.user_name.setText(event.getUser_id());
+        FirebaseFirestore firebaseFirestore;
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        String id = model.getUser_id();
+        DocumentReference documentReference = firebaseFirestore.collection("Users").document(id);
 
-        Picasso.with(ctx).load(event.getEvent_image()).fit().centerCrop().into(holder.post_img);
+        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                holder.userName.setText(documentSnapshot.getString("eMail"));
+
+                Picasso.with(v.getContext()).load(model.getEvent_image()).into(holder.imageView);
+            }
+        });
+
+
+
     }
 
-    @Override
-    public int getItemCount() {
-        return feed.size();
-    }
+    public class FeedHolder extends RecyclerView.ViewHolder {
 
-    public class FeedImageAdapter extends RecyclerView.ViewHolder{
-        TextView user_name;
-        ImageView post_img;
-        public FeedImageAdapter(View itemView) {
+        TextView userName;
+        ImageView imageView;
+
+        public FeedHolder(View itemView) {
             super(itemView);
-
-            user_name = itemView.findViewById(R.id.posted_by);
-            post_img = itemView.findViewById(R.id.post_img);
+            userName = itemView.findViewById(R.id.posted_by);
+            imageView = itemView.findViewById(R.id.post_img);
         }
     }
 }

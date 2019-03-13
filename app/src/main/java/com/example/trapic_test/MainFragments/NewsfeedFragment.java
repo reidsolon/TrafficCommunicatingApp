@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import com.example.trapic_test.Adapters.FeedAdapter;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +25,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -39,6 +42,7 @@ public class NewsfeedFragment extends Fragment {
     private FirebaseFirestore firebaseFirestore;
 
     private DocumentReference documentReference;
+    private CollectionReference collectionReference;
 
     private List<Event> list;
     View view;
@@ -53,26 +57,7 @@ public class NewsfeedFragment extends Fragment {
         view = inflater.inflate(R.layout.newsfeed_layout, container, false);
 
         initViews();
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-
-        documentReference = firebaseFirestore.collection("Posts").document();
-
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                Event event = documentSnapshot.toObject(Event.class);
-
-                list.add(event);
-
-                feedAdapter = new FeedAdapter(getContext(), list);
-
-                recyclerView.setAdapter(feedAdapter);
-            }
-
-        });
-
+        setupRecycleView();
         return view;
     }
 
@@ -81,5 +66,31 @@ public class NewsfeedFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         list = new ArrayList<>();
+
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        collectionReference = firebaseFirestore.collection("Posts");
+    }
+
+    public void setupRecycleView(){
+        Query query = collectionReference.orderBy("currentTime", Query.Direction.ASCENDING);
+
+        FirestoreRecyclerOptions<Event> options = new FirestoreRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
+
+        feedAdapter = new FeedAdapter(options);
+
+        recyclerView.setAdapter(feedAdapter);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        feedAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        feedAdapter.stopListening();
     }
 }

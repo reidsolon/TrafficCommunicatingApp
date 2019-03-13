@@ -146,6 +146,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     public void initView(){
+
         layout = findViewById(R.id.postevent_layout);
         caption =  findViewById(R.id.event_caption);
         location =  findViewById(R.id.event_location);
@@ -154,6 +155,7 @@ public class PostActivity extends AppCompatActivity {
         cameraBtn = findViewById(R.id.camera_btn);
         img1 = findViewById(R.id.image_1);
         img2 = findViewById(R.id.image_2);
+
     }
 
     public void addEvent(){
