@@ -38,6 +38,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedImageAdapt
     @Override
     public void onBindViewHolder(@NonNull FeedImageAdapter holder, int position) {
         Event event = feed.get(position);
+
+        holder.user_name.setText(event.getUser_id());
+
         Picasso.with(ctx).load(event.getEvent_image()).fit().centerCrop().into(holder.post_img);
     }
 

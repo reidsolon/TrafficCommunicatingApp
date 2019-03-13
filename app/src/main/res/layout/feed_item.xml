@@ -34,8 +34,8 @@
         </LinearLayout>
     </LinearLayout>
 
-
     <LinearLayout
+        android:id="@+id/img_holder"
         android:layout_below="@+id/name_area"
         android:layout_width="match_parent"
         android:layout_height="300dp">
@@ -45,5 +45,47 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+    </LinearLayout>
+    <LinearLayout
+        android:weightSum="3"
+        android:layout_below="@+id/img_holder"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+            
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
