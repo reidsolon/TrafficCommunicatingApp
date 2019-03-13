@@ -6,60 +6,167 @@
 
     <LinearLayout
         android:weightSum="100"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
+            android:layout_margin="50dp"
             android:id="@+id/cat_1"
-            android:layout_weight="50"
-            android:layout_width="0dp"
-            android:gravity="center"
-            android:layout_height="140dp">
-            <ImageView
-                android:src="@drawable/trapic_logo"
-                android:layout_width="100dp"
-                android:layout_height="100dp" />
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:background="@drawable/eventcat1"
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+            <LinearLayout
+                android:layout_weight="35"
+                android:layout_margin="10dp"
+                android:background="@drawable/eventcat_holder"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:src="@drawable/trapic_logo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_weight="75"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#fff"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:text="Construction Area"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+
         </LinearLayout>
         <LinearLayout
+            android:layout_marginRight="50dp"
+            android:layout_marginLeft="50dp"
             android:id="@+id/cat_2"
-            android:layout_weight="50"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="140dp">
-            <ImageView
-                android:src="@drawable/trapic_logo"
-                android:layout_width="100dp"
-                android:layout_height="100dp" />
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:background="@drawable/eventcat2"
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+            <LinearLayout
+                android:layout_weight="35"
+                android:layout_margin="10dp"
+                android:background="@drawable/eventcat_holder"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:src="@drawable/trapic_logo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_weight="75"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#fff"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:text="Congestion"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:weightSum="100"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
             android:id="@+id/cat_3"
-            android:layout_weight="50"
-            android:layout_width="0dp"
-            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:background="@drawable/eventcat3"
+            android:layout_width="match_parent"
             android:layout_height="100dp">
-            <ImageView
-                android:src="@drawable/trapic_logo"
-                android:layout_width="100dp"
-                android:layout_height="100dp" />
+            <LinearLayout
+                android:layout_weight="35"
+                android:layout_margin="10dp"
+                android:background="@drawable/eventcat_holder"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:src="@drawable/trapic_logo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_weight="75"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#fff"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:text="Traffic Jam"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+
         </LinearLayout>
         <LinearLayout
+            android:layout_margin="50dp"
             android:id="@+id/cat_4"
-            android:layout_weight="50"
-            android:layout_width="0dp"
-            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:background="@drawable/eventcat1"
+            android:layout_width="match_parent"
             android:layout_height="100dp">
-            <ImageView
-                android:src="@drawable/trapic_logo"
-                android:layout_width="100dp"
-                android:layout_height="100dp" />
+            <LinearLayout
+                android:layout_weight="35"
+                android:layout_margin="10dp"
+                android:background="@drawable/eventcat_holder"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:src="@drawable/trapic_logo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_weight="75"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#fff"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:text="Road Crash"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>
