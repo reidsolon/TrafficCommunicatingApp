@@ -26,6 +26,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import java.util.Collection;
 
 public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.FeedHolder> {
@@ -77,13 +79,16 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
         Picasso.with(ctx).load(model.getEvent_image()).fit().into(holder.imageView);
         holder.caption.setText(model.getEvent_caption());
         final DocumentReference documentReference = firebaseFirestore.collection("Users").document(id);
-
+        holder.type.setText(model.getEvent_type());
+        holder.timestamp.setText(model.getCurrentTime());
+        holder.location.setText(model.getEvent_location());
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 holder.email.setText(documentSnapshot.getString("eMail"));
                 String fullname = documentSnapshot.get("firstname")+" "+documentSnapshot.getString("lastname");
-                holder.user_name.setText(fullname);
+                holder.user_name.setText(WordUtils.capitalize(fullname));
+
             }
         });
 
@@ -95,11 +100,14 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
 
     public class FeedHolder extends RecyclerView.ViewHolder {
 
-        TextView email, user_name, caption;
+        TextView email, user_name, caption, type, timestamp, location;
         ImageView imageView;
 
         public FeedHolder(View itemView) {
             super(itemView);
+            location = itemView.findViewById(R.id.location);
+            timestamp = itemView.findViewById(R.id.timestamp);
+            type = itemView.findViewById(R.id.event_type);
             user_name = itemView.findViewById(R.id.user_name);
             email = itemView.findViewById(R.id.posted_by);
             imageView = itemView.findViewById(R.id.post_img);

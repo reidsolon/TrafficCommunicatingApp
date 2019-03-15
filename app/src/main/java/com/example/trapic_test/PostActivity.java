@@ -140,7 +140,7 @@ public class PostActivity extends AppCompatActivity {
     public Uri getImageUri(Context ctx, Bitmap bmp){
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(ctx.getContentResolver(), bmp, "Title", null);
         return Uri.parse(path);
 
