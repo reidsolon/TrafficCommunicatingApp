@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.trapic_test.Model.Event;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -57,7 +58,7 @@ public class PostActivity extends AppCompatActivity {
     FirebaseStorage fireStorage;
     FirebaseFirestore firestore;
     StorageReference storageReference;
-    StorageTask uploadTask;
+    Task<Uri> uploadTask;
 
     RelativeLayout layout;
     TextView type, location;
@@ -164,15 +165,23 @@ public class PostActivity extends AppCompatActivity {
         final String location_txt = location.getText().toString();
         final StorageReference reference = storageReference.child(System.currentTimeMillis()+"."+getFileExtension(uri));
 
-        uploadTask = reference.putFile(uri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+        uploadTask =  reference.putFile(uri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
 
-                        String id = auth.getUid();
-                        Event event = new Event(caption_txt, type_txt, location_txt, taskSnapshot.getStorage().getDownloadUrl().toString(), id);
+                if(!task.isSuccessful()){
+                    throw task.getException();
+                }
+                return reference.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
 
-                    firestore.collection("Posts").document().set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                String id = auth.getUid();
+                Uri uri2 = task.getResult();
+                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id);
+                firestore.collection("Posts").document().set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             dialog.dismiss();
@@ -201,12 +210,51 @@ public class PostActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
 
                     }
-                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    }
                 });
+
+
+//                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//
+//                        String id = auth.getUid();
+//                        Event event = new Event(caption_txt, type_txt, location_txt, taskSnapshot.getStorage().getDownloadUrl().toString(), id);
+//
+//                        firestore.collection("Posts").document().set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void aVoid) {
+//                            dialog.dismiss();
+//                            Snackbar.make(layout, "Event Posted Successfully" ,Snackbar.LENGTH_LONG).show();
+//
+//                            Handler handler = new Handler();
+//                            handler.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    startActivity(new Intent(getApplicationContext(), MainFragment.class));
+//                                       finish();
+//                                }
+//                            }, 1000);
+//
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            dialog.dismiss();
+//                            Toast.makeText(getApplicationContext(), "Failure to post event", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//
+//                    }
+//                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+//
+//                    }
+//                });
 
 
     }

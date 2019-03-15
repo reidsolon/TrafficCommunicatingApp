@@ -3,6 +3,7 @@ package com.example.trapic_test.UserFragments;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -52,7 +53,8 @@ public class LoginFragment extends AppCompatActivity {
 
         dbRef = FirebaseDatabase.getInstance().getReference("User");
         dialog = new ProgressDialog(LoginFragment.this);
-        dialog.setMessage("Logging in your account...");
+        dialog.setTitle("Logging in");
+        dialog.setMessage("Checking your account...");
         logBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,7 +101,15 @@ public class LoginFragment extends AppCompatActivity {
                 }
             });
         }else{
-            dialog.dismiss();
+            Handler handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.dismiss();
+                }
+            }, 1000);
+
             Toast.makeText(getApplicationContext(), "Login failed" ,Toast.LENGTH_LONG).show();
         }
 

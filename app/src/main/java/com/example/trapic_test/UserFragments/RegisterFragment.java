@@ -162,7 +162,7 @@ public class RegisterFragment extends AppCompatActivity {
                         {
                             Log.d("RegisterFragment", "onComplete: " + e.getMessage());
                         }
-                        String id = firebaseAuth.getUid();
+                        String  id = firebaseAuth.getUid();
                         user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
                         firestore.collection("Users").document(id).set(user)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
