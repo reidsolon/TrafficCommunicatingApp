@@ -35,8 +35,12 @@ dependencies {
     //picasso
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
+    'com.google.android.gms:play-services-maps:15.0.1'
+
     implementation 'de.hdodenhof:circleimageview:3.0.0'
 
+//    MAPBOX
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:7.2.0'
 
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'org.apache.commons:commons-lang3:3.6'
