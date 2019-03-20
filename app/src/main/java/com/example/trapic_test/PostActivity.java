@@ -1,10 +1,15 @@
 package com.example.trapic_test;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +17,9 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -25,6 +33,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.trapic_test.Model.Event;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,6 +53,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -69,6 +80,8 @@ public class PostActivity extends AppCompatActivity {
     Uri uri;
     ProgressDialog dialog;
 
+    LatLng latLang;
+
     private final int CAMERA_RESULT_CODE = 1; // result code for camera
 
 
@@ -87,42 +100,74 @@ public class PostActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         initView();
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED){
+            requestStoragePermission();
+        }else{
+            String category = getIntent().getStringExtra("Category");
+            type.setText(category);
 
-        String category = getIntent().getStringExtra("Category");
-        type.setText(category);
+            postBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-        postBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                    dialog.show();
 
-                dialog.show();
+                    if(validatePost()){
+                        addEvent();
+                    }else{
 
-                if(validatePost()){
-                    addEvent();
-                }else{
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
 
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.dismiss();
-
-                            Toast.makeText(getApplicationContext(), "Something is empty!", Toast.LENGTH_LONG).show();
-                        }
-                    }, 2000);
+                                Toast.makeText(getApplicationContext(), "Something is empty!", Toast.LENGTH_LONG).show();
+                            }
+                        }, 2000);
+                    }
                 }
-            }
-        });
+            });
 
-        cameraBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, CAMERA_RESULT_CODE);
-            }
-        });
-
+            cameraBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, CAMERA_RESULT_CODE);
+                }
+            });
+        }
     }
+    public void requestStoragePermission(){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(PostActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)){
+            new AlertDialog.Builder(this).setTitle("Permission").setMessage("Allow this app to write external storage to be able to post")
+                    .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(PostActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                        }
+                    }).setNegativeButton("Don't Allow", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }).create().show();
+        }else{
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == 1){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                startActivity(new Intent(getApplicationContext(), SelectEvent.class));
+            }
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -132,7 +177,7 @@ public class PostActivity extends AppCompatActivity {
 
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             uri = getImageUri(this, photo);
-            Picasso.with(PostActivity.this).load(uri).fit().into(img1);
+            Picasso.get().load(uri).fit().into(img1);
 
         }
     }

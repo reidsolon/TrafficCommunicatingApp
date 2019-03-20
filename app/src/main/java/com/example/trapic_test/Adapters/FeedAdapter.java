@@ -1,6 +1,7 @@
 package com.example.trapic_test.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -8,8 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.trapic_test.CommentsActivity;
+import com.example.trapic_test.MainActivity;
 import com.example.trapic_test.MainFragment;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
@@ -34,6 +38,7 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
     View v;
     String name;
     Context ctx;
+
     /**
      * Create a new RecyclerView adapter that listens to a Firestore Query.  See {@link
      * FirestoreRecyclerOptions} for configuration options.
@@ -58,49 +63,52 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
 
         FirebaseFirestore firebaseFirestore;
         firebaseFirestore = FirebaseFirestore.getInstance();
+        final String[] postId = {null};
+        final String[] postBy = new String[1];
         final String id = model.getUser_id();
-//        final DocumentReference documentReference = firebaseFirestore.collection("Users").document();
-//        final CollectionReference documentReference1 = firebaseFirestore.collection("Users");
-//
-//
-//
-//                    documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                            holder.email.setText(documentSnapshot.getString("eMail"));
-//                            String fullname = documentSnapshot.get("firstname")+" "+documentSnapshot.getString("lastname");
-//                            holder.user_name.setText(fullname);
-//
-//
-//                            Picasso.with(ctx).load(documentSnapshot.getString("event_image")).fit().into(holder.imageView);
-//                            holder.caption.setText(documentSnapshot.getString("event_caption"));
-//                        }
-//                    });
-        Picasso.with(ctx).load(model.getEvent_image()).fit().into(holder.imageView);
-        holder.caption.setText(model.getEvent_caption());
-        final DocumentReference documentReference = firebaseFirestore.collection("Users").document(id);
-        holder.type.setText(model.getEvent_type());
-        holder.timestamp.setText(model.getCurrentTime());
-        holder.location.setText(model.getEvent_location());
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                holder.email.setText(documentSnapshot.getString("eMail"));
-                String fullname = documentSnapshot.get("firstname")+" "+documentSnapshot.getString("lastname");
-                holder.user_name.setText(WordUtils.capitalize(fullname));
+        final DocumentReference documentReference1 = firebaseFirestore.collection("Users").document();
+        final DocumentReference documentReference2 = firebaseFirestore.collection("Posts").document();
 
+                Picasso.get().load(model.getEvent_image()).fit().into(holder.imageView);
+                holder.caption.setText(model.getEvent_caption());
+                final DocumentReference documentReference = firebaseFirestore.collection("Users").document(id);
+                holder.type.setText(model.getEvent_type());
+                holder.timestamp.setText(model.getCurrentTime());
+                holder.location.setText(model.getEvent_location());
+                documentReference2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        postId[0] = documentSnapshot.getId();
+                    }
+                });
+                documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+
+                        holder.email.setText(documentSnapshot.getString("eMail"));
+                        String fullname = documentSnapshot.get("firstname")+" "+documentSnapshot.getString("lastname");
+                        holder.user_name.setText(WordUtils.capitalize(fullname));
+                    }
+
+
+        });
+        holder.cmt_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ctx, CommentsActivity.class);
+                intent.putExtra("PostId", postId[0]);
+                intent.putExtra("PostBy", holder.user_name.getText().toString());
+                intent.putExtra("PublisherId", model.getUser_id());
+                ctx.startActivity(intent);
             }
         });
-
-
-
-
-
     }
 
     public class FeedHolder extends RecyclerView.ViewHolder {
 
         TextView email, user_name, caption, type, timestamp, location;
+        LinearLayout like_btn, cmt_btn;
         ImageView imageView;
 
         public FeedHolder(View itemView) {
@@ -112,6 +120,8 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
             email = itemView.findViewById(R.id.posted_by);
             imageView = itemView.findViewById(R.id.post_img);
             caption = itemView.findViewById(R.id.caption);
+            like_btn = itemView.findViewById(R.id.like_btn);
+            cmt_btn = itemView.findViewById(R.id.comment_btn);
         }
     }
 }

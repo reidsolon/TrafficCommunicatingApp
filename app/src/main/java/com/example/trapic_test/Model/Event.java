@@ -10,6 +10,8 @@ public class Event {
     private String event_location;
     private String user_id;
     private String event_image;
+    private double event_lat;
+    private double event_lng;
     private String currentTime = Calendar.getInstance().getTime().toString();
 
     public Event(){
