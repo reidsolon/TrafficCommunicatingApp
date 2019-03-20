@@ -224,9 +224,10 @@ public class PostActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Uri> task) {
 
                 String id = auth.getUid();
+                String id2 = firestore.collection("Posts").document().getId();
                 Uri uri2 = task.getResult();
-                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id);
-                firestore.collection("Posts").document().set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id2);
+                firestore.collection("Posts").document(id2).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             dialog.dismiss();

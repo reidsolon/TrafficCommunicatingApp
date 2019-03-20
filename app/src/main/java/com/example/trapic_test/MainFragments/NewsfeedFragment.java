@@ -65,7 +65,6 @@ public class NewsfeedFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        list = new ArrayList<>();
 
         firebaseFirestore = FirebaseFirestore.getInstance();
 

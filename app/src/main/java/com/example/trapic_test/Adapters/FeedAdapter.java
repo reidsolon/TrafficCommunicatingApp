@@ -63,10 +63,8 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
 
         FirebaseFirestore firebaseFirestore;
         firebaseFirestore = FirebaseFirestore.getInstance();
-        final String[] postId = {null};
-        final String[] postBy = new String[1];
         final String id = model.getUser_id();
-        final DocumentReference documentReference1 = firebaseFirestore.collection("Users").document();
+
         final DocumentReference documentReference2 = firebaseFirestore.collection("Posts").document();
 
                 Picasso.get().load(model.getEvent_image()).fit().into(holder.imageView);
@@ -75,19 +73,11 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
                 holder.type.setText(model.getEvent_type());
                 holder.timestamp.setText(model.getCurrentTime());
                 holder.location.setText(model.getEvent_location());
-                documentReference2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        postId[0] = documentSnapshot.getId();
-                    }
-                });
                 documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-
-                        holder.email.setText(documentSnapshot.getString("eMail"));
-                        String fullname = documentSnapshot.get("firstname")+" "+documentSnapshot.getString("lastname");
+                        holder.email.setText(documentSnapshot.getString("user_eMail"));
+                        String fullname = documentSnapshot.get("user_firstname")+" "+documentSnapshot.getString("user_lastname");
                         holder.user_name.setText(WordUtils.capitalize(fullname));
                     }
 
@@ -97,7 +87,7 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ctx, CommentsActivity.class);
-                intent.putExtra("PostId", postId[0]);
+                intent.putExtra("PostId", model.getEvent_id());
                 intent.putExtra("PostBy", holder.user_name.getText().toString());
                 intent.putExtra("PublisherId", model.getUser_id());
                 ctx.startActivity(intent);

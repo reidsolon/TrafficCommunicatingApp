@@ -71,7 +71,7 @@ public class MainFragment extends AppCompatActivity {
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String firstname = "Hi, "+documentSnapshot.getString("firstname");
+                String firstname = "Hi, "+documentSnapshot.getString("user_firstname");
                 test.setText(firstname);
             }
         }).addOnFailureListener(new OnFailureListener() {
