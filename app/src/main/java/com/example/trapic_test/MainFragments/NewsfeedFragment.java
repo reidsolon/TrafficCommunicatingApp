@@ -72,7 +72,7 @@ public class NewsfeedFragment extends Fragment {
     }
 
     public void setupRecycleView(){
-        Query query = collectionReference.orderBy("currentTime", Query.Direction.DESCENDING);
+        Query query = collectionReference.orderBy("event_time", Query.Direction.ASCENDING);
 
         FirestoreRecyclerOptions<Event> options = new FirestoreRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
 

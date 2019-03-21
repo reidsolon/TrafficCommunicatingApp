@@ -33,6 +33,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 public class MainFragment extends AppCompatActivity {
     TextView test;
     Button logout;
@@ -71,7 +73,7 @@ public class MainFragment extends AppCompatActivity {
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String firstname = "Hi, "+documentSnapshot.getString("user_firstname");
+                String firstname = "Hi, "+ WordUtils.capitalize(documentSnapshot.getString("user_firstname"));
                 test.setText(firstname);
             }
         }).addOnFailureListener(new OnFailureListener() {

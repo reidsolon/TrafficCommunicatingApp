@@ -21,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -59,6 +60,7 @@ import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 
 public class PostActivity extends AppCompatActivity {
 
@@ -226,7 +228,12 @@ public class PostActivity extends AppCompatActivity {
                 String id = auth.getUid();
                 String id2 = firestore.collection("Posts").document().getId();
                 Uri uri2 = task.getResult();
-                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id2);
+                Date d = new Date();
+                final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+                Date time = new Date();
+                final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
+
+                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id2, d_time, d_date);
                 firestore.collection("Posts").document(id2).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {

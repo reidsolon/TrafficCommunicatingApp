@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,6 +26,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import java.sql.Time;
+import java.util.Date;
 import java.util.HashMap;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -80,11 +83,15 @@ public class CommentsActivity extends AppCompatActivity {
     public void addComment(){
         final String comment = comment_edittext.getText().toString();
         final DocumentReference documentReference = firestore.collection("Users").document(auth.getUid());
+        Date d = new Date();
+        final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+        Date time = new Date();
+        final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
         documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 String fullname = documentSnapshot.getString("user_firstname")+" "+documentSnapshot.getString("user_lastname");
-                Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname);
+                Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time);
                 String id = firestore.collection("Comments").document().getId();
                 firestore.collection("Comments").document(id).set(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -103,8 +110,9 @@ public class CommentsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         collectionReference = firestore.collection("Comments");
 
-        Query query = collectionReference.whereEqualTo("post_id", postId);
-
+        Query query;
+        query = collectionReference.whereEqualTo("post_id", postId);
+        query.orderBy("comment_time", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<Comment> options = new FirestoreRecyclerOptions.Builder<Comment>().setQuery(query, Comment.class).build();
 
         feedAdapter = new CommentAdapter(options, getApplicationContext());

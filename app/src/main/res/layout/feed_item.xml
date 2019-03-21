@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:layout_marginTop="15dp"
+    android:layout_marginBottom="5dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -11,6 +12,10 @@
         android:orientation="vertical"
         android:layout_height="wrap_content">
         <LinearLayout
+            android:paddingTop="5dp"
+            android:background="@drawable/feed_header"
+            android:layout_marginEnd="6dp"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="10dp"
             android:id="@+id/name_area"
             android:orientation="horizontal"
@@ -69,6 +74,11 @@
         </LinearLayout>
 
         <RelativeLayout
+            android:background="@drawable/feed_body"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:gravity="center"
             android:id="@+id/img_holder"
             android:layout_below="@+id/name_area"
@@ -76,6 +86,7 @@
             android:layout_height="400dp">
 
             <ImageView
+
                 android:id="@+id/post_img"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
@@ -86,7 +97,7 @@
                 android:textColor="#fff"
                 android:layout_marginTop="10dp"
                 android:textSize="20sp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="40dp"
                 android:layout_width="wrap_content"
                 android:text="@string/app_name"
                 android:layout_height="wrap_content"
@@ -95,14 +106,14 @@
             <TextView
                 android:id="@+id/timestamp"
                 android:background="@drawable/timestamp_holder"
-                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"
                 android:layout_width="wrap_content"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:textColor="#fff"
                 android:gravity="center"
                 android:layout_alignParentRight="true"
-                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"
@@ -111,12 +122,13 @@
             <LinearLayout
                 android:background="@drawable/timestamp_holder"
                 android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:layout_marginEnd="5dp"
                 android:gravity="center"
                 android:layout_marginBottom="10dp"
-                android:layout_toStartOf="@+id/timestamp"
                 android:layout_height="wrap_content"
                 android:paddingRight="10dp"
                 android:paddingLeft="5dp">
@@ -136,107 +148,118 @@
 
         </RelativeLayout>
         <LinearLayout
-            android:id="@+id/caption_holder"
-            android:layout_below="@+id/img_holder"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_below="@id/img_holder"
+            android:orientation="vertical"
+            android:background="@drawable/feed_footer"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:paddingTop="5dp"
-                android:textColor="#111"
-                android:paddingBottom="5dp"
-                android:text="Fetching caption..."
-                android:id="@+id/caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/like_holder"
-            android:layout_below="@+id/caption_holder"
-            android:weightSum="100"
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-
             <LinearLayout
-                android:layout_weight="40"
-                android:layout_width="0dp"
-                android:layout_height="match_parent">
+                android:id="@+id/caption_holder"
+                android:layout_below="@+id/img_holder"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:paddingTop="5dp"
+                    android:textSize="15sp"
+                    android:textColor="#111"
+                    android:paddingBottom="5dp"
+                    android:text="Fetching caption..."
+                    android:id="@+id/caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/like_holder"
+                android:layout_below="@+id/caption_holder"
+                android:weightSum="100"
+                android:layout_width="match_parent"
+                android:layout_height="40dp">
+
+                <LinearLayout
+                    android:layout_weight="40"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/like_btn"
+                    android:gravity="center"
+                    android:layout_weight="20"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:src="@drawable/ic_thumb_up_black_24dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="17sp"
+                        android:textColor="#111"
+                        android:text=" 0 "/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/comment_btn"
+                    android:gravity="center"
+                    android:layout_weight="20"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:src="@drawable/ic_mode_comment_black_24dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:layout_weight="20"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:src="@drawable/ic_report_black_24dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_below="@+id/like_holder"
+                android:orientation="horizontal"
+                android:id="@+id/dash_line"
+                android:background="#f1f1f1"
+                android:layout_width="match_parent"
+                android:layout_height="0.01dp">
 
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/like_btn"
-                android:gravity="center"
-                android:layout_weight="20"
-                android:layout_width="0dp"
-                android:layout_height="match_parent">
 
-                <ImageView
-                    android:src="@drawable/ic_thumb_up_black_24dp"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp" />
-
+                android:paddingBottom="10dp"
+                android:layout_below="@+id/dash_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
                 <TextView
+                    android:paddingTop="15dp"
+                    android:layout_marginStart="15dp"
+                    android:paddingBottom="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="17sp"
-                    android:textColor="#111"
-                    android:text=" 0 "/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/comment_btn"
-                android:gravity="center"
-                android:layout_weight="20"
-                android:layout_width="0dp"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:src="@drawable/ic_mode_comment_black_24dp"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:gravity="center"
-                android:layout_weight="20"
-                android:layout_width="0dp"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:src="@drawable/ic_report_black_24dp"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp" />
-
+                    android:text="View all 0 comments"/>
             </LinearLayout>
         </LinearLayout>
-        <LinearLayout
-            android:layout_below="@+id/like_holder"
-            android:orientation="horizontal"
-            android:id="@+id/dash_line"
-            android:background="#A5A5A5"
-            android:layout_width="match_parent"
-            android:layout_height="0.01dp">
 
-        </LinearLayout>
-        <LinearLayout
-
-            android:paddingBottom="10dp"
-            android:layout_below="@+id/dash_line"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:paddingTop="15dp"
-                android:layout_marginStart="15dp"
-                android:paddingBottom="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="View all 0 comments"/>
-        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

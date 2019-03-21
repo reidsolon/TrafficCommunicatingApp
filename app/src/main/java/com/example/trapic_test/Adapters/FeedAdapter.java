@@ -71,7 +71,7 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
                 holder.caption.setText(model.getEvent_caption());
                 final DocumentReference documentReference = firebaseFirestore.collection("Users").document(id);
                 holder.type.setText(model.getEvent_type());
-                holder.timestamp.setText(model.getCurrentTime());
+                holder.timestamp.setText(model.getEvent_time());
                 holder.location.setText(model.getEvent_location());
                 documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
