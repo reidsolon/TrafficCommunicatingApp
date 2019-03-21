@@ -114,7 +114,6 @@ public class CommentsActivity extends AppCompatActivity {
         query = collectionReference.whereEqualTo("post_id", postId);
         query.orderBy("comment_time", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<Comment> options = new FirestoreRecyclerOptions.Builder<Comment>().setQuery(query, Comment.class).build();
-
         feedAdapter = new CommentAdapter(options, getApplicationContext());
 
         recyclerView.setAdapter(feedAdapter);

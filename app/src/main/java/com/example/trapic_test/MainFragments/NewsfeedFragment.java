@@ -92,4 +92,10 @@ public class NewsfeedFragment extends Fragment {
         super.onStop();
         feedAdapter.stopListening();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        feedAdapter.stopListening();
+    }
 }

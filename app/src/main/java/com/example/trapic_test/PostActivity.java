@@ -140,6 +140,8 @@ public class PostActivity extends AppCompatActivity {
             });
         }
     }
+
+
     public void requestStoragePermission(){
         if(ActivityCompat.shouldShowRequestPermissionRationale(PostActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)){
             new AlertDialog.Builder(this).setTitle("Permission").setMessage("Allow this app to write external storage to be able to post")
