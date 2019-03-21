@@ -96,7 +96,7 @@ public class PostActivity extends AppCompatActivity {
         dialog.setMessage("Posting event...");
         auth = FirebaseAuth.getInstance();
         firebaseUser = auth.getCurrentUser();
-        dbRefs = FirebaseDatabase.getInstance().getReference("PostedEvents");
+        dbRefs = FirebaseDatabase.getInstance().getReference("Posts");
         storageReference = FirebaseStorage.getInstance().getReference("postimage");
         fireStorage = FirebaseStorage.getInstance();
         firestore = FirebaseFirestore.getInstance();
@@ -228,44 +228,69 @@ public class PostActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Uri> task) {
 
                 String id = auth.getUid();
-                String id2 = firestore.collection("Posts").document().getId();
+//                String id2 = firestore.collection("Posts").document().getId();
+                String id3 = dbRefs.push().getKey();
                 Uri uri2 = task.getResult();
                 Date d = new Date();
                 final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
                 Date time = new Date();
                 final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
 
-                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id2, d_time, d_date);
-                firestore.collection("Posts").document(id2).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            dialog.dismiss();
-                            Snackbar.make(layout, "Event Posted Successfully" ,Snackbar.LENGTH_LONG).show();
+                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date);
+                dbRefs.child(id3).setValue(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        dialog.dismiss();
+                        Snackbar.make(layout, "Event Posted Successfully", Snackbar.LENGTH_LONG).show();
 
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startActivity(new Intent(getApplicationContext(), MainFragment.class));
-                                       finish();
-                                }
-                            }, 1000);
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            dialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "Failure to post event", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                startActivity(new Intent(getApplicationContext(), MainFragment.class));
+                                finish();
+                            }
+                        }, 1000);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-
+                        dialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "Failure to post event", Toast.LENGTH_LONG).show();
                     }
                 });
+            }
+
+//            firestore.collection("Posts").document(id2).set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void aVoid) {
+//                            dialog.dismiss();
+//                            Snackbar.make(layout, "Event Posted Successfully" ,Snackbar.LENGTH_LONG).show();
+//
+//                            Handler handler = new Handler();
+//                            handler.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    startActivity(new Intent(getApplicationContext(), MainFragment.class));
+//                                       finish();
+//                                }
+//                            }, 1000);
+//
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            dialog.dismiss();
+//                            Toast.makeText(getApplicationContext(), "Failure to post event", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//
+//                    }
+//                });
 
 
 //                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -310,8 +335,7 @@ public class PostActivity extends AppCompatActivity {
 //
 //                    }
 //                });
-
-
+        });
     }
     public boolean validatePost(){
 

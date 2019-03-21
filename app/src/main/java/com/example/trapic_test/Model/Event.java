@@ -35,31 +35,79 @@ public class Event {
         return event_caption;
     }
 
-    public String getEvent_location() {
-        return event_location;
+    public void setEvent_caption(String event_caption) {
+        this.event_caption = event_caption;
     }
 
     public String getEvent_type() {
         return event_type;
     }
 
-    public String getEvent_image() {
-        return event_image;
+    public void setEvent_type(String event_type) {
+        this.event_type = event_type;
+    }
+
+    public String getEvent_location() {
+        return event_location;
+    }
+
+    public void setEvent_location(String event_location) {
+        this.event_location = event_location;
     }
 
     public String getUser_id() {
         return user_id;
     }
 
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getEvent_image() {
+        return event_image;
+    }
+
+    public void setEvent_image(String event_image) {
+        this.event_image = event_image;
+    }
+
     public String getEvent_id() {
         return event_id;
+    }
+
+    public void setEvent_id(String event_id) {
+        this.event_id = event_id;
+    }
+
+    public double getEvent_lat() {
+        return event_lat;
+    }
+
+    public void setEvent_lat(double event_lat) {
+        this.event_lat = event_lat;
+    }
+
+    public double getEvent_lng() {
+        return event_lng;
+    }
+
+    public void setEvent_lng(double event_lng) {
+        this.event_lng = event_lng;
     }
 
     public String getEvent_time() {
         return event_time;
     }
 
+    public void setEvent_time(String event_time) {
+        this.event_time = event_time;
+    }
+
     public String getEvent_date() {
         return event_date;
+    }
+
+    public void setEvent_date(String event_date) {
+        this.event_date = event_date;
     }
 }

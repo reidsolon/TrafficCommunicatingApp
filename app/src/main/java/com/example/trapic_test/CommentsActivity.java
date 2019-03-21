@@ -2,6 +2,7 @@ package com.example.trapic_test;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,20 +16,30 @@ import android.widget.Toast;
 
 import com.example.trapic_test.Adapters.CommentAdapter;
 import com.example.trapic_test.Adapters.FeedAdapter;
+import com.example.trapic_test.Adapters.NewsfeedAdapter;
+import com.example.trapic_test.Adapters.UserCommentAdapter;
 import com.example.trapic_test.Model.Comment;
 import com.example.trapic_test.Model.Event;
+import com.example.trapic_test.Model.User;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class CommentsActivity extends AppCompatActivity {
 
@@ -36,10 +47,12 @@ public class CommentsActivity extends AppCompatActivity {
     String postId, postBy, publisherID;
     TextView comment_txt;
     EditText comment_edittext;
+    DatabaseReference dbRefs;
+    List<Comment> list;
     FirebaseFirestore firestore;
 
     private RecyclerView recyclerView;
-    private CommentAdapter feedAdapter;
+    private UserCommentAdapter userCommentAdapter;
     private CollectionReference collectionReference;
     FirebaseAuth auth;
     @Override
@@ -49,6 +62,8 @@ public class CommentsActivity extends AppCompatActivity {
 
         setContentView(R.layout.comment_layout);
         initViews();
+        list = new ArrayList<>();
+        dbRefs = FirebaseDatabase.getInstance().getReference("Comments");
 
         Intent intent = getIntent();
         postBy = intent.getStringExtra("PostBy");
@@ -68,7 +83,6 @@ public class CommentsActivity extends AppCompatActivity {
                 }
             }
         });
-
         setupRecycleView();
     }
 
@@ -81,53 +95,95 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     public void addComment(){
+//        final String comment = comment_edittext.getText().toString();
+//        final DocumentReference documentReference = firestore.collection("Users").document(auth.getUid());
+//        Date d = new Date();
+//        final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+//        Date time = new Date();
+//        final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
+//        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                String fullname = documentSnapshot.getString("user_firstname")+" "+documentSnapshot.getString("user_lastname");
+//                Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time);
+//                String id = firestore.collection("Comments").document().getId();
+//                firestore.collection("Comments").document(id).set(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
+//                        comment_edittext.setText("");
+//                    }
+//                });
+//            }
+//        });
         final String comment = comment_edittext.getText().toString();
-        final DocumentReference documentReference = firestore.collection("Users").document(auth.getUid());
+        com.google.firebase.database.Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_id").equalTo(auth.getCurrentUser().getUid());
         Date d = new Date();
         final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
         Date time = new Date();
         final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+
+        query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String fullname = documentSnapshot.getString("user_firstname")+" "+documentSnapshot.getString("user_lastname");
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+                User user = dataSnapshot.getValue(User.class);
+
+                String fullname = user.getUser_firstname()+" "+user.getUser_lastname();
                 Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time);
-                String id = firestore.collection("Comments").document().getId();
-                firestore.collection("Comments").document(id).set(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                String id = dbRefs.push().getKey();
+                dbRefs.child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
                         comment_edittext.setText("");
                     }
                 });
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
+
 
     }
 
     public void setupRecycleView(){
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        collectionReference = firestore.collection("Comments");
+//        collectionReference = firestore.collection("Comments");
+//
+//        Query query;
+//        query = collectionReference.whereEqualTo("post_id", postId);
+//        query.orderBy("comment_time", Query.Direction.DESCENDING);
+//        FirestoreRecyclerOptions<Comment> options = new FirestoreRecyclerOptions.Builder<Comment>().setQuery(query, Comment.class).build();
+//        feedAdapter = new CommentAdapter(options, getApplicationContext());
+//
+//        recyclerView.setAdapter(feedAdapter);
 
-        Query query;
-        query = collectionReference.whereEqualTo("post_id", postId);
-        query.orderBy("comment_time", Query.Direction.DESCENDING);
-        FirestoreRecyclerOptions<Comment> options = new FirestoreRecyclerOptions.Builder<Comment>().setQuery(query, Comment.class).build();
-        feedAdapter = new CommentAdapter(options, getApplicationContext());
+        Query query = FirebaseDatabase.getInstance().getReference("Comments").orderByChild("post_id").equalTo(postId);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                list.clear();
 
-        recyclerView.setAdapter(feedAdapter);
+                for(DataSnapshot snapshot :  dataSnapshot.getChildren()) {
+
+                    Comment event = snapshot.getValue(Comment.class);
+                    list.add(event);
+                }
+                userCommentAdapter = new UserCommentAdapter(getApplicationContext(), list);
+                recyclerView.setAdapter(userCommentAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        feedAdapter.startListening();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        feedAdapter.stopListening();
-    }
 }

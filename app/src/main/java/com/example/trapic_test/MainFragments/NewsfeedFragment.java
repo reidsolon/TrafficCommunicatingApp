@@ -12,20 +12,27 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.trapic_test.Adapters.FeedAdapter;
+import com.example.trapic_test.Adapters.NewsfeedAdapter;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -44,6 +51,8 @@ public class NewsfeedFragment extends Fragment {
     private DocumentReference documentReference;
     private CollectionReference collectionReference;
 
+    private NewsfeedAdapter newsfeedAdapter;
+
     private List<Event> list;
     View view;
     public NewsfeedFragment(){
@@ -58,6 +67,7 @@ public class NewsfeedFragment extends Fragment {
 
         initViews();
         setupRecycleView();
+        readPosts();
         return view;
     }
 
@@ -72,30 +82,77 @@ public class NewsfeedFragment extends Fragment {
     }
 
     public void setupRecycleView(){
-        Query query = collectionReference.orderBy("event_time", Query.Direction.ASCENDING);
+//        Query query = collectionReference.orderBy("event_time", Query.Direction.ASCENDING);
+//
+//        FirestoreRecyclerOptions<Event> options = new FirestoreRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
+//
+//        feedAdapter = new FeedAdapter(options, getContext());
+//
+//        recyclerView.setAdapter(feedAdapter);
 
-        FirestoreRecyclerOptions<Event> options = new FirestoreRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
+        list = new ArrayList<>();
 
-        feedAdapter = new FeedAdapter(options, getContext());
+    }
 
-        recyclerView.setAdapter(feedAdapter);
+    private void readPosts(){
+        Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("event_time");
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                list.clear();
+
+                for(DataSnapshot snapshot :  dataSnapshot.getChildren()) {
+
+                    Event event = snapshot.getValue(Event.class);
+                    list.add(event);
+                }
+                newsfeedAdapter = new NewsfeedAdapter(getContext(), list);
+                recyclerView.setAdapter(newsfeedAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+//        DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Posts");
+//        dbRefs.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                list.clear();
+//
+//                for(DataSnapshot snapshot :  dataSnapshot.getChildren()){
+//
+//                    Event event = snapshot.getValue(Event.class);
+//                    list.add(event);
+//                }
+//
+//
+//                newsfeedAdapter = new NewsfeedAdapter(getContext(), list);
+//                recyclerView.setAdapter(newsfeedAdapter);
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        feedAdapter.startListening();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        feedAdapter.stopListening();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        feedAdapter.stopListening();
     }
 }

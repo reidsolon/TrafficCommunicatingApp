@@ -80,7 +80,7 @@ public class RegisterFragment extends AppCompatActivity {
         progressBar.setTitle("Creating your account");
         progressBar.setMessage("Registering User...");
 
-        dbRef = FirebaseDatabase.getInstance().getReference("User");
+        dbRef = FirebaseDatabase.getInstance().getReference("Users");
 
         reg_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,26 +163,51 @@ public class RegisterFragment extends AppCompatActivity {
                             Log.d("RegisterFragment", "onComplete: " + e.getMessage());
                         }
                         String  id = firebaseAuth.getUid();
-                        user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
-                        firestore.collection("Users").document(id).set(user)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(getApplicationContext(), "Account Registered Successfully", Toast.LENGTH_LONG).show();
-                                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                                        user.sendEmailVerification();
-                                        Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
-                                        activation.putExtra("Email" , email.getText().toString());
-                                        finish();
-                                        startActivity(activation);
-                                        progressBar.dismiss();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
 
+                        String push_id = firebaseAuth.getUid();
+
+                        user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
+
+                        dbRef.child(push_id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                                Toast.makeText(getApplicationContext(), "Account Registered Successfully", Toast.LENGTH_LONG).show();
+
+                                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                                user.sendEmailVerification();
+
+                                Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
+
+                                activation.putExtra("Email" , email.getText().toString());
+
+                                finish();
+
+                                startActivity(activation);
+
+                                progressBar.dismiss();
                             }
                         });
+//                        firestore.collection("Users").document(id).set(user)
+//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                    @Override
+//                                    public void onSuccess(Void aVoid) {
+//                                        Toast.makeText(getApplicationContext(), "Account Registered Successfully", Toast.LENGTH_LONG).show();
+//                                        FirebaseUser user = firebaseAuth.getCurrentUser();
+//                                        user.sendEmailVerification();
+//                                        Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
+//                                        activation.putExtra("Email" , email.getText().toString());
+//                                        finish();
+//                                        startActivity(activation);
+//                                        progressBar.dismiss();
+//                                    }
+//                                }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//
+//                            }
+//                        });
 
 
                     } else {

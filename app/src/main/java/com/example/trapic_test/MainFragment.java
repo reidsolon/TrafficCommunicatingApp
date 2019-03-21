@@ -23,12 +23,16 @@ import com.example.trapic_test.MainFragments.MapFragment;
 import com.example.trapic_test.MainFragments.NewsfeedFragment;
 import com.example.trapic_test.MainFragments.NotificationFragment;
 import com.example.trapic_test.MainFragments.ProfileFragment;
+import com.example.trapic_test.Model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -59,29 +63,43 @@ public class MainFragment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainfragment_layout);
         init();
-        String id = auth.getUid();
-
+        String id = auth.getCurrentUser().getUid();
+        db = FirebaseDatabase.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
         documentReference = firestore.collection("Users").document(id);
-
+        dbRefs = db.getReference("Users").child(id);
         if(auth.getCurrentUser() == null){
             finish();
             startActivity(new Intent(MainFragment.this, MainActivity.class));
         }
-
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        dbRefs.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String firstname = "Hi, "+ WordUtils.capitalize(documentSnapshot.getString("user_firstname"));
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+                User user = dataSnapshot.getValue(User.class);
+                String firstname = "Hi, "+ WordUtils.capitalize(user.getUser_firstname());
                 test.setText(firstname);
+
             }
-        }).addOnFailureListener(new OnFailureListener() {
+
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
+//        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                String firstname = "Hi, "+ WordUtils.capitalize(documentSnapshot.getString("user_firstname"));
+//                test.setText(firstname);
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//
+//            }
+//        });
 
 
 
