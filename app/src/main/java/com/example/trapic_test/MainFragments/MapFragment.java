@@ -19,10 +19,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -31,6 +39,7 @@ import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -131,7 +140,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMap = mapboxMap;
 
 
@@ -141,16 +150,14 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
-                        initLocationEngine();
+                        loadAllMarkers();
                     }
                 });
 
             }
         });
     }
-    @SuppressWarnings({"MissingPermission"})
-    private void initLocationEngine(){
-    }
+
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent() {
@@ -185,7 +192,27 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
         }
     }
+    public void loadAllMarkers(){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
+                    Event event = dataSnapshot1.getValue(Event.class);
 
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.setTitle(event.getEvent_type()+": "+event.getEvent_location());
+                    markerOptions.position(new LatLng(event.getEvent_lat(), event.getEvent_lng()));
+                    mMap.addMarker(markerOptions);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
     @Override
     @SuppressWarnings( {"MissingPermission"})
     public void onStart() {

@@ -55,8 +55,9 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
         holder.timestamp.setText(event.getEvent_time());
         holder.caption.setText(event.getEvent_caption());
+        holder.type.setText(event.getEvent_type());
         holder.setUserInfo(event.getUser_id());
-
+        holder.location.setText(event.getEvent_location());
         holder.cmt_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

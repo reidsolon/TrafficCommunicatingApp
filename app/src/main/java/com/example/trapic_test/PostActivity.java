@@ -82,8 +82,8 @@ public class PostActivity extends AppCompatActivity {
     Uri uri;
     ProgressDialog dialog;
 
-    LatLng latLang;
-
+    String category, address;
+    double location_lat, location_lng;
     private final int CAMERA_RESULT_CODE = 1; // result code for camera
 
 
@@ -105,8 +105,12 @@ public class PostActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED){
             requestStoragePermission();
         }else{
-            String category = getIntent().getStringExtra("Category");
+            category = getIntent().getStringExtra("Category");
+            location_lat = getIntent().getDoubleExtra("Lat", 0);
+            location_lng = getIntent().getDoubleExtra("Lng", 0);
+            address = getIntent().getStringExtra("Address");
             type.setText(category);
+            location.setText(address);
 
             postBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -236,7 +240,7 @@ public class PostActivity extends AppCompatActivity {
                 Date time = new Date();
                 final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
 
-                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date);
+                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date, location_lat, location_lng );
                 dbRefs.child(id3).setValue(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

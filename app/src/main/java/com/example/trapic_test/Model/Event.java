@@ -20,7 +20,7 @@ public class Event {
 
     }
 
-    public Event(String caption, String type, String location, String image, String id, String event_id, String time, String date){
+    public Event(String caption, String type, String location, String image, String id, String event_id, String time, String date, double lat, double lng){
         this.event_caption = caption;
         this.event_type = type;
         this.event_location = location;
@@ -29,6 +29,8 @@ public class Event {
         this.event_id =event_id;
         this.event_time = time;
         this.event_date = date;
+        this.event_lat = lat;
+        this.event_lng = lng;
     }
 
     public String getEvent_caption() {
