@@ -132,7 +132,7 @@ public class CommentsActivity extends AppCompatActivity {
                 String fullname = user.getUser_firstname()+" "+user.getUser_lastname();
                 Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time);
                 String id = dbRefs.push().getKey();
-                dbRefs.child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                dbRefs.child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
@@ -164,7 +164,7 @@ public class CommentsActivity extends AppCompatActivity {
 //
 //        recyclerView.setAdapter(feedAdapter);
 
-        Query query = FirebaseDatabase.getInstance().getReference("Comments").orderByChild("post_id").equalTo(postId);
+        Query query = FirebaseDatabase.getInstance().getReference("Comments").child(postId).orderByChild("post_id").equalTo(postId);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

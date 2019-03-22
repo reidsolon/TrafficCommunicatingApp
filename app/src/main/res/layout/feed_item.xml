@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:layout_marginTop="15dp"
+    android:layout_marginEnd="6dp"
+    android:layout_marginStart="6dp"
     android:layout_marginBottom="5dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -97,7 +99,7 @@
                 android:textColor="#fff"
                 android:layout_marginTop="10dp"
                 android:textSize="20sp"
-                android:layout_marginStart="40dp"
+                android:layout_marginStart="10dp"
                 android:layout_width="wrap_content"
                 android:text="@string/app_name"
                 android:layout_height="wrap_content"
@@ -184,8 +186,15 @@
                 <LinearLayout
                     android:layout_weight="40"
                     android:layout_width="0dp"
+                    android:gravity="left|center_vertical"
                     android:layout_height="match_parent">
-
+                    <TextView
+                        android:layout_marginStart="20dp"
+                        android:id="@+id/like_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="17sp"
+                        android:text=" 0 "/>
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/like_btn"
@@ -195,16 +204,11 @@
                     android:layout_height="match_parent">
 
                     <ImageView
+                        android:id="@+id/like_img"
                         android:src="@drawable/ic_thumb_up_black_24dp"
                         android:layout_width="20dp"
                         android:layout_height="20dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="17sp"
-                        android:textColor="#111"
-                        android:text=" 0 "/>
 
                 </LinearLayout>
 
@@ -251,6 +255,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
+                    android:id="@+id/cmt_txt"
                     android:paddingTop="15dp"
                     android:layout_marginStart="15dp"
                     android:paddingBottom="10dp"

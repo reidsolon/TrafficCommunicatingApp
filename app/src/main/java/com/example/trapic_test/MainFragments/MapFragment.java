@@ -141,7 +141,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
-                        enableLocationComponent();
                         initLocationEngine();
                     }
                 });

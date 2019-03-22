@@ -50,9 +50,9 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
     @Override
     public void onBindViewHolder(@NonNull final NewsfeedHolder holder, int position) {
-
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final Event event = eventList.get(position);
-        Picasso.get().load(event.getEvent_image()).into(holder.imageView);
+        Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
         holder.timestamp.setText(event.getEvent_time());
         holder.caption.setText(event.getEvent_caption());
         holder.setUserInfo(event.getUser_id());
@@ -67,6 +67,21 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 ctx.startActivity(intent);
             }
         });
+        holder.isLike(event.getEvent_id(), holder.like_img);
+        holder.countLike(event.getEvent_id(), holder.like_txt);
+        holder.countComment(event.getEvent_id(),holder.cmt_txt);
+        holder.like_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(holder.like_img.getTag().equals("like")){
+                    FirebaseDatabase.getInstance().getReference().child("Likes").child(event.getEvent_id())
+                            .child(firebaseUser.getUid()).setValue(true);
+                }else{
+                    FirebaseDatabase.getInstance().getReference().child("Likes").child(event.getEvent_id())
+                            .child(firebaseUser.getUid()).removeValue();
+                }
+            }
+        });
 
     }
 
@@ -78,23 +93,79 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     }
 
     public class NewsfeedHolder extends RecyclerView.ViewHolder{
-        TextView email, user_name, caption, type, timestamp, location;
+        TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt;
         LinearLayout like_btn, cmt_btn;
-        ImageView imageView;
+        ImageView imageView, like_img;
         public NewsfeedHolder(View itemView) {
             super(itemView);
-
+            like_img = itemView.findViewById(R.id.like_img);
             location = itemView.findViewById(R.id.location);
             timestamp = itemView.findViewById(R.id.timestamp);
+            like_txt = itemView.findViewById(R.id.like_txt);
             type = itemView.findViewById(R.id.event_type);
             user_name = itemView.findViewById(R.id.user_name);
             email = itemView.findViewById(R.id.posted_by);
             imageView = itemView.findViewById(R.id.post_img);
+            cmt_txt = itemView.findViewById(R.id.cmt_txt);
             caption = itemView.findViewById(R.id.caption);
             like_btn = itemView.findViewById(R.id.like_btn);
             cmt_btn = itemView.findViewById(R.id.comment_btn);
         }
+        public void countLike(String post_id, final TextView view){
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes").child(post_id);
+
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    view.setText(dataSnapshot.getChildrenCount()+" thanks");
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+        public void countComment(String post_id, final TextView textView){
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Comments").child(post_id);
+
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    textView.setText("View all "+dataSnapshot.getChildrenCount()+" comment/s");
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+        public void isLike(String post_id, final ImageView view){
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Likes").child(post_id);
+
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.child(user.getUid()).exists()){
+                        view.setImageResource(R.drawable.ic_thumb_up_black_24dp);
+                        view.setTag("liked");
+                    }else{
+                        view.setImageResource(R.drawable.ic_thumb_up_black_24dp2);
+                        view.setTag("like");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
         public void setUserInfo(String id){
+
             Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_id").equalTo(id);
 
             query.addValueEventListener(new ValueEventListener() {

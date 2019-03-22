@@ -21,14 +21,20 @@
             android:layout_height="match_parent"
             android:text="Comments"/>
     </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
-        android:layout_below="@+id/back_container"
+        android:layout_above="@id/text_area"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/back_container"
+        android:layout_marginTop="0dp"
+        android:background="#f1f1f1">
 
     </android.support.v7.widget.RecyclerView>
     <LinearLayout
+        android:background="#fff"
+        android:id="@+id/text_area"
         android:weightSum="100"
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
