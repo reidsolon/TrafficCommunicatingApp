@@ -80,8 +80,9 @@ public class SelectEvent extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostActivity.class);
                 intent.putExtra("Category", "Congestion");
-                intent.putExtra("Lat", "Lat:" +lat);
-                intent.putExtra("Lng", "Lng:" +lng);
+                intent.putExtra("Lat", lat);
+                intent.putExtra("Lng", lng);
+                intent.putExtra("Address", my_address);
                 startActivity(intent);
             }
         });
@@ -91,8 +92,9 @@ public class SelectEvent extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostActivity.class);
                 intent.putExtra("Category", "Traffic Jams");
-                intent.putExtra("Lat", "Lat:" +lat);
-                intent.putExtra("Lng", "Lng:" +lng);
+                intent.putExtra("Lat", lat);
+                intent.putExtra("Lng", lng);
+                intent.putExtra("Address", my_address);
             }
         });
 
@@ -101,8 +103,9 @@ public class SelectEvent extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PostActivity.class);
                 intent.putExtra("Category", "Road Crash");
-                intent.putExtra("Lat", "Lat:" +lat);
-                intent.putExtra("Lng", "Lng:" +lng);
+                intent.putExtra("Lat", lat);
+                intent.putExtra("Lng", lng);
+                intent.putExtra("Address", my_address);
                 startActivity(intent);
             }
         });

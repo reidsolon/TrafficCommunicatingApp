@@ -191,4 +191,8 @@ public class MainFragment extends AppCompatActivity {
             }
         }
     }
+
+    public void set(int i){
+        viewPager.setCurrentItem(i, true);
+    }
 }

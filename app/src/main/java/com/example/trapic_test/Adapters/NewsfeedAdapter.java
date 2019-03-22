@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.trapic_test.CommentsActivity;
+import com.example.trapic_test.MainFragment;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
@@ -84,6 +85,13 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             }
         });
 
+        holder.viewMapBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
     }
 
 
@@ -95,7 +103,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
     public class NewsfeedHolder extends RecyclerView.ViewHolder{
         TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt;
-        LinearLayout like_btn, cmt_btn;
+        LinearLayout like_btn, cmt_btn, viewMapBtn;
         ImageView imageView, like_img;
         public NewsfeedHolder(View itemView) {
             super(itemView);
@@ -111,6 +119,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             caption = itemView.findViewById(R.id.caption);
             like_btn = itemView.findViewById(R.id.like_btn);
             cmt_btn = itemView.findViewById(R.id.comment_btn);
+            viewMapBtn = itemView.findViewById(R.id.viewMapBtn);
         }
         public void countLike(String post_id, final TextView view){
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes").child(post_id);

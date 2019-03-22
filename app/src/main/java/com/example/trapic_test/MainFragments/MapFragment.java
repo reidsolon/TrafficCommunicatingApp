@@ -23,7 +23,6 @@ import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,10 +38,13 @@ import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
@@ -52,6 +54,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import java.util.List;
+import java.util.zip.Inflater;
 
 public class MapFragment extends Fragment implements PermissionsListener{
 
@@ -151,6 +154,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
                         loadAllMarkers();
+                        mMap.setMinZoomPreference(12);
                     }
                 });
 
@@ -203,7 +207,11 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.setTitle(event.getEvent_type()+": "+event.getEvent_location());
                     markerOptions.position(new LatLng(event.getEvent_lat(), event.getEvent_lng()));
+
                     mMap.addMarker(markerOptions);
+
+
+
                 }
             }
 

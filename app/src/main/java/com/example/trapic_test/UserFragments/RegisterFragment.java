@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.trapic_test.AccountActivation;
+import com.example.trapic_test.Model.Notification;
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.MainFragment;
 import com.example.trapic_test.R;
@@ -48,6 +49,7 @@ public class RegisterFragment extends AppCompatActivity {
     EditText uname, fname, lname, pw1, pw2, email;
     LinearLayout layout;
     Button reg_btn, log_btn;
+    FirebaseUser auth;
 
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
@@ -174,19 +176,27 @@ public class RegisterFragment extends AppCompatActivity {
 
                                 Toast.makeText(getApplicationContext(), "Account Registered Successfully", Toast.LENGTH_LONG).show();
 
-                                FirebaseUser user = firebaseAuth.getCurrentUser();
+                                auth = firebaseAuth.getCurrentUser();
+                                auth.sendEmailVerification();
+                                dbRef = FirebaseDatabase.getInstance().getReference("Notifications");
+                                String id = dbRef.push().getKey();
+                                Notification notification = new Notification(id, auth.getUid());
+                                dbRef.child(auth.getUid()).child(id).setValue(notification).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
 
-                                user.sendEmailVerification();
+                                        activation.putExtra("Email" , email.getText().toString());
 
-                                Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
+                                        finish();
 
-                                activation.putExtra("Email" , email.getText().toString());
+                                        startActivity(activation);
 
-                                finish();
+                                        progressBar.dismiss();
+                                    }
+                                });
 
-                                startActivity(activation);
 
-                                progressBar.dismiss();
                             }
                         });
 //                        firestore.collection("Users").document(id).set(user)
