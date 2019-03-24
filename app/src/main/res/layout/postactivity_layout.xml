@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     android:orientation="vertical"
-    android:background="@drawable/background_postevent"
+    android:background="#f1f1f1"
     android:id="@+id/postevent_layout"
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
-        android:layout_marginTop="40dp"
         android:id="@+id/caption_holder"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -30,10 +29,11 @@
 
                 <LinearLayout
                     android:layout_marginTop="20dp"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:orientation="horizontal"
                     android:weightSum="100"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <LinearLayout
@@ -65,7 +65,7 @@
                             android:paddingRight="20dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="My Location Here"/>
+                            android:text="Getting location..."/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -74,67 +74,69 @@
 
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout
-        android:weightSum="100"
-        android:layout_width="match_parent"
-        android:layout_height="70dp">
-
         <LinearLayout
-            android:layout_weight="60"
             android:weightSum="100"
-            android:orientation="horizontal"
-            android:layout_width="0dp"
-            android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_weight="100"
+                android:weightSum="100"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
                 android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:layout_marginTop="20dp"
-                    android:layout_marginLeft="20dp"
-                    android:orientation="horizontal"
-                    android:weightSum="100"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <LinearLayout
-                        android:layout_width="5dp"
-                        android:background="#FF000F"
-                        android:layout_height="match_parent">
-
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:background="#fff"
-                        android:gravity="center"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_location_on_black_24dp"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:background="#fff"
-                        android:gravity="center"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-                        <TextView
-                            android:id="@+id/event_type"
-                            android:textSize="15sp"
-                            android:textColor="#111"
-                            android:paddingRight="20dp"
+
+                        <LinearLayout
+                            android:layout_width="5dp"
+                            android:background="#FF000F"
+                            android:layout_height="match_parent">
+
+                        </LinearLayout>
+                        <LinearLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Event Category"/>
+                            android:background="#fff"
+                            android:gravity="center"
+                            android:layout_height="match_parent">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_location_on_black_24dp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:background="#fff"
+                            android:gravity="center"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+                            <TextView
+                                android:id="@+id/event_type"
+                                android:textSize="15sp"
+                                android:textColor="#111"
+                                android:paddingRight="20dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""/>
+                        </LinearLayout>
+
                     </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
-
         </LinearLayout>
-    </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -183,12 +185,13 @@
         android:layout_height="match_parent">
         <LinearLayout
             android:orientation="vertical"
-            android:layout_weight="50"
+            android:layout_weight="100"
             android:layout_width="0dp"
+            android:gravity="center"
             android:layout_height="200dp">
             <ImageView
                 android:id="@+id/image_1"
-                android:layout_width="match_parent"
+                android:layout_width="250dp"
                 android:layout_height="match_parent" />
         </LinearLayout>
 

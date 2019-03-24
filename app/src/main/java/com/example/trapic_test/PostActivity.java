@@ -8,10 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -60,7 +62,12 @@ import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static android.os.Build.ID;
 
 public class PostActivity extends AppCompatActivity {
 
@@ -85,6 +92,8 @@ public class PostActivity extends AppCompatActivity {
     String category, address;
     double location_lat, location_lng;
     private final int CAMERA_RESULT_CODE = 1; // result code for camera
+    private int imageCounter;
+    private String currentImagePath;
 
 
     @Override
@@ -138,8 +147,10 @@ public class PostActivity extends AppCompatActivity {
             cameraBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, CAMERA_RESULT_CODE);
+//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(intent, CAMERA_RESULT_CODE);
+
+                    capturePhoto();
                 }
             });
         }
@@ -177,17 +188,62 @@ public class PostActivity extends AppCompatActivity {
     }
 
 
+    public void capturePhoto(){
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(this.getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                ex.printStackTrace();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, CAMERA_RESULT_CODE);
+            }
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CAMERA_RESULT_CODE && resultCode == RESULT_OK){
 
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            uri = getImageUri(this, photo);
+//            Bitmap photo = (Bitmap) data.getExtras().get("data");
+//            uri = getImageUri(this, photo);
+//            Picasso.get().load(uri).fit().into(img1);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(currentImagePath, options);
+            uri = getImageUri(this, bitmap);
+
             Picasso.get().load(uri).fit().into(img1);
 
+
+
         }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "User" + ID + "Image" + imageCounter + "_" + timeStamp;
+        imageCounter++;
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String path = storageDir.getPath() + "/ALUMA";
+        File temp = new File(path);
+        temp.mkdirs();
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".png",         /* suffix */
+                temp      /* directory */
+        );
+        currentImagePath = image.getPath();
+        return image;
     }
 
     public Uri getImageUri(Context ctx, Bitmap bmp){
