@@ -16,6 +16,7 @@ import com.example.trapic_test.MainFragment;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
+import com.example.trapic_test.ViewMapActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -88,6 +89,13 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         holder.viewMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Intent intent = new Intent(ctx, ViewMapActivity.class);
+                intent.putExtra("Lat", event.getEvent_lat());
+                intent.putExtra("Lng", event.getEvent_lng());
+                intent.putExtra("Location", event.getEvent_location());
+                intent.putExtra("Time", event.getEvent_time());
+                ctx.startActivity(intent);
 
             }
         });

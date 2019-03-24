@@ -2,5 +2,18 @@
     <string name="app_name">TraPic</string>
     <string name="register_txt"><b>REGISTER AN ACCOUNT</b></string>
     <string name="Loading_name">Fetching name...</string>
+    <string name="time_ago_suffix">SuffixTest</string>
+    <string name="time_ago_prefix">PrefixTest</string>
+    <string name="time_ago_seconds">seconds</string>
+    <string name="time_ago_minute">min</string>
+    <string name="time_ago_minutes">mins</string>
+    <string name="time_ago_hour">hr</string>
+    <string name="time_ago_hours">hrs</string>
+    <string name="time_ago_day">day</string>
+    <string name="time_ago_days">days</string>
+    <string name="time_ago_month">mon</string>
+    <string name="time_ago_months">mons</string>
+    <string name="time_ago_year">yr</string>
+    <string name="time_ago_years">yrs</string>
     <string name="activation_txt">You successfully registered your account. We sent a account activation on your email, please kindly check and verify your email address.</string>
 </resources>

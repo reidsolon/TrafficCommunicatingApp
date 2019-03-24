@@ -154,6 +154,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
                         loadAllMarkers();
+                        enableLocationComponent();
                         mMap.setMinZoomPreference(12);
                     }
                 });
@@ -209,8 +210,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     markerOptions.position(new LatLng(event.getEvent_lat(), event.getEvent_lng()));
 
                     mMap.addMarker(markerOptions);
-
-
 
                 }
             }
