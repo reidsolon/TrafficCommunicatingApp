@@ -4,22 +4,29 @@
     android:background="#f1f1f1"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/profile_header"
-        android:background="@drawable/tablayout_style"
+        android:background="@drawable/profile_bar"
         android:layout_width="match_parent"
         android:layout_height="200dp">
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/info_holder"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         android:background="@drawable/profile_info_container"
         android:layout_marginTop="-80dp"
         android:layout_below="@+id/img_container"
+        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="300dp">
         <TextView
@@ -48,4 +55,15 @@
             android:layout_height="150dp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/profile_info_container"
+        android:layout_below="@+id/info_holder"
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+
+    </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>

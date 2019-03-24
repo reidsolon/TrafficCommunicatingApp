@@ -66,6 +66,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
     Location location;
     FusedLocationProviderClient client;
     LatLng latLng;
+    private LocationComponent locationComponent;
 
     public MapFragment() {
 
@@ -163,6 +164,10 @@ public class MapFragment extends Fragment implements PermissionsListener{
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent() {
@@ -171,7 +176,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
         if (PermissionsManager.areLocationPermissionsGranted(getContext())) {
 
             // Get an instance of the component
-            LocationComponent locationComponent = mMap.getLocationComponent();
+             locationComponent = mMap.getLocationComponent();
 
             // Activate with options
             locationComponent.activateLocationComponent(getContext(), mMap.getStyle());
@@ -225,6 +230,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
     public void onStart() {
         super.onStart();
         mapView.onStart();
+
     }
 
     @Override
@@ -243,6 +249,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
     public void onStop() {
         super.onStop();
         mapView.onStop();
+
     }
 
     @Override

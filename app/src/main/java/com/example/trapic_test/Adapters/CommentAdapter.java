@@ -53,6 +53,10 @@ public class CommentAdapter extends FirestoreRecyclerAdapter<Comment, CommentAda
 
     }
 
+    @Override
+    public int getItemCount() {
+        return super.getItemCount();
+    }
 
     public class CommentAdapterHolder extends RecyclerView.ViewHolder{
         TextView publisher, commentMsg;

@@ -66,7 +66,6 @@ public class NewsfeedFragment extends Fragment {
         view = inflater.inflate(R.layout.newsfeed_layout, container, false);
 
         initViews();
-        setupRecycleView();
         readPosts();
         return view;
     }
@@ -79,19 +78,8 @@ public class NewsfeedFragment extends Fragment {
         firebaseFirestore = FirebaseFirestore.getInstance();
 
         collectionReference = firebaseFirestore.collection("Posts");
-    }
-
-    public void setupRecycleView(){
-//        Query query = collectionReference.orderBy("event_time", Query.Direction.ASCENDING);
-//
-//        FirestoreRecyclerOptions<Event> options = new FirestoreRecyclerOptions.Builder<Event>().setQuery(query, Event.class).build();
-//
-//        feedAdapter = new FeedAdapter(options, getContext());
-//
-//        recyclerView.setAdapter(feedAdapter);
 
         list = new ArrayList<>();
-
     }
 
     private void readPosts(){
@@ -117,44 +105,6 @@ public class NewsfeedFragment extends Fragment {
 
             }
         });
-//        DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Posts");
-//        dbRefs.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                list.clear();
-//
-//                for(DataSnapshot snapshot :  dataSnapshot.getChildren()){
-//
-//                    Event event = snapshot.getValue(Event.class);
-//                    list.add(event);
-//                }
-//
-//
-//                newsfeedAdapter = new NewsfeedAdapter(getContext(), list);
-//                recyclerView.setAdapter(newsfeedAdapter);
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
 
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 }
