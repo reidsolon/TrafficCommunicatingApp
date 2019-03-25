@@ -1,12 +1,15 @@
 package com.example.trapic_test.Adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.text.WordUtils;
@@ -100,6 +104,24 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             }
         });
 
+        if(event.getUser_id().equals(firebaseUser.getUid())){
+            holder.deleteBtn.setVisibility(View.VISIBLE);
+
+            holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Posts");
+
+                    dbRefs.child(event.getEvent_id()).removeValue();
+                }
+            });
+
+        }else{
+            holder.deleteBtn.setVisibility(View.GONE);
+        }
+
     }
 
 
@@ -112,9 +134,11 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     public class NewsfeedHolder extends RecyclerView.ViewHolder{
         TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt;
         LinearLayout like_btn, cmt_btn, viewMapBtn;
+        Button deleteBtn;
         ImageView imageView, like_img;
         public NewsfeedHolder(View itemView) {
             super(itemView);
+            deleteBtn = itemView.findViewById(R.id.delete_btn);
             like_img = itemView.findViewById(R.id.like_img);
             location = itemView.findViewById(R.id.location);
             timestamp = itemView.findViewById(R.id.timestamp);
@@ -135,7 +159,13 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    view.setText(dataSnapshot.getChildrenCount()+" thanks");
+
+                    if(dataSnapshot.getChildrenCount() > 1){
+                        view.setText(dataSnapshot.getChildrenCount()+" thanks");
+                    }else{
+                        view.setText(dataSnapshot.getChildrenCount()+" thank");
+                    }
+
                 }
 
                 @Override
