@@ -22,8 +22,10 @@ import com.example.trapic_test.Model.Comment;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -95,27 +97,6 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     public void addComment(){
-//        final String comment = comment_edittext.getText().toString();
-//        final DocumentReference documentReference = firestore.collection("Users").document(auth.getUid());
-//        Date d = new Date();
-//        final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
-//        Date time = new Date();
-//        final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
-//        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                String fullname = documentSnapshot.getString("user_firstname")+" "+documentSnapshot.getString("user_lastname");
-//                Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time);
-//                String id = firestore.collection("Comments").document().getId();
-//                firestore.collection("Comments").document(id).set(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
-//                        comment_edittext.setText("");
-//                    }
-//                });
-//            }
-//        });
         final String comment = comment_edittext.getText().toString();
         com.google.firebase.database.Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_id").equalTo(auth.getCurrentUser().getUid());
         Date d = new Date();
@@ -137,6 +118,8 @@ public class CommentsActivity extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
                         comment_edittext.setText("");
+
+                        sendNotification();
                     }
                 });
 
@@ -154,15 +137,6 @@ public class CommentsActivity extends AppCompatActivity {
     public void setupRecycleView(){
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        collectionReference = firestore.collection("Comments");
-//
-//        Query query;
-//        query = collectionReference.whereEqualTo("post_id", postId);
-//        query.orderBy("comment_time", Query.Direction.DESCENDING);
-//        FirestoreRecyclerOptions<Comment> options = new FirestoreRecyclerOptions.Builder<Comment>().setQuery(query, Comment.class).build();
-//        feedAdapter = new CommentAdapter(options, getApplicationContext());
-//
-//        recyclerView.setAdapter(feedAdapter);
 
         Query query = FirebaseDatabase.getInstance().getReference("Comments").child(postId).orderByChild("post_id").equalTo(postId);
         query.addValueEventListener(new ValueEventListener() {
@@ -181,6 +155,27 @@ public class CommentsActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void sendNotification(){
+        DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Notifications");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("user_id", user.getUid());
+        map.put("text", " commented on your post.");
+        map.put("post_id", "");
+
+        dbRefs.child(user.getUid()).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
 
             }
         });
