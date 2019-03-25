@@ -45,6 +45,7 @@ public class RegisterFragment extends AppCompatActivity {
     ProgressDialog progressBar;
     DatabaseReference dbRef;
     FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
     FirebaseFirestore firestore;
     EditText uname, fname, lname, pw1, pw2, email;
     LinearLayout layout;
@@ -69,6 +70,7 @@ public class RegisterFragment extends AppCompatActivity {
 
         firestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registerfragment);
         initViews();
@@ -180,44 +182,18 @@ public class RegisterFragment extends AppCompatActivity {
                                 auth.sendEmailVerification();
                                 dbRef = FirebaseDatabase.getInstance().getReference("Notifications");
                                 String id = dbRef.push().getKey();
-                                Notification notification = new Notification(id, auth.getUid());
-                                dbRef.child(auth.getUid()).child(id).setValue(notification).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+
                                         Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
 
                                         activation.putExtra("Email" , email.getText().toString());
-
                                         finish();
-
                                         startActivity(activation);
 
                                         progressBar.dismiss();
-                                    }
-                                });
 
 
                             }
                         });
-//                        firestore.collection("Users").document(id).set(user)
-//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void aVoid) {
-//                                        Toast.makeText(getApplicationContext(), "Account Registered Successfully", Toast.LENGTH_LONG).show();
-//                                        FirebaseUser user = firebaseAuth.getCurrentUser();
-//                                        user.sendEmailVerification();
-//                                        Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
-//                                        activation.putExtra("Email" , email.getText().toString());
-//                                        finish();
-//                                        startActivity(activation);
-//                                        progressBar.dismiss();
-//                                    }
-//                                }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//
-//                            }
-//                        });
 
 
                     } else {

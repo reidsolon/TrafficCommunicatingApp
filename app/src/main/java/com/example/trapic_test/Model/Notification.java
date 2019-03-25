@@ -9,9 +9,9 @@ public class Notification {
 
     }
 
-    public Notification(String notif_id,String notif_user_id) {
+    public Notification(String notif_id) {
         this.notif_id = notif_id;
-        this.notif_user_id = notif_user_id;
+
     }
 
     public String getNotif_id() {

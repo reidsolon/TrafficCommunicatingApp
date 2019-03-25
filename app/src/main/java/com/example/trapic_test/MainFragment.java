@@ -40,15 +40,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.apache.commons.lang3.text.WordUtils;
 
 public class MainFragment extends AppCompatActivity {
-    TextView test;
-    Button logout;
+    private TextView test;
+    private Button logout;
 
-    LinearLayout postLink;
-    FirebaseAuth auth;
-    FirebaseFirestore firestore;
-    FirebaseDatabase db;
-    DatabaseReference dbRefs;
-    DocumentReference documentReference;
+    private LinearLayout postLink;
+    private FirebaseAuth auth;
+    private FirebaseDatabase db;
+    private DatabaseReference dbRefs;
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -65,9 +63,7 @@ public class MainFragment extends AppCompatActivity {
         init();
         String id = auth.getCurrentUser().getUid();
         db = FirebaseDatabase.getInstance();
-        firestore = FirebaseFirestore.getInstance();
 
-        documentReference = firestore.collection("Users").document(id);
         dbRefs = db.getReference("Users").child(id);
         if(auth.getCurrentUser() == null){
             finish();
@@ -88,18 +84,6 @@ public class MainFragment extends AppCompatActivity {
 
             }
         });
-//        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                String firstname = "Hi, "+ WordUtils.capitalize(documentSnapshot.getString("user_firstname"));
-//                test.setText(firstname);
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//
-//            }
-//        });
 
 
 

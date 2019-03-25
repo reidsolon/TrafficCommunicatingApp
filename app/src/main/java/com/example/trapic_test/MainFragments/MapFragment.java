@@ -58,14 +58,11 @@ import java.util.zip.Inflater;
 
 public class MapFragment extends Fragment implements PermissionsListener{
 
-    MapboxMap mMap;
-    MapView mapView;
+    private MapboxMap mMap;
+    private MapView mapView;
     private String[] list;
     private Button myLocBtn, myLocBtn2;
-    PermissionsManager permissionsManager;
-    Location location;
-    FusedLocationProviderClient client;
-    LatLng latLng;
+    private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
 
     public MapFragment() {

@@ -141,7 +141,7 @@ public class SelectEvent extends AppCompatActivity {
 
                     lat = locationResult.getLastLocation().getLatitude();
                     lng = locationResult.getLastLocation().getLongitude();
-                    Log.e("Lat", "Lat: "+lat);
+                    Log.e("Lat", "Lat: "+lat+" Lng:"+lng);
                     geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
 
                     try {

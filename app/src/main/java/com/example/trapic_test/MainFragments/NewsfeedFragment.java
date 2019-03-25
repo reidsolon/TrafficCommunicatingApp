@@ -45,14 +45,8 @@ import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 public class NewsfeedFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private FeedAdapter feedAdapter;
     private FirebaseFirestore firebaseFirestore;
-
-    private DocumentReference documentReference;
-    private CollectionReference collectionReference;
-
     private NewsfeedAdapter newsfeedAdapter;
-
     private List<Event> list;
     View view;
     public NewsfeedFragment(){
@@ -76,8 +70,6 @@ public class NewsfeedFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         firebaseFirestore = FirebaseFirestore.getInstance();
-
-        collectionReference = firebaseFirestore.collection("Posts");
 
         list = new ArrayList<>();
     }

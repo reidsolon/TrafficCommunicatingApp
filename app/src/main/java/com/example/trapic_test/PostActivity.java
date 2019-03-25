@@ -35,7 +35,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.trapic_test.Model.Comment;
 import com.example.trapic_test.Model.Event;
+import com.example.trapic_test.Model.Notification;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Continuation;
@@ -72,22 +74,22 @@ import static android.os.Build.ID;
 public class PostActivity extends AppCompatActivity {
 
     //vars
-    DatabaseReference dbRefs;
-    FirebaseAuth auth;
-    FirebaseUser firebaseUser;
-    FirebaseStorage fireStorage;
-    FirebaseFirestore firestore;
-    StorageReference storageReference;
-    Task<Uri> uploadTask;
+    private DatabaseReference dbRefs;
+    private FirebaseAuth auth;
+    private FirebaseUser firebaseUser;
+    private FirebaseStorage fireStorage;
+    private FirebaseFirestore firestore;
+    private StorageReference storageReference;
+    private Task<Uri> uploadTask;
 
-    RelativeLayout layout;
-    TextView type, location;
-    LinearLayout postBtn, cameraBtn, view;
-    EditText caption ;
+    private RelativeLayout layout;
+    private TextView type, location;
+    private LinearLayout postBtn, cameraBtn, view;
+    private EditText caption ;
 
-    ImageView img1,img2;
-    Uri uri;
-    ProgressDialog dialog;
+    private ImageView img1,img2;
+    private Uri uri;
+    private ProgressDialog dialog;
 
     String category, address;
     double location_lat, location_lng;
@@ -287,9 +289,8 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
 
-                String id = auth.getUid();
-//                String id2 = firestore.collection("Posts").document().getId();
-                String id3 = dbRefs.push().getKey();
+                final String id = auth.getUid();
+                final String id3 = dbRefs.push().getKey();
                 Uri uri2 = task.getResult();
                 Date d = new Date();
                 final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
@@ -301,6 +302,22 @@ public class PostActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         dialog.dismiss();
+
+                        Notification notification = new Notification(id3);
+                        dbRefs = FirebaseDatabase.getInstance().getReference("Notifications");
+
+                        dbRefs.child(id3).setValue(notification).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+
                         Snackbar.make(layout, "Event Posted Successfully", Snackbar.LENGTH_LONG).show();
 
                         Handler handler = new Handler();
