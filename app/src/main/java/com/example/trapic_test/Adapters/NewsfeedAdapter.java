@@ -138,7 +138,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         ImageView imageView, like_img;
         public NewsfeedHolder(View itemView) {
             super(itemView);
-            deleteBtn = itemView.findViewById(R.id.delete_btn);
+
             like_img = itemView.findViewById(R.id.like_img);
             location = itemView.findViewById(R.id.location);
             timestamp = itemView.findViewById(R.id.timestamp);
@@ -152,6 +152,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             like_btn = itemView.findViewById(R.id.like_btn);
             cmt_btn = itemView.findViewById(R.id.comment_btn);
             viewMapBtn = itemView.findViewById(R.id.viewMapBtn);
+            deleteBtn = itemView.findViewById(R.id.delete_btn);
         }
         public void countLike(String post_id, final TextView view){
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes").child(post_id);

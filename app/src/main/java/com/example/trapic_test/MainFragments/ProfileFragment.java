@@ -27,11 +27,11 @@ public class ProfileFragment extends Fragment {
 
     View v;
     FirebaseAuth auth;
-    FirebaseUser user;
+    FirebaseUser firebaseUser;
     DatabaseReference dbRefs;
     FirebaseDatabase firebaseDatabase;
 
-    private TextView user_fullname_txt;
+    private TextView user_fullname_txt, user_email;
     public ProfileFragment(){
 
     }
@@ -55,20 +55,28 @@ public class ProfileFragment extends Fragment {
 
     public void initViews(){
         user_fullname_txt = getActivity().findViewById(R.id.user_full_name);
+        user_email = getActivity().findViewById(R.id.user_email);
     }
 
     public void loadUserInfo(){
         auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
-        String id = user.getUid();
+        firebaseUser = auth.getCurrentUser();
+        String id = firebaseUser.getUid();
         dbRefs = FirebaseDatabase.getInstance().getReference("Users").child(id);
 
         dbRefs.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-
+                if(firebaseUser.isEmailVerified()){
+                    String suffix = " - verified";
+                    user_email.setText(user.getUser_eMail()+suffix);
+                }else{
+                    String suffix = " - unverified";
+                    user_email.setText(user.getUser_eMail()+suffix);
+                }
                 user_fullname_txt.setText(WordUtils.capitalize(user.getUser_firstname()+" "+user.getUser_lastname()));
+
             }
 
             @Override
