@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,9 @@ import android.widget.Toast;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -53,14 +58,19 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.Inflater;
 
-public class MapFragment extends Fragment implements PermissionsListener{
+public class MapFragment extends Fragment implements PermissionsListener {
 
     private MapboxMap mMap;
     private MapView mapView;
+    private LocationRequest locationRequest;
     private String[] list;
+    private double lat, lng;
+    private LatLng latLng1;
     private Button myLocBtn, myLocBtn2;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
@@ -100,21 +110,21 @@ public class MapFragment extends Fragment implements PermissionsListener{
                 builder.setSingleChoiceItems(list, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if(which == 0){
+                        if (which == 0) {
                             mMap.setStyle(Style.TRAFFIC_NIGHT, new Style.OnStyleLoaded() {
                                 @Override
                                 public void onStyleLoaded(@NonNull Style style) {
                                     enableLocationComponent();
                                 }
                             });
-                        }else if(which == 1){
+                        } else if (which == 1) {
                             mMap.setStyle(Style.TRAFFIC_DAY, new Style.OnStyleLoaded() {
                                 @Override
                                 public void onStyleLoaded(@NonNull Style style) {
                                     enableLocationComponent();
                                 }
                             });
-                        }else{
+                        } else {
                             mMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
                                 @Override
                                 public void onStyleLoaded(@NonNull Style style) {
@@ -153,6 +163,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                         // Get an instance of the component
                         loadAllMarkers();
                         enableLocationComponent();
+                        myLocation();
                         mMap.setMinZoomPreference(12);
                     }
                 });
@@ -166,14 +177,14 @@ public class MapFragment extends Fragment implements PermissionsListener{
         super.onDestroyView();
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     private void enableLocationComponent() {
 
         // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(getContext())) {
 
             // Get an instance of the component
-             locationComponent = mMap.getLocationComponent();
+            locationComponent = mMap.getLocationComponent();
 
             // Activate with options
             locationComponent.activateLocationComponent(getContext(), mMap.getStyle());
@@ -199,19 +210,27 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
         }
     }
-    public void loadAllMarkers(){
+
+    public void loadAllMarkers() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     Event event = dataSnapshot1.getValue(Event.class);
 
+                    double test = latLng1.distanceTo(new LatLng(event.getEvent_lat(), event.getEvent_lng()));
+
                     MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.setTitle(event.getEvent_type()+": "+event.getEvent_location());
+                    markerOptions.setTitle(event.getEvent_type() + ": " + event.getEvent_location()+" "+test+"m away from you");
+                    markerOptions.setSnippet("Shet");
                     markerOptions.position(new LatLng(event.getEvent_lat(), event.getEvent_lng()));
 
                     mMap.addMarker(markerOptions);
+
+
+
+                    Log.d("Distance", ""+test);
 
                 }
             }
@@ -222,6 +241,40 @@ public class MapFragment extends Fragment implements PermissionsListener{
             }
         });
     }
+
+    private void myLocation() {
+
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
+
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(4000);
+        locationRequest.setFastestInterval(2000);
+        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+
+                lat = locationResult.getLastLocation().getLatitude();
+                lng = locationResult.getLastLocation().getLongitude();
+
+                latLng1 = new LatLng(lat, lng);
+
+            }
+        }, Looper.getMainLooper());
+
+    }
+
     @Override
     @SuppressWarnings( {"MissingPermission"})
     public void onStart() {

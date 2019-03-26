@@ -1,5 +1,6 @@
 package com.example.trapic_test.MainFragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,10 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
+import com.example.trapic_test.SendFeedbackActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,11 +34,11 @@ public class ProfileFragment extends Fragment {
     FirebaseUser firebaseUser;
     DatabaseReference dbRefs;
     FirebaseDatabase firebaseDatabase;
-    private TextView activate_btn;
-
+    private LinearLayout send_feedback_link;
     private ImageView user_status_img;
+    private TextView user_fullname_txt, user_email, activate_btn;
 
-    private TextView user_fullname_txt, user_email;
+
     public ProfileFragment(){
 
     }
@@ -55,6 +58,13 @@ public class ProfileFragment extends Fragment {
         loadUserInfo();
 
         initViews();
+
+        send_feedback_link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), SendFeedbackActivity.class));
+            }
+        });
     }
 
     public void initViews(){
@@ -62,6 +72,7 @@ public class ProfileFragment extends Fragment {
         user_status_img = getActivity().findViewById(R.id.user_status_img);
         user_fullname_txt = getActivity().findViewById(R.id.user_full_name);
         user_email = getActivity().findViewById(R.id.user_email);
+        send_feedback_link = getActivity().findViewById(R.id.send_feedback_link);
     }
 
     public void loadUserInfo(){

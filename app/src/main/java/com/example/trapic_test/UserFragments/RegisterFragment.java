@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -37,6 +38,7 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.Date;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
@@ -170,7 +172,10 @@ public class RegisterFragment extends AppCompatActivity {
 
                         String push_id = firebaseAuth.getUid();
 
-                        user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg);
+                        Date d = new Date();
+                        final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+                        String account_status;
+                        user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg, d_date, "unverified");
 
                         dbRef.child(push_id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

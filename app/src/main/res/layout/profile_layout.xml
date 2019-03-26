@@ -236,6 +236,7 @@
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/send_feedback_link"
                 android:layout_marginTop="5dp"
                 android:weightSum="2"
                 android:background="@drawable/profile_info_holder"

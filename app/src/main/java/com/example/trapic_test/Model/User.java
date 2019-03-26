@@ -6,16 +6,20 @@ public class User {
     public String user_lastname = null;
     public String user_passWord = null;
     public String user_eMail = null;
+    private String user_created = null;
+    private String user_status;
 
     public User(){
 
     }
 
-    public User(String id, String firstname, String lastname, String passWord, String eMail){
+    public User(String id, String firstname, String lastname, String passWord, String eMail, String created, String account_status){
        this.user_id = id;
        this.user_firstname = firstname;
        this.user_lastname = lastname;
        this.user_passWord = passWord;
+       this.user_status = account_status;
+       this.user_created = created;
        this.user_eMail = eMail;
     }
 
@@ -57,5 +61,21 @@ public class User {
 
     public void setUser_eMail(String user_eMail) {
         this.user_eMail = user_eMail;
+    }
+
+    public String getUser_created() {
+        return user_created;
+    }
+
+    public void setUser_created(String user_created) {
+        this.user_created = user_created;
+    }
+
+    public String getUser_status() {
+        return user_status;
+    }
+
+    public void setUser_status(String user_status) {
+        this.user_status = user_status;
     }
 }

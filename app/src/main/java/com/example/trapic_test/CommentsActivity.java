@@ -1,5 +1,6 @@
 package com.example.trapic_test;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -164,11 +165,12 @@ public class CommentsActivity extends AppCompatActivity {
         DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Notifications");
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         HashMap<String, Object> map = new HashMap<>();
+        map.put("notification_type", "comment");
         map.put("user_id", user.getUid());
         map.put("text", " commented on your post.");
-        map.put("post_id", "");
-
-        dbRefs.child(user.getUid()).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+        map.put("post_id", postId);
+        String id = dbRefs.push().getKey();
+        dbRefs.child(user.getUid()).child(id).setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
 
