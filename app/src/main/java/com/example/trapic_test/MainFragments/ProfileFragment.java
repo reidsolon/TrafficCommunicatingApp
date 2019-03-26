@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.trapic_test.Model.User;
@@ -30,6 +31,9 @@ public class ProfileFragment extends Fragment {
     FirebaseUser firebaseUser;
     DatabaseReference dbRefs;
     FirebaseDatabase firebaseDatabase;
+    private TextView activate_btn;
+
+    private ImageView user_status_img;
 
     private TextView user_fullname_txt, user_email;
     public ProfileFragment(){
@@ -54,6 +58,8 @@ public class ProfileFragment extends Fragment {
     }
 
     public void initViews(){
+        activate_btn = getActivity().findViewById(R.id.activate_btn);
+        user_status_img = getActivity().findViewById(R.id.user_status_img);
         user_fullname_txt = getActivity().findViewById(R.id.user_full_name);
         user_email = getActivity().findViewById(R.id.user_email);
     }
@@ -69,11 +75,12 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 if(firebaseUser.isEmailVerified()){
-                    String suffix = " - verified";
-                    user_email.setText(user.getUser_eMail()+suffix);
+                    user_status_img.setImageResource(R.drawable.ic_verified_user_black_24dp);
+
+                    activate_btn.setVisibility(View.GONE);
                 }else{
-                    String suffix = " - unverified";
-                    user_email.setText(user.getUser_eMail()+suffix);
+                    user_status_img.setImageResource(R.drawable.ic_priority_high_black_24dp);
+                    activate_btn.setVisibility(View.VISIBLE);
                 }
                 user_fullname_txt.setText(WordUtils.capitalize(user.getUser_firstname()+" "+user.getUser_lastname()));
 

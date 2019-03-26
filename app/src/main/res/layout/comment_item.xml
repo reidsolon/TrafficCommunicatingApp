@@ -18,9 +18,10 @@
             android:layout_weight="20"
             android:layout_width="0dp"
             android:layout_height="match_parent">
-            <de.hdodenhof.circleimageview.CircleImageView
+            <ImageView
+                android:layout_margin="8dp"
                 android:layout_width="match_parent"
-                android:src="@drawable/fui_ic_googleg_color_24dp"
+                android:src="@drawable/profile_picture"
                 android:layout_height="match_parent" />
         </LinearLayout>
 
@@ -37,6 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent">
                 <TextView
+                    android:layout_marginStart="10dp"
                     android:layout_gravity="start"
                     android:layout_marginTop="5dp"
                     android:text="Fetching name"
@@ -48,6 +50,7 @@
                 <TextView
                     android:text="Fetching msg"
                     android:id="@+id/comment_msg"
+                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
