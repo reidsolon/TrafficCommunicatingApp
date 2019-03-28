@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -61,6 +62,8 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
         holder.timestamp.setText(event.getEvent_time());
         holder.caption.setText(event.getEvent_caption());
+
+        holder.caption.setCompoundDrawables(ctx.getResources().getDrawable(R.drawable.ic_construction_marker), null, null, null);
         holder.type.setText(event.getEvent_type());
         holder.setUserInfo(event.getUser_id());
         holder.location.setText(event.getEvent_location());
@@ -111,10 +114,27 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 @Override
                 public void onClick(View v) {
 
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                    builder.setTitle("Delete Post");
+                    builder.setMessage("Are you sure you want to delete this post?");
+                    builder.setPositiveButton("Delete Post", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Posts");
+                            dbRefs.child(event.getEvent_id()).removeValue();
+                        }
+                    });
 
-                    DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Posts");
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                    dbRefs.child(event.getEvent_id()).removeValue();
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
                 }
             });
 

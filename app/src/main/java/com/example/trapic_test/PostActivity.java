@@ -91,11 +91,13 @@ public class PostActivity extends AppCompatActivity {
     private Uri uri;
     private ProgressDialog dialog;
 
-    String category, address;
-    double location_lat, location_lng;
+    private String category, address;
+    private double location_lat, location_lng;
     private final int CAMERA_RESULT_CODE = 1; // result code for camera
     private int imageCounter;
     private String currentImagePath;
+
+    private ImageView cat_img;
 
 
     @Override
@@ -120,6 +122,24 @@ public class PostActivity extends AppCompatActivity {
             location_lat = getIntent().getDoubleExtra("Lat", 0);
             location_lng = getIntent().getDoubleExtra("Lng", 0);
             address = getIntent().getStringExtra("Address");
+
+            switch (category){
+                case "Construction Area":{
+                    cat_img.setImageResource(R.drawable.ic_construction_marker);
+                break;
+                }
+
+                case "Traffic Jams":{
+                    cat_img.setImageResource(R.drawable.ic_traffic_jam);
+                    break;
+                }
+
+                case "Road Crash":{
+                    cat_img.setImageResource(R.drawable.ic_road_crash);
+                    break;
+                }
+
+            }
             type.setText(category);
             location.setText(address);
 
@@ -216,17 +236,12 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CAMERA_RESULT_CODE && resultCode == RESULT_OK){
 
-//            Bitmap photo = (Bitmap) data.getExtras().get("data");
-//            uri = getImageUri(this, photo);
-//            Picasso.get().load(uri).fit().into(img1);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             Bitmap bitmap = BitmapFactory.decodeFile(currentImagePath, options);
             uri = getImageUri(this, bitmap);
 
             Picasso.get().load(uri).fit().into(img1);
-
-
 
         }
     }
@@ -267,6 +282,7 @@ public class PostActivity extends AppCompatActivity {
         cameraBtn = findViewById(R.id.camera_btn);
         img1 = findViewById(R.id.image_1);
         img2 = findViewById(R.id.image_2);
+        cat_img = findViewById(R.id.category_img);
 
     }
 

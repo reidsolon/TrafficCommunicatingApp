@@ -57,7 +57,6 @@ public class SelectEvent extends AppCompatActivity {
 
     public void initViews() {
         cat1 = (LinearLayout) findViewById(R.id.cat_1);
-        cat2 = (LinearLayout) findViewById(R.id.cat_2);
         cat3 = (LinearLayout) findViewById(R.id.cat_3);
         cat4 = (LinearLayout) findViewById(R.id.cat_4);
     }
@@ -75,17 +74,6 @@ public class SelectEvent extends AppCompatActivity {
             }
         });
 
-        cat2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PostActivity.class);
-                intent.putExtra("Category", "Congestion");
-                intent.putExtra("Lat", lat);
-                intent.putExtra("Lng", lng);
-                intent.putExtra("Address", my_address);
-                startActivity(intent);
-            }
-        });
 
         cat3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +83,7 @@ public class SelectEvent extends AppCompatActivity {
                 intent.putExtra("Lat", lat);
                 intent.putExtra("Lng", lng);
                 intent.putExtra("Address", my_address);
+                startActivity(intent);
             }
         });
 

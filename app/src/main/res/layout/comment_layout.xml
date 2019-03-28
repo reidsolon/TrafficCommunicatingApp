@@ -22,16 +22,18 @@
             android:text="Comments"/>
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview"
-        android:layout_above="@id/text_area"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/back_container"
-        android:layout_marginTop="0dp"
-        android:background="#f1f1f1">
+        <android.support.v7.widget.RecyclerView
+            android:paddingBottom="4dp"
+            android:background="@drawable/gradient_bg"
+            android:layout_below="@+id/back_container"
+            android:layout_above="@id/text_area"
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp">
 
-    </android.support.v7.widget.RecyclerView>
+        </android.support.v7.widget.RecyclerView>
+
     <LinearLayout
         android:background="#fff"
         android:id="@+id/text_area"
@@ -42,6 +44,7 @@
         <EditText
             android:id="@+id/comment"
             android:layout_weight="80"
+            android:backgroundTint="#fff"
             android:layout_width="0dp"
             android:hint="Enter your comment here..."
             android:layout_height="match_parent" />

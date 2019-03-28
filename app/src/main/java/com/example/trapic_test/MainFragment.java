@@ -125,11 +125,11 @@ public class MainFragment extends AppCompatActivity {
 
     public void init(){
 
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        test = (TextView) findViewById(R.id.test);
-        postLink = (LinearLayout) findViewById(R.id.post_link);
-        logout = (Button) findViewById(R.id.logout_btn);
+        viewPager =  findViewById(R.id.viewPager);
+        tabLayout =  findViewById(R.id.tabLayout);
+        test =  findViewById(R.id.test);
+        postLink =  findViewById(R.id.post_link);
+        logout =  findViewById(R.id.logout_btn);
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();

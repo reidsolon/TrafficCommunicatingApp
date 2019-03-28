@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout android:orientation="vertical"
+    android:background="@drawable/gradient_bg"
     android:weightSum="100"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -8,8 +9,8 @@
 
     <LinearLayout
         android:id="@+id/signout_section"
-        android:background="#dbdbd9"
         android:weightSum="100"
+        android:paddingBottom="2dp"
         android:layout_width="match_parent"
         android:layout_height="50dp">
 
@@ -64,8 +65,8 @@
                     android:id="@+id/logout_btn"
                     android:layout_width="80dp"
                     android:text="Sign Out"
-                    android:textColor="#fff"
-                    android:background="@drawable/reg_btn"
+                    android:textColor="#111"
+                    android:background="@drawable/signout_btn"
                     android:layout_height="30dp" />
         </LinearLayout>
     </LinearLayout>
@@ -77,7 +78,6 @@
 
 
             <android.support.v4.view.ViewPager
-                android:background="#dbdbd9"
                 android:id="@+id/viewPager"
                 android:layout_above="@id/tablayout_holder"
                 android:layout_width="match_parent"

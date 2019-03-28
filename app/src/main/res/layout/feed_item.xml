@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:layout_marginTop="10dp"
-    android:layout_marginEnd="6dp"
-    android:background="@drawable/feed_item_holder"
-    android:layout_marginStart="6dp"
     android:layout_marginBottom="5dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
-        android:layout_margin="5dp"
-
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="wrap_content">
@@ -23,7 +18,7 @@
             android:id="@+id/name_area"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="60dp">hu
+            android:layout_height="50dp">
             <LinearLayout
                 android:layout_width="60dp"
                 android:gravity="center"
@@ -35,8 +30,8 @@
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:foregroundGravity="center"
                         android:src="@drawable/profile_picture"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:id="@+id/user_img"/>
                     <de.hdodenhof.circleimageview.CircleImageView
                         app:civ_border_color="#fff"
@@ -45,7 +40,8 @@
                         android:layout_width="20dp"
                         android:layout_marginStart="30dp"
                         android:layout_height="20dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="17dp"
                         android:layout_alignParentBottom="true"
                         android:src="@drawable/ic_fiber_manual_record_black_24dp"/>
                 </RelativeLayout>
@@ -89,8 +85,8 @@
 
         <RelativeLayout
             android:background="@drawable/feed_body"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
             android:layout_marginTop="5dp"
             android:gravity="center"
             android:id="@+id/img_holder"
@@ -99,10 +95,11 @@
             android:layout_height="400dp">
 
             <ImageView
-                android:background="@drawable/image_holder"
                 android:id="@+id/post_img"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@drawable/image_holder" />
             <TextView
                 android:id="@+id/event_type"
                 android:layout_marginBottom="10dp"
@@ -117,6 +114,7 @@
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"/>
             <TextView
+                android:drawableStart="@drawable/ic_access_time_black_24dp"
                 android:id="@+id/timestamp"
                 android:background="@drawable/timestamp_holder"
                 android:layout_alignParentTop="true"
@@ -127,7 +125,7 @@
                 android:gravity="center"
                 android:layout_alignParentRight="true"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginRight="5dp"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"
                 android:paddingRight="5dp"
@@ -141,7 +139,7 @@
                 android:paddingBottom="5dp"
                 android:layout_marginEnd="5dp"
                 android:gravity="center"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="2dp"
                 android:layout_height="wrap_content"
                 android:paddingRight="10dp"
                 android:paddingLeft="5dp">
@@ -182,7 +180,7 @@
                     android:layout_marginRight="30dp"
                     android:paddingTop="5dp"
                     android:textSize="17sp"
-                    android:textColor="#fff"
+                    android:textColor="#111"
                     android:paddingBottom="5dp"
                     android:text="Fetching caption..."
                     android:id="@+id/caption"
@@ -213,7 +211,6 @@
                     android:layout_marginStart="15dp"
                     android:paddingBottom="10dp"
                     android:layout_width="wrap_content"
-                    android:textColor="#fff"
                     android:layout_height="wrap_content"
                     android:text="View all 0 comments"/>
 
@@ -227,7 +224,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
                         <TextView
-                            android:textColor="#fff"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="View on Map"/>
@@ -240,77 +236,76 @@
                 </LinearLayout>
 
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_margin="5dp"
-            android:id="@+id/like_holder"
-            android:layout_below="@+id/footer_container"
-            android:weightSum="100"
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-
             <LinearLayout
-                android:layout_weight="100"
-                android:weightSum="40"
-                android:layout_width="0dp"
-                android:gravity="start|center_vertical"
-                android:layout_height="match_parent">
-                <LinearLayout
-                    android:id="@+id/like_btn"
-                    android:gravity="center"
-                    android:layout_weight="10"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/like_img"
-                        android:src="@drawable/ic_thumb_up_black_24dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-
-                </LinearLayout>
+                android:layout_margin="5dp"
+                android:id="@+id/like_holder"
+                android:layout_below="@+id/footer_container"
+                android:weightSum="100"
+                android:layout_width="match_parent"
+                android:layout_height="40dp">
 
                 <LinearLayout
-                    android:id="@+id/comment_btn"
-                    android:gravity="center"
-                    android:layout_weight="10"
+                    android:layout_weight="100"
+                    android:weightSum="40"
                     android:layout_width="0dp"
+                    android:gravity="start|center_vertical"
                     android:layout_height="match_parent">
+                    <LinearLayout
+                        android:id="@+id/like_btn"
+                        android:gravity="center"
+                        android:layout_weight="10"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent">
 
-                    <ImageView
-                        android:src="@drawable/ic_mode_comment_black_24dp"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp" />
+                        <ImageView
+                            android:id="@+id/like_img"
+                            android:src="@drawable/ic_thumb_up_black_24dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
 
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/comment_btn"
+                        android:gravity="center"
+                        android:layout_weight="10"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:src="@drawable/ic_mode_comment_black_24dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:gravity="center"
+                        android:layout_weight="10"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:src="@drawable/ic_report_black_24dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp" />
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:gravity="center"
+                        android:layout_weight="10"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:text="0"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/like_txt"/>
+                    </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout
-                    android:gravity="center"
-                    android:layout_weight="10"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:src="@drawable/ic_report_black_24dp"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp" />
-
-                </LinearLayout>
-                <LinearLayout
-                    android:gravity="center"
-                    android:layout_weight="10"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:text="0"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/like_txt"/>
-                </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
 
     </RelativeLayout>
