@@ -2,6 +2,7 @@ package com.example.trapic_test.MainFragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -21,6 +23,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
@@ -43,6 +48,7 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -62,21 +68,26 @@ import org.apache.commons.lang3.text.WordUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapFragment extends Fragment implements PermissionsListener {
+public class MapFragment extends Fragment implements PermissionsListener{
 
     private MapboxMap mMap;
     private MapView mapView;
     private LocationRequest locationRequest;
+    private TextView event_type_txt, event_caption_txt, event_time_txt;
+    private ImageView cat_img;
     private String[] list;
     private double lat, lng;
     private LatLng latLng1;
-    private Event event;
-    private Button myLocBtn, myLocBtn2;
+    private Event[] event = new Event[200];
+    private BottomSheetDialog dialog;
+    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, commentBtn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
+    private int i=0;
     private MarkerOptions markerOptions;
     private String event_user_id, event_user_fullname;
+    private Marker[] event_marker = new Marker[200];
 
     public MapFragment() {
 
@@ -92,10 +103,10 @@ public class MapFragment extends Fragment implements PermissionsListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        dialog = new BottomSheetDialog(getContext());
+        dialog.setContentView(R.layout.marker_dialog);
+        initViews(view);
 
-        mapView = view.findViewById(R.id.mapView);
-        myLocBtn = view.findViewById(R.id.my_loc);
-        myLocBtn2 = view.findViewById(R.id.my_loc2);
 
         myLocBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,48 +117,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
         myLocBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                list = new String[]{"Night Mode Traffic", "Day Mode Traffic", "Normal Streets"};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Select Map Type");
-                builder.setSingleChoiceItems(list, -1, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            mMap.setStyle(Style.TRAFFIC_NIGHT, new Style.OnStyleLoaded() {
-                                @Override
-                                public void onStyleLoaded(@NonNull Style style) {
-                                    enableLocationComponent();
-                                }
-                            });
-                        } else if (which == 1) {
-                            mMap.setStyle(Style.TRAFFIC_DAY, new Style.OnStyleLoaded() {
-                                @Override
-                                public void onStyleLoaded(@NonNull Style style) {
-                                    enableLocationComponent();
-                                }
-                            });
-                        } else {
-                            mMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
-                                @Override
-                                public void onStyleLoaded(@NonNull Style style) {
-                                    enableLocationComponent();
-                                }
-                            });
-                        }
-                        dialog.dismiss();
-                    }
-                });
-
-                builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
+               selectType();
             }
         });
         mapView.onCreate(savedInstanceState);
@@ -164,8 +134,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
-                        myLocation();
-                        loadAllMarkers();
                         enableLocationComponent();
                         mMap.setMinZoomPreference(12);
                     }
@@ -175,8 +143,65 @@ public class MapFragment extends Fragment implements PermissionsListener {
         });
     }
 
-    private void animateLocation(){
 
+    
+    private void selectType(){
+        list = new String[]{"Night Mode Traffic", "Day Mode Traffic", "Normal Streets"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Select Map Type");
+        builder.setSingleChoiceItems(list, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    mMap.setStyle(Style.TRAFFIC_NIGHT, new Style.OnStyleLoaded() {
+                        @Override
+                        public void onStyleLoaded(@NonNull Style style) {
+                            enableLocationComponent();
+                        }
+                    });
+                } else if (which == 1) {
+                    mMap.setStyle(Style.TRAFFIC_DAY, new Style.OnStyleLoaded() {
+                        @Override
+                        public void onStyleLoaded(@NonNull Style style) {
+                            enableLocationComponent();
+                        }
+                    });
+                } else {
+                    mMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+                        @Override
+                        public void onStyleLoaded(@NonNull Style style) {
+                            enableLocationComponent();
+                        }
+                    });
+                }
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    private void initViews(View view){
+        mapView = view.findViewById(R.id.mapView);
+        myLocBtn = view.findViewById(R.id.my_loc);
+        myLocBtn2 = view.findViewById(R.id.my_loc2);
+
+        viewNewsfeedBtn = dialog.findViewById(R.id.marker_viewfeed_btn);
+        commentBtn = dialog.findViewById(R.id.marker_cmt_btn);
+        cat_img = dialog.findViewById(R.id.cat_img);
+        event_type_txt = dialog.findViewById(R.id.event_cat_txt);
+        event_caption_txt = dialog.findViewById(R.id.event_cap);
+
+    }
+    private void animateLocation(){
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
@@ -204,6 +229,9 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
             // setting up my location
             cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(30).build();
+
+            myLocation();
+            loadAllMarkers();
         } else {
 
             permissionsManager = new PermissionsManager(this);
@@ -221,20 +249,21 @@ public class MapFragment extends Fragment implements PermissionsListener {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                    event = dataSnapshot1.getValue(Event.class);
+                    event[i] = dataSnapshot1.getValue(Event.class);
 
-                    event_user_id = event.getUser_id();
+                    event_user_id = event[i].getUser_id();
                     markerOptions = new MarkerOptions();
+
                     if(latLng1 != null){
 
-                        double distance = latLng1.distanceTo(new LatLng(event.getEvent_lat(), event.getEvent_lng()));
+                        double distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
                         final double roundedDistance = Math.round(distance * 100.0) / 100.0;
                         final double roundedKm;
                         if(roundedDistance > 1000.0){
                             roundedKm = Math.round((roundedDistance / 100.0) * 100.0)/100.0;
-                            markerOptions.setTitle(event.getEvent_type() + ": " + event.getEvent_location()+" "+roundedKm+" km away from you");
+                            markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedKm+" km away from you");
                         }else{
-                            markerOptions.setTitle(event.getEvent_type() + ": " + event.getEvent_location()+" "+roundedDistance+" m away from you");
+                            markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
                         }
 
                         IconFactory iconFactory = IconFactory.getInstance(getActivity());
@@ -243,7 +272,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
                         Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
 
 
-                        switch(event.getEvent_type()){
+                        switch(event[i].getEvent_type()){
                             case "Congestion":{
                                 markerOptions.icon(trafficjam_marker);
                                 break;
@@ -264,12 +293,13 @@ public class MapFragment extends Fragment implements PermissionsListener {
                                 break;
                             }
                         }
-                        markerOptions.setSnippet("at "+event.getEvent_time()+" ");
-                            markerOptions.position(new LatLng(event.getEvent_lat(), event.getEvent_lng()));
+                            markerOptions.position(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
+                            event_marker[i] = mMap.addMarker(markerOptions);
 
-                            mMap.addMarker(markerOptions);
 
                     }
+
+                    i++;
                 }
             }
 
@@ -284,6 +314,8 @@ public class MapFragment extends Fragment implements PermissionsListener {
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             callPermission();
         }else {
+
+
             FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
 
             locationRequest = new LocationRequest();
@@ -406,6 +438,25 @@ public class MapFragment extends Fragment implements PermissionsListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    private void showMarkerInfo(String type, String time, String caption){
+        event_type_txt.setText(WordUtils.capitalize(type));
+        event_caption_txt.setText(caption);
+        switch (type){
+            case "Construction Area":{
+                cat_img.setImageResource(R.drawable.ic_construction_marker);
+                break;
+            }
+            case "Traffic Jams":{
+                cat_img.setImageResource(R.drawable.ic_traffic_jam);
+                break;
+            }
 
+            case "Road Crash":{
+                cat_img.setImageResource(R.drawable.ic_road_crash);
+                break;
+            }
+        }
+        dialog.show();
+    }
 
 }

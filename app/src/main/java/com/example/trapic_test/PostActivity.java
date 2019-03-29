@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -169,8 +170,9 @@ public class PostActivity extends AppCompatActivity {
             cameraBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(intent, CAMERA_RESULT_CODE);
+
+                    StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                    StrictMode.setVmPolicy(builder.build());
 
                     capturePhoto();
                 }
@@ -282,7 +284,7 @@ public class PostActivity extends AppCompatActivity {
         cameraBtn = findViewById(R.id.camera_btn);
         img1 = findViewById(R.id.image_1);
         img2 = findViewById(R.id.image_2);
-        cat_img = findViewById(R.id.category_img);
+        cat_img = findViewById(R.id.category_img1);
 
     }
 
@@ -450,7 +452,7 @@ public class PostActivity extends AppCompatActivity {
 
 
         if(location_txt.equals("")){
-            location.setError("Adasdasd");
+            location.setError("Please select event type again!");
             location_bol = false;
         }else{
             location_bol = true;

@@ -1,6 +1,7 @@
 package com.example.trapic_test.Adapters;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -142,6 +143,13 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             holder.deleteBtn.setVisibility(View.GONE);
         }
 
+        holder.report_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.openDialog();
+            }
+        });
+
     }
 
 
@@ -153,7 +161,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
     public class NewsfeedHolder extends RecyclerView.ViewHolder{
         TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt;
-        LinearLayout like_btn, cmt_btn, viewMapBtn;
+        LinearLayout like_btn, cmt_btn, viewMapBtn, report_btn;
         Button deleteBtn;
         ImageView imageView, like_img;
         public NewsfeedHolder(View itemView) {
@@ -173,6 +181,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             cmt_btn = itemView.findViewById(R.id.comment_btn);
             viewMapBtn = itemView.findViewById(R.id.viewMapBtn);
             deleteBtn = itemView.findViewById(R.id.delete_btn);
+            report_btn = itemView.findViewById(R.id.report_btn);
         }
         public void countLike(String post_id, final TextView view){
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes").child(post_id);
@@ -194,6 +203,11 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
                 }
             });
+        }
+        private void openDialog(){
+            Dialog dialog = new Dialog(ctx);
+            dialog.setContentView(R.layout.report_layout);
+            dialog.show();
         }
         public void countComment(String post_id, final TextView textView){
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Comments").child(post_id);

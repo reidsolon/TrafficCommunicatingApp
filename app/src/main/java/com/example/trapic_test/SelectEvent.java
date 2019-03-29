@@ -49,10 +49,11 @@ public class SelectEvent extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.selectevent_layout);
-
+        callPermission();
         initViews();
         onClicks();
-        callPermission();
+
+
     }
 
     public void initViews() {
