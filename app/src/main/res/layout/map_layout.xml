@@ -8,11 +8,23 @@
         android:layout_height="match_parent">
 
     </com.mapbox.mapboxsdk.maps.MapView>
+
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:gravity="end"
         android:layout_above="@+id/select_type_holder"
         android:layout_height="wrap_content">
+        <Button
+            android:text="Testing "
+            android:textColor="#fff"
+            android:drawableStart="@drawable/ic_person_pin_circle_black_24dp"
+            android:paddingStart="10dp"
+            android:background="@drawable/selectmap_layout"
+            android:layout_marginBottom="5dp"
+            android:id="@+id/test_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
         <Button
             android:text=" I AM HERE "
             android:textColor="#fff"

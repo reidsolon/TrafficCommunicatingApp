@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.trapic_test.CommentsActivity;
 import com.example.trapic_test.MainFragment;
@@ -22,6 +26,7 @@ import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
 import com.example.trapic_test.ViewMapActivity;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +40,8 @@ import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.NewsfeedHolder>{
@@ -146,7 +153,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         holder.report_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.openDialog();
+                holder.openDialog(event.getUser_id(), event.getEvent_id());
             }
         });
 
@@ -160,9 +167,9 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     }
 
     public class NewsfeedHolder extends RecyclerView.ViewHolder{
-        TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt;
+        TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt, report_txt;
         LinearLayout like_btn, cmt_btn, viewMapBtn, report_btn;
-        Button deleteBtn;
+        Button deleteBtn, dialog_send_btn;
         ImageView imageView, like_img;
         public NewsfeedHolder(View itemView) {
             super(itemView);
@@ -204,10 +211,59 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 }
             });
         }
-        private void openDialog(){
-            Dialog dialog = new Dialog(ctx);
+        private void openDialog(String user_id, String event_id){
+            final Dialog dialog = new Dialog(ctx);
             dialog.setContentView(R.layout.report_layout);
             dialog.show();
+
+            String uid = user_id;
+            String eid = event_id;
+            dialog_send_btn = dialog.findViewById(R.id.report_btn);
+            report_txt = dialog.findViewById(R.id.report_msg);
+
+
+
+                Date d = new Date();
+                final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+                Date time = new Date();
+                final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
+
+                final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Reports").child(event_id);
+
+                final HashMap<String, Object> map = new HashMap<>();
+                map.put("report_id", databaseReference.push().getKey());
+                map.put("report_user_id", user_id);
+                map.put("report_date", d_date);
+                map.put("report_time", d_time);
+
+                dialog_send_btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(report_txt.getText().toString().equals("")){
+                            report_txt.setError("Please specify your report message!");
+                        }else {
+                            databaseReference.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    report_txt.setText("");
+                                    Toast.makeText(ctx, "You successfully reported that event", Toast.LENGTH_LONG).show();
+
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            dialog.dismiss();
+                                        }
+                                    }, 1000);
+                                }
+                            });
+                        }
+                    }
+                });
+
+
+
+
         }
         public void countComment(String post_id, final TextView textView){
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Comments").child(post_id);

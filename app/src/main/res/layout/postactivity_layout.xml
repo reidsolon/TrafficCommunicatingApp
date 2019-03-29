@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content">
             <ImageView
-                android:id="@+id/category_img1"
+                android:id="@+id/category_img"
                 android:src="@drawable/ic_road_crash"
                 android:layout_width="120dp"
                 android:layout_height="120dp" />
@@ -120,6 +120,7 @@
                 android:layout_height="match_parent">
 
                 <EditText
+                    android:backgroundTint="#111"
                     android:id="@+id/event_caption"
                     android:textColor="#fff"
                     android:textColorHint="#fff"

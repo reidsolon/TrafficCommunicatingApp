@@ -284,7 +284,7 @@ public class PostActivity extends AppCompatActivity {
         cameraBtn = findViewById(R.id.camera_btn);
         img1 = findViewById(R.id.image_1);
         img2 = findViewById(R.id.image_2);
-        cat_img = findViewById(R.id.category_img1);
+        cat_img = findViewById(R.id.category_img);
 
     }
 

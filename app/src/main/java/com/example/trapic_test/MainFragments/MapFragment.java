@@ -80,7 +80,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
     private LatLng latLng1;
     private Event[] event = new Event[200];
     private BottomSheetDialog dialog;
-    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, commentBtn;
+    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, commentBtn, testing;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
@@ -118,6 +118,12 @@ public class MapFragment extends Fragment implements PermissionsListener{
             @Override
             public void onClick(View v) {
                selectType();
+            }
+        });
+        testing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMarkerInfo();
             }
         });
         mapView.onCreate(savedInstanceState);
@@ -193,6 +199,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
         mapView = view.findViewById(R.id.mapView);
         myLocBtn = view.findViewById(R.id.my_loc);
         myLocBtn2 = view.findViewById(R.id.my_loc2);
+        testing = view.findViewById(R.id.test_btn);
 
         viewNewsfeedBtn = dialog.findViewById(R.id.marker_viewfeed_btn);
         commentBtn = dialog.findViewById(R.id.marker_cmt_btn);
@@ -202,6 +209,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
     }
     private void animateLocation(){
+        myLocation();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
@@ -226,9 +234,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
             // Set the component's render mode
             locationComponent.setRenderMode(RenderMode.COMPASS);
-
-            // setting up my location
-            cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(30).build();
 
             myLocation();
             loadAllMarkers();
@@ -334,8 +339,10 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
                 }
             }, Looper.getMainLooper());
-        }
+            // setting up my location
+            cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
 
+        }
     }
 
     private void callPermission(){
@@ -438,24 +445,13 @@ public class MapFragment extends Fragment implements PermissionsListener{
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void showMarkerInfo(String type, String time, String caption){
-        event_type_txt.setText(WordUtils.capitalize(type));
-        event_caption_txt.setText(caption);
-        switch (type){
-            case "Construction Area":{
-                cat_img.setImageResource(R.drawable.ic_construction_marker);
-                break;
-            }
-            case "Traffic Jams":{
-                cat_img.setImageResource(R.drawable.ic_traffic_jam);
-                break;
-            }
+    private void showMarkerInfo(){
+        event_type_txt.setText(WordUtils.capitalize("Test"));
+        event_caption_txt.setText("Test");
 
-            case "Road Crash":{
-                cat_img.setImageResource(R.drawable.ic_road_crash);
-                break;
-            }
-        }
+
+        cat_img.setImageResource(R.drawable.ic_traffic_jam);
+
         dialog.show();
     }
 

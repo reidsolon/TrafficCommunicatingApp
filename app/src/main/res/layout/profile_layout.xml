@@ -178,7 +178,7 @@
 
     <LinearLayout
         android:id="@+id/img_container"
-        android:layout_marginTop="-160dp"
+        android:layout_marginTop="-140dp"
         android:gravity="center"
         android:layout_below="@+id/profile_header"
         android:layout_width="match_parent"

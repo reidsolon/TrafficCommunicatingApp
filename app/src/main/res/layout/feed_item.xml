@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="50dp"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
     android:layout_marginBottom="5dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -11,7 +13,6 @@
         android:orientation="vertical"
         android:layout_height="wrap_content">
         <LinearLayout
-            android:paddingTop="5dp"
             android:background="@drawable/feed_header"
             android:layout_marginEnd="6dp"
             android:layout_marginStart="6dp"
@@ -27,12 +28,18 @@
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:foregroundGravity="center"
-                        android:src="@drawable/profile_picture"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:id="@+id/user_img"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:gravity="center"
+                        android:layout_height="match_parent">
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:foregroundGravity="center"
+                            android:src="@drawable/profile_picture"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:id="@+id/user_img"/>
+                    </LinearLayout>
+
                     <de.hdodenhof.circleimageview.CircleImageView
                         app:civ_border_color="#fff"
                         app:civ_border_width="3dp"
@@ -41,7 +48,7 @@
                         android:layout_marginStart="30dp"
                         android:layout_height="20dp"
                         android:layout_marginEnd="4dp"
-                        android:layout_marginBottom="17dp"
+                        android:layout_marginBottom="7dp"
                         android:layout_alignParentBottom="true"
                         android:src="@drawable/ic_fiber_manual_record_black_24dp"/>
                 </RelativeLayout>
@@ -56,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:textColor="#111"
                     android:layout_marginLeft="5dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="10dp"
                     android:textSize="18sp"
                     android:text="Fetching names..."
                     android:layout_height="wrap_content"
@@ -87,7 +94,6 @@
             android:background="@drawable/feed_body"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="6dp"
-            android:layout_marginTop="5dp"
             android:gravity="center"
             android:id="@+id/img_holder"
             android:layout_below="@+id/name_area"
@@ -162,10 +168,9 @@
             android:id="@+id/footer_container"
             android:layout_below="@id/img_holder"
             android:orientation="vertical"
-            android:layout_marginTop="5dp"
             android:background="@drawable/feed_footer"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <LinearLayout
@@ -288,9 +293,9 @@
                         android:layout_height="match_parent">
 
                         <ImageView
-                            android:src="@drawable/ic_report_black_24dp"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_report_black_24dp" />
 
                     </LinearLayout>
                     <LinearLayout

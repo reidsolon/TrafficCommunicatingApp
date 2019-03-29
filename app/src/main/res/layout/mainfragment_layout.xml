@@ -7,82 +7,15 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:id="@+id/signout_section"
-        android:weightSum="100"
-        android:paddingBottom="2dp"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
 
-        <LinearLayout
-            android:weightSum="100"
-            android:orientation="horizontal"
-            android:layout_width="250dp"
-            android:background="@drawable/mainfragment_nameholder"
-
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:layout_weight="20"
-                android:layout_width="0dp"
-                android:gravity="center"
-                android:layout_marginLeft="5dp"
-                android:layout_height="match_parent">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="40dp"
-                    android:src="@drawable/profile_picture"
-                    android:layout_height="40dp" />
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_weight="55"
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:gravity="center"
-                android:layout_height="match_parent">
-                <TextView
-                    android:textColor="#fff"
-                    android:id="@+id/test"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/Loading_name"/>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_weight="25"
-                android:gravity="center"
-                android:layout_width="0dp"
-                android:layout_height="match_parent">
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:layout_height="match_parent">
-                <Button
-                    android:id="@+id/logout_btn"
-                    android:layout_width="80dp"
-                    android:text="Sign Out"
-                    android:textColor="#111"
-                    android:background="@drawable/signout_btn"
-                    android:layout_height="30dp" />
-        </LinearLayout>
-    </LinearLayout>
     <RelativeLayout
-        android:layout_below="@+id/signout_section"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
-
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewPager"
                 android:layout_above="@id/tablayout_holder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
             </android.support.v4.view.ViewPager>
 
 
@@ -128,5 +61,68 @@
             </LinearLayout>
 
         </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/signout_section"
+        android:weightSum="100"
+        android:paddingBottom="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
 
+        <LinearLayout
+            android:weightSum="100"
+            android:orientation="horizontal"
+            android:layout_width="250dp"
+            android:background="@drawable/mainfragment_nameholder"
+
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_weight="20"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_height="match_parent">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="40dp"
+                    android:src="@drawable/profile_picture"
+                    android:layout_height="40dp" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_weight="55"
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <TextView
+                    android:textColor="#111"
+                    android:textSize="15sp"
+                    android:id="@+id/test"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Loading_name"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_weight="25"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="match_parent">
+            <Button
+                android:id="@+id/logout_btn"
+                android:layout_width="80dp"
+                android:text="Sign Out"
+                android:textColor="#111"
+                android:background="@drawable/signout_btn"
+                android:layout_height="30dp" />
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>
