@@ -124,7 +124,7 @@ public class CommentsActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
                         comment_edittext.setText("");
 
-                        sendNotification();
+                        setupRecycleView();
                     }
                 });
 
@@ -142,9 +142,8 @@ public class CommentsActivity extends AppCompatActivity {
     public void setupRecycleView(){
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        Query query1 = FirebaseDatabase.getInstance().getReference("Comments").orderByChild("comment_time");
 
-        Query query = FirebaseDatabase.getInstance().getReference("Comments").child(postId).orderByChild("comment_time");
+        Query query = FirebaseDatabase.getInstance().getReference("Comments").child(postId).orderByChild("comment_date_time");
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

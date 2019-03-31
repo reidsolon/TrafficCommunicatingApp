@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,6 +38,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -105,7 +108,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
         super.onViewCreated(view, savedInstanceState);
         dialog = new BottomSheetDialog(getContext());
         dialog.setContentView(R.layout.marker_dialog);
-        myLocation();
+
         initViews(view);
 
 
@@ -133,7 +136,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMap = mapboxMap;
-                myLocation();
 
                 mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
 
@@ -141,8 +143,8 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
-                        enableLocationComponent();
-
+                        loadAllMarkers();
+                        callPermission();
                         mMap.setMinZoomPreference(12);
                     }
                 });
@@ -211,7 +213,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
     }
     private void animateLocation(){
-        loadAllMarkers();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
@@ -283,9 +284,11 @@ public class MapFragment extends Fragment implements PermissionsListener{
             final double roundedKm;
             if(roundedDistance > 1000.0){
                 roundedKm = Math.round((roundedDistance / 100.0) * 100.0)/100.0;
-                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedKm+" km away from you");
+                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedKm+" km away from you")
+                        .setSnippet(event[i].getEvent_id());
             }else{
-                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
+                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you")
+                .setSnippet(event[i].getEvent_id());
             }
             if(distance <= 50){
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
@@ -311,7 +314,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     Notification notification = builder.build();
                     NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-                    manager.notify(1, notification);
+                    manager.notify(2, notification);
                 }else{
                     builder.setContentTitle(event[i].getEvent_type())
                             .setContentText("There is a event within" + roundedDistance +"m near you.")
@@ -322,16 +325,13 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     Notification notification = builder.build();
                     NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-                    manager.notify(1, notification);
+                    manager.notify(3, notification);
                 }
-
-
-
             }
 
             IconFactory iconFactory = IconFactory.getInstance(getActivity());
             Icon construction_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_construction_marker));
-            Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_road_crash));
+            final Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_road_crash));
             Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
 
 
@@ -356,19 +356,23 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     break;
                 }
             }
+
+
             markerOptions.position(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
             event_marker[i] = mMap.addMarker(markerOptions);
-
-            map.put(event_marker[i], event[i]);
 
             mMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(@NonNull Marker marker) {
+                    event_type_txt.setText(WordUtils.capitalize(marker.getTitle()));
+                    event_caption_txt.setText(marker.getTitle());
+                    cat_img.setImageResource(R.drawable.ic_traffic_jam);
 
-                    Toast.makeText(getContext(), map.get(event[i]).getEvent_type(), Toast.LENGTH_SHORT).show();
+                    dialog.show();
                     return true;
                 }
             });
+            map.put(event_marker[i], event[i]);
             i++;
         }
 
@@ -378,7 +382,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             callPermission();
         }else {
-
 
             FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
 
@@ -400,7 +403,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
             }, Looper.getMainLooper());
             // setting up my location
             cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
-
         }
     }
 
@@ -409,6 +411,17 @@ public class MapFragment extends Fragment implements PermissionsListener{
             @Override
             public void onGranted() {
                 myLocation();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ProgressDialog dialog = new ProgressDialog(getActivity());
+                        dialog.setMessage("Retrieving current location");
+                        enableLocationComponent();
+                        loadAllMarkers();
+                    }
+                },1000);
+
             }
 
             @Override
@@ -505,13 +518,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
     }
 
     private void showMarkerInfo(){
-        event_type_txt.setText(WordUtils.capitalize("Test"));
-        event_caption_txt.setText("Test");
 
-
-        cat_img.setImageResource(R.drawable.ic_traffic_jam);
-
-        dialog.show();
     }
 
 }
