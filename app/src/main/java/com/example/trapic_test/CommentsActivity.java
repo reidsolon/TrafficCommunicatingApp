@@ -38,8 +38,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -100,10 +103,11 @@ public class CommentsActivity extends AppCompatActivity {
     public void addComment(){
         final String comment = comment_edittext.getText().toString();
         com.google.firebase.database.Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_id").equalTo(auth.getCurrentUser().getUid());
-        Date d = new Date();
-        final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
-        Date time = new Date();
-        final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
+
+        final String d_date = (String) DateFormat.format("MMMM d, yyyy", new Date());
+        final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
+        final String date_time = (String) DateFormat.format("MMMM d, yyyy hh:mm:ss a", new Date());
+
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -112,7 +116,7 @@ public class CommentsActivity extends AppCompatActivity {
                 User user = dataSnapshot.getValue(User.class);
 
                 String fullname = user.getUser_firstname()+" "+user.getUser_lastname();
-                Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time);
+                Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time,date_time);
                 String id = dbRefs.push().getKey();
                 dbRefs.child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -138,8 +142,9 @@ public class CommentsActivity extends AppCompatActivity {
     public void setupRecycleView(){
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        Query query1 = FirebaseDatabase.getInstance().getReference("Comments").orderByChild("comment_time");
 
-        Query query = FirebaseDatabase.getInstance().getReference("Comments").child(postId).orderByChild("post_id").equalTo(postId);
+        Query query = FirebaseDatabase.getInstance().getReference("Comments").child(postId).orderByChild("comment_time");
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -148,7 +153,12 @@ public class CommentsActivity extends AppCompatActivity {
                 for(DataSnapshot snapshot :  dataSnapshot.getChildren()) {
 
                     Comment event = snapshot.getValue(Comment.class);
-                    list.add(event);
+                    if(event.getPost_id().equals(postId)){
+                        list.add(event);
+
+                        Collections.reverse(list);
+
+                    }
                 }
                 userCommentAdapter = new UserCommentAdapter(getApplicationContext(), list);
                 recyclerView.setAdapter(userCommentAdapter);

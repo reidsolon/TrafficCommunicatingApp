@@ -311,11 +311,12 @@ public class PostActivity extends AppCompatActivity {
                 final String id3 = dbRefs.push().getKey();
                 Uri uri2 = task.getResult();
                 Date d = new Date();
-                final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+                final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
                 Date time = new Date();
-                final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
+                final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
+                final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
 
-                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date, location_lat, location_lng );
+                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date, location_lat, location_lng, date_time);
                 dbRefs.child(id3).setValue(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

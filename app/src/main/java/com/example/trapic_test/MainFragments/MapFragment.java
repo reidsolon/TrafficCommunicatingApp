@@ -2,7 +2,8 @@ package com.example.trapic_test.MainFragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.LayoutInflater;
@@ -28,21 +30,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.trapic_test.Model.Event;
-import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -66,6 +64,7 @@ import com.nabinbhandari.android.permissions.Permissions;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MapFragment extends Fragment implements PermissionsListener{
@@ -88,6 +87,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
     private MarkerOptions markerOptions;
     private String event_user_id, event_user_fullname;
     private Marker[] event_marker = new Marker[200];
+    private HashMap<Marker, Event> map = new HashMap<Marker, Event>();
 
     public MapFragment() {
 
@@ -105,6 +105,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
         super.onViewCreated(view, savedInstanceState);
         dialog = new BottomSheetDialog(getContext());
         dialog.setContentView(R.layout.marker_dialog);
+        myLocation();
         initViews(view);
 
 
@@ -141,6 +142,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
                         enableLocationComponent();
+
                         mMap.setMinZoomPreference(12);
                     }
                 });
@@ -209,7 +211,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
     }
     private void animateLocation(){
-        myLocation();
+        loadAllMarkers();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
@@ -255,64 +257,121 @@ public class MapFragment extends Fragment implements PermissionsListener{
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
                     event[i] = dataSnapshot1.getValue(Event.class);
-
-                    event_user_id = event[i].getUser_id();
-                    markerOptions = new MarkerOptions();
-
-                    if(latLng1 != null){
-
-                        double distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
-                        final double roundedDistance = Math.round(distance * 100.0) / 100.0;
-                        final double roundedKm;
-                        if(roundedDistance > 1000.0){
-                            roundedKm = Math.round((roundedDistance / 100.0) * 100.0)/100.0;
-                            markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedKm+" km away from you");
-                        }else{
-                            markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
-                        }
-
-                        IconFactory iconFactory = IconFactory.getInstance(getActivity());
-                        Icon construction_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_construction_marker));
-                        Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_road_crash));
-                        Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
-
-
-                        switch(event[i].getEvent_type()){
-                            case "Congestion":{
-                                markerOptions.icon(trafficjam_marker);
-                                break;
-                            }
-
-                            case "Construction Area":{
-                                markerOptions.icon(construction_marker);
-                                break;
-                            }
-
-                            case "Traffic Jams":{
-                                markerOptions.icon(trafficjam_marker);
-                                break;
-                            }
-
-                            case "Road Crash":{
-                                markerOptions.icon(roadcrash_marker);
-                                break;
-                            }
-                        }
-                            markerOptions.position(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
-                            event_marker[i] = mMap.addMarker(markerOptions);
-
-
-                    }
-
-                    i++;
+                    loadMarkerDatas();
                 }
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
+
+    }
+
+    private void loadMarkerDatas(){
+
+        event_user_id = event[i].getUser_id();
+        markerOptions = new MarkerOptions();
+
+
+        if(latLng1 != null){
+
+            double distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
+            final double roundedDistance = Math.round(distance * 100.0) / 100.0;
+            final double roundedKm;
+            if(roundedDistance > 1000.0){
+                roundedKm = Math.round((roundedDistance / 100.0) * 100.0)/100.0;
+                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedKm+" km away from you");
+            }else{
+                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
+            }
+            if(distance <= 50){
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
+
+                if(event[i].getEvent_type().equals("Construction Area")){
+                    builder.setContentTitle(event[i].getEvent_type())
+                            .setContentText("There is a event within" + roundedDistance +"m near you.")
+                            .setSmallIcon(R.drawable.ic_construction_marker)
+                            .setTicker("There is an event posted near you!")
+                            .setAutoCancel(true);
+
+                    Notification notification = builder.build();
+                    NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    manager.notify(1, notification);
+                }else if(event[i].getEvent_type().equals("Traffic Jams")){
+                    builder.setContentTitle(event[i].getEvent_type())
+                            .setContentText("There is a event within" + roundedDistance +"m near you.")
+                            .setSmallIcon(R.drawable.ic_traffic_jam)
+                            .setTicker("There is an event posted near you!")
+                            .setAutoCancel(true);
+
+                    Notification notification = builder.build();
+                    NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    manager.notify(1, notification);
+                }else{
+                    builder.setContentTitle(event[i].getEvent_type())
+                            .setContentText("There is a event within" + roundedDistance +"m near you.")
+                            .setSmallIcon(R.drawable.ic_road_crash)
+                            .setTicker("There is an event posted near you!")
+                            .setAutoCancel(true);
+
+                    Notification notification = builder.build();
+                    NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    manager.notify(1, notification);
+                }
+
+
+
+            }
+
+            IconFactory iconFactory = IconFactory.getInstance(getActivity());
+            Icon construction_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_construction_marker));
+            Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_road_crash));
+            Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
+
+
+            switch(event[i].getEvent_type()){
+                case "Congestion":{
+                    markerOptions.icon(trafficjam_marker);
+                    break;
+                }
+
+                case "Construction Area":{
+                    markerOptions.icon(construction_marker);
+                    break;
+                }
+
+                case "Traffic Jams":{
+                    markerOptions.icon(trafficjam_marker);
+                    break;
+                }
+
+                case "Road Crash":{
+                    markerOptions.icon(roadcrash_marker);
+                    break;
+                }
+            }
+            markerOptions.position(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
+            event_marker[i] = mMap.addMarker(markerOptions);
+
+            map.put(event_marker[i], event[i]);
+
+            mMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(@NonNull Marker marker) {
+
+                    Toast.makeText(getContext(), map.get(event[i]).getEvent_type(), Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+            i++;
+        }
+
     }
 
     private void myLocation() {

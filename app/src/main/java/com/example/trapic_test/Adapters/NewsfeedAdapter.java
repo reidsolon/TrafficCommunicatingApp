@@ -39,6 +39,7 @@ import com.mapbox.mapboxsdk.maps.Style;
 import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -68,7 +69,9 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final Event event = eventList.get(position);
         Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
-        holder.timestamp.setText(event.getEvent_time());
+        PrettyTime p = new PrettyTime();
+        String pretty = p.format(new Date(event.getEvent_date_time()));
+        holder.timestamp.setText(pretty);
         holder.caption.setText(event.getEvent_caption());
 
         holder.caption.setCompoundDrawables(ctx.getResources().getDrawable(R.drawable.ic_construction_marker), null, null, null);

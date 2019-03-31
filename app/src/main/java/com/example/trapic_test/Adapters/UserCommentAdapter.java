@@ -20,7 +20,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -44,9 +47,12 @@ public class UserCommentAdapter extends RecyclerView.Adapter<UserCommentAdapter.
     @Override
     public void onBindViewHolder(@NonNull UserCommentHolder holder, int position) {
         Comment comment = list.get(position);
+
+        PrettyTime p = new PrettyTime();
+        final String test = p.format(new Date(comment.getComment_date_time()));
         holder.setCommentInfo(comment.getComment_user_id(),holder.publisher);
         holder.commentMsg.setText(comment.getCmt_msg());
-        holder.comment_time.setText("at "+comment.getComment_time());
+        holder.comment_time.setText(test);
     }
 
     @Override

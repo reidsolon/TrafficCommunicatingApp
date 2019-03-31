@@ -15,12 +15,13 @@ public class Event {
     private double event_lng;
     private String event_time;
     private String event_date;
+    private String event_date_time;
 
     public Event(){
 
     }
 
-    public Event(String caption, String type, String location, String image, String id, String event_id, String time, String date, double lat, double lng){
+    public Event(String caption, String type, String location, String image, String id, String event_id, String time, String date, double lat, double lng, String date_time){
         this.event_caption = caption;
         this.event_type = type;
         this.event_location = location;
@@ -31,6 +32,7 @@ public class Event {
         this.event_date = date;
         this.event_lat = lat;
         this.event_lng = lng;
+        this.event_date_time = date_time;
     }
 
     public String getEvent_caption() {
@@ -111,5 +113,9 @@ public class Event {
 
     public void setEvent_date(String event_date) {
         this.event_date = event_date;
+    }
+
+    public String getEvent_date_time() {
+        return event_date_time;
     }
 }

@@ -12,8 +12,9 @@ public class Comment {
     private String comment_user_fullname;
     private String comment_date;
     private String comment_time;
+    private String comment_date_time;
 
-    public Comment(String id, String id2, String msg, String id3, String fullname, String date, String time){
+    public Comment(String id, String id2, String msg, String id3, String fullname, String date, String time, String date_time){
         this.publisher_id = id;
         this.post_id = id2;
         this.cmt_msg = msg;
@@ -21,6 +22,7 @@ public class Comment {
         this.comment_user_fullname = fullname;
         this.comment_date = date;
         this.comment_time = time;
+        this.comment_date_time = date_time;
     }
 
     public String getPublisher_id() {
@@ -61,5 +63,9 @@ public class Comment {
 
     public String getComment_time() {
         return comment_time;
+    }
+
+    public String getComment_date_time() {
+        return comment_date_time;
     }
 }
