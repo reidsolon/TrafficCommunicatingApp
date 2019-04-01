@@ -26,7 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginFragment extends AppCompatActivity {
-    Button logBtn, regBtn;
+    Button logBtn, regBtn, guestBtn;
     EditText pw, email;
     FirebaseAuth auth;
     ProgressDialog dialog;
@@ -50,6 +50,7 @@ public class LoginFragment extends AppCompatActivity {
         regBtn = (Button) findViewById(R.id.register_link);
         pw = (EditText) findViewById(R.id.log_pw);
         email = (EditText) findViewById(R.id.log_email);
+        guestBtn = findViewById(R.id.guest_btn);
 
         dbRef = FirebaseDatabase.getInstance().getReference("User");
         dialog = new ProgressDialog(LoginFragment.this);
@@ -73,6 +74,13 @@ public class LoginFragment extends AppCompatActivity {
             public void onClick(View v) {
                 finish();
                 startActivity(new Intent(getApplicationContext(), RegisterFragment.class));
+            }
+        });
+
+        guestBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), GuestActivity.class));
             }
         });
 
@@ -145,5 +153,8 @@ public class LoginFragment extends AppCompatActivity {
         }
 
         return false;
+    }
+    public void onBackPressed() {
+        Toast.makeText(getApplicationContext(), "Back is disabled.", Toast.LENGTH_SHORT).show();
     }
 }

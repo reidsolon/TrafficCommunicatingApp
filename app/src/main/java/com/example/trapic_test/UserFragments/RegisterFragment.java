@@ -51,7 +51,7 @@ public class RegisterFragment extends AppCompatActivity {
     FirebaseFirestore firestore;
     EditText uname, fname, lname, pw1, pw2, email;
     LinearLayout layout;
-    Button reg_btn, log_btn;
+    Button reg_btn, log_btn,guest_btn;
     FirebaseUser auth;
 
     private static final Pattern PASSWORD_PATTERN =
@@ -107,6 +107,13 @@ public class RegisterFragment extends AppCompatActivity {
 
             }
         });
+
+        guest_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), GuestActivity.class));
+            }
+        });
     }
 
     public void initViews(){
@@ -118,6 +125,7 @@ public class RegisterFragment extends AppCompatActivity {
         email = (EditText) findViewById(R.id.reg_email);
         log_btn = (Button) findViewById(R.id.login_link);
         reg_btn = (Button) findViewById(R.id.reg_btn);
+        guest_btn = findViewById(R.id.guest_btn);
 
     }
 
@@ -185,6 +193,8 @@ public class RegisterFragment extends AppCompatActivity {
 
                                 auth = firebaseAuth.getCurrentUser();
                                 auth.sendEmailVerification();
+                                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
                                 dbRef = FirebaseDatabase.getInstance().getReference("Notifications");
                                 String id = dbRef.push().getKey();
 
@@ -281,6 +291,11 @@ public class RegisterFragment extends AppCompatActivity {
         }else{
             return false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(getApplicationContext(), "Back is disabled.", Toast.LENGTH_SHORT).show();
     }
 }
 

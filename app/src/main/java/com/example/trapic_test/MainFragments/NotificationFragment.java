@@ -30,6 +30,8 @@ public class NotificationFragment extends Fragment {
     private RecyclerView recyclerView;
     private View v;
     private List<Notification> list;
+    private FirebaseAuth auth;
+    private FirebaseUser user;
 
     public NotificationFragment(){
 
@@ -38,20 +40,33 @@ public class NotificationFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.notification_layout, container, false);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            if(user.isEmailVerified() && FirebaseAuth.getInstance().getCurrentUser() != null){
+                v = inflater.inflate(R.layout.notification_layout, container, false);
+                initView();
+            }else{
+                v = inflater.inflate(R.layout.unverified_newsfeed, container, false);
+            }
+        }else{
+            v = inflater.inflate(R.layout.unverified_newsfeed, container, false);
+        }
+
+
         return v;
     }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        recyclerView = view.findViewById(R.id.recyclerview);
+    private void initView(){
+        recyclerView = v.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
 
         list = new ArrayList<>();
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        loadNotification();
+//        loadNotification();
 
 
     }

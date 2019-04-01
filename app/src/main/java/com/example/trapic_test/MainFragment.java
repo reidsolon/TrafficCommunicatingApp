@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.trapic_test.Adapters.ViewPagerAdapter;
 import com.example.trapic_test.MainFragments.MapFragment;
@@ -40,7 +41,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.apache.commons.lang3.text.WordUtils;
 
 public class MainFragment extends AppCompatActivity {
-    private TextView test;
+    private TextView test, status_mode_txt;
     private Button logout;
 
     private LinearLayout postLink;
@@ -61,32 +62,7 @@ public class MainFragment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainfragment_layout);
         init();
-        String id = auth.getCurrentUser().getUid();
-        db = FirebaseDatabase.getInstance();
-
-        dbRefs = db.getReference("Users").child(id);
-        if(auth.getCurrentUser() == null){
-            finish();
-            startActivity(new Intent(MainFragment.this, MainActivity.class));
-        }
-        dbRefs.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataSnapshot.getChildren();
-                User user = dataSnapshot.getValue(User.class);
-                String firstname = "Hi, "+ WordUtils.capitalize(user.getUser_firstname());
-                test.setText(firstname);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-
+        loadUserInfo();
 
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -105,24 +81,91 @@ public class MainFragment extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                auth.signOut();
-                finish();
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+                        FirebaseAuth.getInstance().signOut();
+                        finish();
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    }else if(FirebaseAuth.getInstance().getCurrentUser() != null || FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+                        FirebaseAuth.getInstance().signOut();
+                        finish();
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    }else{
+                        finish();
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    }
+                }else{
+                    finish();
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                }
             }
         });
 
         postLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED){
-                    requestStoragePermission();
+                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                    if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified() && FirebaseAuth.getInstance().getCurrentUser() != null){
+                        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED){
+                            requestStoragePermission();
+                        }else{
+                            startActivity(new Intent(getApplicationContext(), SelectEvent.class));
+                        }
+                    }else{
+                        Toast.makeText(getApplicationContext(), "Unverified account/Guest cannot use this feature.", Toast.LENGTH_LONG).show();
+                    }
                 }else{
-                    startActivity(new Intent(getApplicationContext(), SelectEvent.class));
+                    Toast.makeText(getApplicationContext(), "Unverified account/Guest cannot use this feature.", Toast.LENGTH_LONG).show();
                 }
+
+
             }
         });
     }
+    private void loadUserInfo(){
 
+
+
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+                status_mode_txt.setText("Verified User");
+            }else if(FirebaseAuth.getInstance().getCurrentUser() != null || FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+                status_mode_txt.setText("Unverified User");
+            }else{
+                status_mode_txt.setText("Guest Mode");
+            }
+
+            String id = auth.getCurrentUser().getUid();
+            db = FirebaseDatabase.getInstance();
+
+            dbRefs = db.getReference("Users").child(id);
+            if(auth.getCurrentUser() == null){
+                finish();
+                startActivity(new Intent(MainFragment.this, MainActivity.class));
+            }
+            dbRefs.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    dataSnapshot.getChildren();
+                    User user = dataSnapshot.getValue(User.class);
+                    String firstname = "Hi, "+ WordUtils.capitalize(user.getUser_firstname());
+                    test.setText(firstname);
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }else{
+            Intent intent = getIntent();
+            String name = intent.getStringExtra("Guest_name");
+            test.setText("Hi,"+ WordUtils.capitalize(name));
+            status_mode_txt.setText("Guest mode");
+        }
+
+    }
     public void init(){
 
         viewPager =  findViewById(R.id.viewPager);
@@ -130,6 +173,8 @@ public class MainFragment extends AppCompatActivity {
         test =  findViewById(R.id.test);
         postLink =  findViewById(R.id.post_link);
         logout =  findViewById(R.id.logout_btn);
+
+        status_mode_txt = findViewById(R.id.status_mode_txt);
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();

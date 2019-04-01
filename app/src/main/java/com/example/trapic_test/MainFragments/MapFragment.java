@@ -39,6 +39,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -124,12 +126,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                selectType();
             }
         });
-        testing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showMarkerInfo();
-            }
-        });
+
         mapView.onCreate(savedInstanceState);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -137,7 +134,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMap = mapboxMap;
 
-                mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+                mapboxMap.setStyle(Style.TRAFFIC_NIGHT, new Style.OnStyleLoaded() {
 
 
                     @Override
@@ -203,13 +200,13 @@ public class MapFragment extends Fragment implements PermissionsListener{
         mapView = view.findViewById(R.id.mapView);
         myLocBtn = view.findViewById(R.id.my_loc);
         myLocBtn2 = view.findViewById(R.id.my_loc2);
-        testing = view.findViewById(R.id.test_btn);
 
         viewNewsfeedBtn = dialog.findViewById(R.id.marker_viewfeed_btn);
         commentBtn = dialog.findViewById(R.id.marker_cmt_btn);
         cat_img = dialog.findViewById(R.id.cat_img);
         event_type_txt = dialog.findViewById(R.id.event_cat_txt);
         event_caption_txt = dialog.findViewById(R.id.event_cap);
+
 
     }
     private void animateLocation(){
@@ -250,6 +247,8 @@ public class MapFragment extends Fragment implements PermissionsListener{
     }
 
     public void loadAllMarkers() {
+
+
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
 
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -365,7 +364,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                 @Override
                 public boolean onMarkerClick(@NonNull Marker marker) {
                     event_type_txt.setText(WordUtils.capitalize(marker.getTitle()));
-                    event_caption_txt.setText(marker.getTitle());
+                    event_caption_txt.setText(marker.getSnippet());
                     cat_img.setImageResource(R.drawable.ic_traffic_jam);
 
                     dialog.show();

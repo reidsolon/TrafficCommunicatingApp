@@ -15,5 +15,6 @@
     <string name="time_ago_months">mons</string>
     <string name="time_ago_year">yr</string>
     <string name="time_ago_years">yrs</string>
+    <string name="unverified_newsfeed_txt">Oops, You need to login/verify your email inorder to see this activity.</string>
     <string name="activation_txt">You successfully registered your account. We sent a account activation on your email, please kindly check and verify your email address.</string>
 </resources>

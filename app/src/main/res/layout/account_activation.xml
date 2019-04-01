@@ -100,7 +100,7 @@
                 android:fontFamily="@font/mooka"
                 android:background="@drawable/guest_btn"
                 android:textColor="#fff"
-                android:drawableLeft="@drawable/ic_chevron_right_black_24dp"/>
+                android:drawableEnd="@drawable/ic_chevron_right_black_24dp"/>
         </LinearLayout>
 
     </LinearLayout>

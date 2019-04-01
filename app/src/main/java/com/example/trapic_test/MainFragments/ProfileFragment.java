@@ -46,7 +46,22 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.profile_layout, container, false);
+        auth = FirebaseAuth.getInstance();
+        firebaseUser = auth.getCurrentUser();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null){
+            if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                v = inflater.inflate(R.layout.profile_layout, container, false);
+                initViews();
+                loadUserInfo();
+                initClicks();
+            }else{
+                v = inflater.inflate(R.layout.unverified_newsfeed, container, false);
+            }
+        }else{
+            v = inflater.inflate(R.layout.unverified_newsfeed, container, false);
+        }
+
+
 
         return v;
     }
@@ -55,9 +70,16 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        loadUserInfo();
+    }
+    private void initClicks(){
 
-        initViews();
+    }
+    public void initViews(){
+        send_feedback_link = v.findViewById(R.id.send_feedback_link);
+        activate_btn = v.findViewById(R.id.activate_btn);
+        user_status_img = v.findViewById(R.id.user_status_img);
+        user_fullname_txt = v.findViewById(R.id.user_full_name);
+        user_email = v.findViewById(R.id.user_email);
 
         send_feedback_link.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,14 +87,6 @@ public class ProfileFragment extends Fragment {
                 startActivity(new Intent(getActivity(), SendFeedbackActivity.class));
             }
         });
-    }
-
-    public void initViews(){
-        activate_btn = getActivity().findViewById(R.id.activate_btn);
-        user_status_img = getActivity().findViewById(R.id.user_status_img);
-        user_fullname_txt = getActivity().findViewById(R.id.user_full_name);
-        user_email = getActivity().findViewById(R.id.user_email);
-        send_feedback_link = getActivity().findViewById(R.id.send_feedback_link);
     }
 
     public void loadUserInfo(){

@@ -23,6 +23,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,7 +53,9 @@ public class NewsfeedFragment extends Fragment {
     private RecyclerView recyclerView;
     private FirebaseFirestore firebaseFirestore;
     private NewsfeedAdapter newsfeedAdapter;
+    private FirebaseAuth auth;
     private List<Event> list;
+    private FirebaseUser user;
     View view;
     public NewsfeedFragment(){
 
@@ -61,54 +64,61 @@ public class NewsfeedFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
+        user = auth.getInstance().getCurrentUser();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            if(user.isEmailVerified() && user != null){
+                view = inflater.inflate(R.layout.newsfeed_layout, container, false);
+                initViews();
+                readPosts();
+                Query query = FirebaseDatabase.getInstance().getReference("Posts");
+                query.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-        view = inflater.inflate(R.layout.newsfeed_layout, container, false);
+                        dataSnapshot.getChildren();
+                        Event event = dataSnapshot.getValue(Event.class);
 
-        initViews();
-        readPosts();
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
 
-        Query query = FirebaseDatabase.getInstance().getReference("Posts");
-        query.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        builder.setContentTitle("Someone posted an event!")
+                                .setContentText("Click here to view")
+                                .setSmallIcon(R.drawable.trapic_logo)
+                                .setTicker("There is an event posted near you!")
+                                .setAutoCancel(true);
 
-                dataSnapshot.getChildren();
-                Event event = dataSnapshot.getValue(Event.class);
+                        Notification notification = builder.build();
+                        NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
+                        manager.notify(3, notification);
+                    }
 
-                builder.setContentTitle("Someone posted an event!")
-                        .setContentText("Click here to view")
-                        .setSmallIcon(R.drawable.trapic_logo)
-                        .setTicker("There is an event posted near you!")
-                        .setAutoCancel(true);
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                Notification notification = builder.build();
-                NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    }
 
-                manager.notify(2, notification);
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+            }else{
+                view = inflater.inflate(R.layout.unverified_newsfeed, container, false);
             }
+        }else{
+            view = inflater.inflate(R.layout.unverified_newsfeed, container, false);
+        }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
         return view;
     }
 
@@ -147,5 +157,30 @@ public class NewsfeedFragment extends Fragment {
             }
         });
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }
