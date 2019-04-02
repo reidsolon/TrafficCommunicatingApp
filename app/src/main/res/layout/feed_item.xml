@@ -96,7 +96,7 @@
             android:id="@+id/img_holder"
             android:layout_below="@+id/name_area"
             android:layout_width="match_parent"
-            android:layout_height="400dp">
+            android:layout_height="440dp">
 
             <ImageView
                 android:id="@+id/post_img"

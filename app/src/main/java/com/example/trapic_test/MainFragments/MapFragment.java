@@ -201,8 +201,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
         myLocBtn = view.findViewById(R.id.my_loc);
         myLocBtn2 = view.findViewById(R.id.my_loc2);
 
-        viewNewsfeedBtn = dialog.findViewById(R.id.marker_viewfeed_btn);
-        commentBtn = dialog.findViewById(R.id.marker_cmt_btn);
+        viewNewsfeedBtn = dialog.findViewById(R.id.view_to_newsfeed);
         cat_img = dialog.findViewById(R.id.cat_img);
         event_type_txt = dialog.findViewById(R.id.event_cat_txt);
         event_caption_txt = dialog.findViewById(R.id.event_cap);
@@ -275,7 +274,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
         event_user_id = event[i].getUser_id();
         markerOptions = new MarkerOptions();
 
-
         if(latLng1 != null){
 
             double distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
@@ -283,11 +281,9 @@ public class MapFragment extends Fragment implements PermissionsListener{
             final double roundedKm;
             if(roundedDistance > 1000.0){
                 roundedKm = Math.round((roundedDistance / 100.0) * 100.0)/100.0;
-                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedKm+" km away from you")
-                        .setSnippet(event[i].getEvent_id());
+                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedKm+" km away from you");
             }else{
-                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you")
-                .setSnippet(event[i].getEvent_id());
+                markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
             }
             if(distance <= 50){
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
@@ -328,10 +324,11 @@ public class MapFragment extends Fragment implements PermissionsListener{
                 }
             }
 
+            markerOptions.setSnippet(event[i].getEvent_id());
             IconFactory iconFactory = IconFactory.getInstance(getActivity());
             Icon construction_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_construction_marker));
             final Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_road_crash));
-            Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
+            final Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
 
 
             switch(event[i].getEvent_type()){
@@ -363,9 +360,15 @@ public class MapFragment extends Fragment implements PermissionsListener{
             mMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(@NonNull Marker marker) {
-                    event_type_txt.setText(WordUtils.capitalize(marker.getTitle()));
+                    event_type_txt.setText(marker.getTitle());
                     event_caption_txt.setText(marker.getSnippet());
-                    cat_img.setImageResource(R.drawable.ic_traffic_jam);
+                    if(marker.getIcon() == roadcrash_marker){
+                        cat_img.setImageResource(R.drawable.ic_road_crash);
+                    }else if(marker.getIcon() == trafficjam_marker){
+                        cat_img.setImageResource(R.drawable.ic_traffic_jam);
+                    }else{
+                        cat_img.setImageResource(R.drawable.ic_construction_marker);
+                    }
 
                     dialog.show();
                     return true;
