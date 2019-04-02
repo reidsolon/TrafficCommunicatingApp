@@ -73,7 +73,6 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         String pretty = p.format(new Date(event.getEvent_date_time()));
         holder.timestamp.setText(pretty);
         holder.caption.setText(event.getEvent_caption());
-
         holder.caption.setCompoundDrawables(ctx.getResources().getDrawable(R.drawable.ic_construction_marker), null, null, null);
         holder.type.setText(event.getEvent_type());
         holder.setUserInfo(event.getUser_id());

@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +76,7 @@ import java.util.List;
 public class MapFragment extends Fragment implements PermissionsListener{
 
     private MapboxMap mMap;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
     private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt;
@@ -113,6 +115,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
         initViews(view);
 
+        refreshAll();
 
         myLocBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,6 +202,8 @@ public class MapFragment extends Fragment implements PermissionsListener{
         mapView = view.findViewById(R.id.mapView);
         myLocBtn = view.findViewById(R.id.my_loc);
         myLocBtn2 = view.findViewById(R.id.my_loc2);
+        swipeRefreshLayout = view.findViewById(R.id.swipe);
+
         close_txt = dialog.findViewById(R.id.close_txt);
 
         viewNewsfeedBtn = dialog.findViewById(R.id.view_to_newsfeed);
@@ -208,6 +213,63 @@ public class MapFragment extends Fragment implements PermissionsListener{
         yesBtn = dialog.findViewById(R.id.yes_btn);
         noBtn = dialog.findViewById(R.id.no_btn);
 
+    }
+    private void refreshAll(){
+        DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("Posts");
+        databaseReference1.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                loadAllMarkers();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("Approval");
+        databaseReference2.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                loadAllMarkers();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
     private void animateLocation(){
         myLocation();
@@ -255,10 +317,13 @@ public class MapFragment extends Fragment implements PermissionsListener{
                 if(dataSnapshot.child(user_id).exists()){
                     yesBtn.setVisibility(View.INVISIBLE);
                     noBtn.setVisibility(View.INVISIBLE);
-                    view.setTag("Voted");
                     close_txt.setText("You just said that this event is closed. Thank you for giving us information.");
+                    view.setTag("Voted");
                 }else{
                     view.setTag("Not Voted");
+                    yesBtn.setVisibility(View.VISIBLE);
+                    noBtn.setVisibility(View.VISIBLE);
+                    close_txt.setText("Is this event closed?");
                 }
             }
 
