@@ -77,14 +77,14 @@ public class MapFragment extends Fragment implements PermissionsListener{
     private MapboxMap mMap;
     private MapView mapView;
     private LocationRequest locationRequest;
-    private TextView event_type_txt, event_caption_txt, event_time_txt;
+    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt;
     private ImageView cat_img;
     private String[] list;
     private double lat, lng;
     private LatLng latLng1;
     private Event[] event = new Event[200];
     private BottomSheetDialog dialog;
-    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, commentBtn, testing;
+    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
@@ -140,6 +140,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
                         // Get an instance of the component
+                        myLocation();
                         loadAllMarkers();
                         callPermission();
                         mMap.setMinZoomPreference(12);
@@ -150,8 +151,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
         });
     }
 
-
-    
     private void selectType(){
         list = new String[]{"Night Mode Traffic", "Day Mode Traffic", "Normal Streets"};
 
@@ -200,15 +199,19 @@ public class MapFragment extends Fragment implements PermissionsListener{
         mapView = view.findViewById(R.id.mapView);
         myLocBtn = view.findViewById(R.id.my_loc);
         myLocBtn2 = view.findViewById(R.id.my_loc2);
+        close_txt = dialog.findViewById(R.id.close_txt);
 
         viewNewsfeedBtn = dialog.findViewById(R.id.view_to_newsfeed);
         cat_img = dialog.findViewById(R.id.cat_img);
         event_type_txt = dialog.findViewById(R.id.event_cat_txt);
         event_caption_txt = dialog.findViewById(R.id.event_cap);
-
+        yesBtn = dialog.findViewById(R.id.yes_btn);
+        noBtn = dialog.findViewById(R.id.no_btn);
 
     }
     private void animateLocation(){
+        myLocation();
+        loadAllMarkers();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
@@ -227,7 +230,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
             // Enable to make component visible
             locationComponent.setLocationComponentEnabled(true);
 
-
             // Set the component's camera mode
             locationComponent.setCameraMode(CameraMode.TRACKING);
 
@@ -243,6 +245,72 @@ public class MapFragment extends Fragment implements PermissionsListener{
             permissionsManager.requestLocationPermissions(getActivity());
 
         }
+    }
+    private void isVoted(String post_id, final Button view){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Approval").child(post_id);
+        final String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child(user_id).exists()){
+                    yesBtn.setVisibility(View.INVISIBLE);
+                    noBtn.setVisibility(View.INVISIBLE);
+                    view.setTag("Voted");
+                    close_txt.setText("You just said that this event is closed. Thank you for giving us information.");
+                }else{
+                    view.setTag("Not Voted");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+    private void loadOnClicks(final String post_id, final Button view){
+
+        final String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Approval");
+
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                loadAllMarkers();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                loadAllMarkers();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    loadAllMarkers();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                loadAllMarkers();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        yesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(view.getTag().equals("Not Voted")){
+                    databaseReference.child(post_id).child(user_id).setValue(true);
+                }else{
+                    yesBtn.setVisibility(View.INVISIBLE);
+                    noBtn.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
     }
 
     public void loadAllMarkers() {
@@ -362,14 +430,16 @@ public class MapFragment extends Fragment implements PermissionsListener{
                 public boolean onMarkerClick(@NonNull Marker marker) {
                     event_type_txt.setText(marker.getTitle());
                     event_caption_txt.setText(marker.getSnippet());
-                    if(marker.getIcon() == roadcrash_marker){
+                    if(marker.getIcon().equals(roadcrash_marker)){
                         cat_img.setImageResource(R.drawable.ic_road_crash);
-                    }else if(marker.getIcon() == trafficjam_marker){
+                    }else if(marker.getIcon().equals(trafficjam_marker)){
                         cat_img.setImageResource(R.drawable.ic_traffic_jam);
                     }else{
                         cat_img.setImageResource(R.drawable.ic_construction_marker);
                     }
 
+                    isVoted(marker.getSnippet(), yesBtn);
+                    loadOnClicks(marker.getSnippet(), yesBtn);
                     dialog.show();
                     return true;
                 }

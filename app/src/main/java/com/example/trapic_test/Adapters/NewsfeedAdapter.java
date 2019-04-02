@@ -224,8 +224,6 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             dialog_send_btn = dialog.findViewById(R.id.report_btn);
             report_txt = dialog.findViewById(R.id.report_msg);
 
-
-
                 Date d = new Date();
                 final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
                 Date time = new Date();

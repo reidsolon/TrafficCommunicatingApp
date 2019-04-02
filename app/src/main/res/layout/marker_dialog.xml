@@ -92,6 +92,7 @@
             android:gravity="center"
             android:layout_height="wrap_content">
             <TextView
+                android:id="@+id/close_txt"
                 android:layout_width="wrap_content"
                 android:textColor="#111"
                 android:text="Is this event closed?"
