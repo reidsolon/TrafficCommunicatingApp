@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +26,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,8 +55,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.api.directions.v5.models.DirectionsResponse;
+import com.mapbox.api.directions.v5.models.DirectionsRoute;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
@@ -69,6 +76,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
+import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 
@@ -78,7 +87,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MapFragment extends Fragment implements PermissionsListener{
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class MapFragment extends Fragment implements PermissionsListener, MapboxMap.OnMapClickListener {
 
     private MapboxMap mMap;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -101,6 +114,13 @@ public class MapFragment extends Fragment implements PermissionsListener{
     private Marker[] event_marker = new Marker[200];
     private HashMap<Marker, Event> map = new HashMap<Marker, Event>();
 
+//    Location Change
+    private Location originLocation;
+    private Point originPoint;
+    private Point destinationPoint;
+    private Marker destinationLocation;
+    private NavigationMapRoute navigationMapRoute;
+
     public MapFragment() {
 
     }
@@ -120,7 +140,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
         initViews(view);
 
-        refreshAll();
+//        refreshAll();
 
         myLocBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,9 +154,7 @@ public class MapFragment extends Fragment implements PermissionsListener{
                selectType();
             }
         });
-
         mapView.onCreate(savedInstanceState);
-
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
@@ -151,12 +169,18 @@ public class MapFragment extends Fragment implements PermissionsListener{
                         myLocation();
                         loadAllMarkers();
                         callPermission();
+                        enableLocationComponent();
                         mMap.setMinZoomPreference(12);
+
+
                     }
                 });
-
             }
         });
+
+//        navigationMapRoute = new NavigationMapRoute(null, mapView, mMap);
+
+
     }
 
     private void selectType(){
@@ -217,6 +241,8 @@ public class MapFragment extends Fragment implements PermissionsListener{
         yesBtn = dialog.findViewById(R.id.yes_btn);
         noBtn = dialog.findViewById(R.id.no_btn);
 
+
+
     }
     private void refreshAll(){
         DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("Posts");
@@ -276,9 +302,13 @@ public class MapFragment extends Fragment implements PermissionsListener{
         });
     }
     private void animateLocation(){
-        myLocation();
-        loadAllMarkers();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        if (latLng1 != null) {
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            myLocation();
+            loadAllMarkers();
+        }
+
     }
 
     @SuppressWarnings({"MissingPermission"})
@@ -302,8 +332,15 @@ public class MapFragment extends Fragment implements PermissionsListener{
             // Set the component's render mode
             locationComponent.setRenderMode(RenderMode.COMPASS);
 
+            originLocation = locationComponent.getLastKnownLocation();
             myLocation();
             loadAllMarkers();
+
+            mMap.addOnMapClickListener(this);
+            if (latLng1 != null) {
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+
         } else {
 
             permissionsManager = new PermissionsManager(this);
@@ -460,7 +497,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
                                     Event event2 = dataSnapshot.getValue(Event.class);
                                     FirebaseDatabase.getInstance().getReference("Posts").child(event2.getEvent_id()).removeValue();
 
-
                             }
 
                             @Override
@@ -563,22 +599,26 @@ public class MapFragment extends Fragment implements PermissionsListener{
             mMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(@NonNull Marker marker) {
-                    event_type_txt.setText(marker.getTitle());
-                    event_caption_txt.setText(marker.getSnippet());
-                    if(marker.getIcon().equals(roadcrash_marker)){
-                        cat_img.setImageResource(R.drawable.ic_road_crash);
-                    }else if(marker.getIcon().equals(trafficjam_marker)){
-                        cat_img.setImageResource(R.drawable.ic_traffic_jam);
-                    }else{
-                        cat_img.setImageResource(R.drawable.ic_construction_marker);
-                    }
+
+//                    if(marker.getIcon().equals(roadcrash_marker)){
+//                        cat_img.setImageResource(R.drawable.ic_road_crash);
+//                    }else if(marker.getIcon().equals(trafficjam_marker)){
+//                        cat_img.setImageResource(R.drawable.ic_traffic_jam);
+//                    }else{
+//                        cat_img.setImageResource(R.drawable.ic_construction_marker);
+//                    }
+                        if(marker.getSnippet() != null){
+                            isVoted(marker.getSnippet(), yesBtn);
+                            loadOnClicks(marker.getSnippet(), yesBtn);
+                            event_type_txt.setText(marker.getTitle());
+                            event_caption_txt.setText(marker.getSnippet());
+                            dialog.show();
+                        }else{
+                            Toast.makeText(getContext(), "Your destination!", Toast.LENGTH_SHORT).show();
+                        }
 
 
 
-                        isVoted(marker.getSnippet(), yesBtn);
-                        loadOnClicks(marker.getSnippet(), yesBtn);
-
-                    dialog.show();
                     return true;
                 }
             });
@@ -606,13 +646,17 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
                     lat = locationResult.getLastLocation().getLatitude();
                     lng = locationResult.getLastLocation().getLongitude();
+                    originLocation = locationResult.getLastLocation();
 
                     latLng1 = new LatLng(lat, lng);
 
                 }
             }, Looper.getMainLooper());
             // setting up my location
-            cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
+            if (latLng1 != null) {
+                cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
+            }
+
         }
     }
 
@@ -731,4 +775,36 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
     }
 
+
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+
+        if(destinationLocation != null){
+            mMap.removeMarker(destinationLocation);
+        }
+        destinationLocation = mMap.addMarker(new MarkerOptions().position(point));
+
+        destinationPoint = Point.fromLngLat(point.getLongitude(), point.getLatitude());
+        originPoint = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
+
+        getRoute(originPoint, destinationPoint);
+        return false;
+    }
+
+    public void getRoute(Point origin, Point destination){
+        NavigationRoute.builder()
+                .accessToken("pk.eyJ1IjoicmVpZHNvbG9uIiwiYSI6ImNqcnZpZThzMTAyN2Ezemx4eHMzM2RoZGwifQ.j65VGpYO6g84DnR1koippQ")
+                .origin(origin)
+                .destination(destination)
+                .build()
+                .getRoute(new Callback<DirectionsResponse>() {
+                    @Override
+                    public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                    }
+                    @Override
+                    public void onFailure(Call<DirectionsResponse> call, Throwable t) {
+
+                    }
+                });
+    }
 }
