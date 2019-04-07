@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.FirebaseApp;
+
 public class SplashActivity extends AppCompatActivity {
 
 
@@ -16,6 +18,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_layout);
 
+        FirebaseApp.initializeApp(SplashActivity.this);
 
         new Handler().postDelayed(new Runnable() {
             @Override

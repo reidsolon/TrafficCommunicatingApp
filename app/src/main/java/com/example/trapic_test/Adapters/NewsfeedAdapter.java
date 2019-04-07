@@ -51,6 +51,8 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     List<Event> eventList;
     FirebaseUser firebaseUser;
 
+    private double thank_num, report_num;
+
 
     public NewsfeedAdapter(Context context, List<Event> eventList){
         this.ctx = context;
@@ -66,6 +68,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
     @Override
     public void onBindViewHolder(@NonNull final NewsfeedHolder holder, int position) {
+
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final Event event = eventList.get(position);
         Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
@@ -88,6 +91,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             }
         });
         holder.isLike(event.getEvent_id(), holder.like_img);
+        holder.countReport(event.getEvent_id(), holder.report_txt);
         holder.countLike(event.getEvent_id(), holder.like_txt);
         holder.countComment(event.getEvent_id(),holder.cmt_txt);
         holder.like_btn.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +106,10 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 }
             }
         });
+
+        double rate = (thank_num + report_num) * 100.0;
+
+        holder.trust_rate_txt.setText("Trust rate: "+rate+"%");
 
         holder.viewMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,13 +177,14 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     }
 
     public class NewsfeedHolder extends RecyclerView.ViewHolder{
-        TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt, report_txt;
+        TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt, report_txt, trust_rate_txt;
         LinearLayout like_btn, cmt_btn, viewMapBtn, report_btn;
         Button deleteBtn, dialog_send_btn;
         ImageView imageView, like_img;
         public NewsfeedHolder(View itemView) {
             super(itemView);
-
+            trust_rate_txt = itemView.findViewById(R.id.trust_rate);
+            report_txt = itemView.findViewById(R.id.report_count_txt);
             like_img = itemView.findViewById(R.id.like_img);
             location = itemView.findViewById(R.id.location);
             timestamp = itemView.findViewById(R.id.timestamp);
@@ -192,17 +201,19 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             deleteBtn = itemView.findViewById(R.id.delete_btn);
             report_btn = itemView.findViewById(R.id.report_btn);
         }
-        public void countLike(String post_id, final TextView view){
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes").child(post_id);
+        public void countReport(String post_id, final TextView view){
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reports").child(post_id);
 
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                     if(dataSnapshot.getChildrenCount() > 1){
-                        view.setText(dataSnapshot.getChildrenCount()+" thanks");
+                        view.setText(dataSnapshot.getChildrenCount()+" Reports");
+                        report_num = dataSnapshot.getChildrenCount();
                     }else{
-                        view.setText(dataSnapshot.getChildrenCount()+" thank");
+                        view.setText(dataSnapshot.getChildrenCount()+" Report");
+                        report_num = dataSnapshot.getChildrenCount();
                     }
 
                 }
@@ -213,48 +224,93 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 }
             });
         }
-        private void openDialog(String user_id, String event_id){
+        public void countLike(String post_id, final TextView view){
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes").child(post_id);
+
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    if(dataSnapshot.getChildrenCount() > 1){
+                        view.setText(dataSnapshot.getChildrenCount()+" Thanks");
+                        thank_num = dataSnapshot.getChildrenCount();
+                    }else{
+                        view.setText(dataSnapshot.getChildrenCount()+" Thank");
+                        thank_num = dataSnapshot.getChildrenCount();
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+
+        }
+        private void openDialog(final String user_id, String event_id){
             final Dialog dialog = new Dialog(ctx);
             dialog.setContentView(R.layout.report_layout);
             dialog.show();
 
             String uid = user_id;
-            String eid = event_id;
+            final String eid = event_id;
             dialog_send_btn = dialog.findViewById(R.id.report_btn);
             report_txt = dialog.findViewById(R.id.report_msg);
 
-                Date d = new Date();
-                final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+                final Date d = new Date();
+                final String d_date = (String) DateFormat.format("MMMM dd, yyyy", d.getDate());
                 Date time = new Date();
                 final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
 
                 final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Reports").child(event_id);
 
                 final HashMap<String, Object> map = new HashMap<>();
+                String msg = report_txt.getText().toString();
                 map.put("report_id", databaseReference.push().getKey());
                 map.put("report_user_id", user_id);
                 map.put("report_date", d_date);
                 map.put("report_time", d_time);
+                map.put("report_msg", msg);
 
                 dialog_send_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(final View v) {
                         if(report_txt.getText().toString().equals("")){
                             report_txt.setError("Please specify your report message!");
                         }else {
-                            databaseReference.setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    report_txt.setText("");
-                                    Toast.makeText(ctx, "You successfully reported that event", Toast.LENGTH_LONG).show();
 
-                                    Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            dialog.dismiss();
-                                        }
-                                    }, 1000);
+                            databaseReference.child(eid).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(!dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists()){
+                                        databaseReference.child(eid).child(FirebaseAuth
+                                                .getInstance()
+                                                .getCurrentUser().getUid()).child(databaseReference.push().getKey())
+                                                .setValue(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                report_txt.setText("");
+                                                Toast.makeText(ctx, "You successfully reported that event", Toast.LENGTH_LONG).show();
+
+                                                Handler handler = new Handler();
+                                                handler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        dialog.dismiss();
+                                                    }
+                                                }, 1000);
+                                            }
+                                        });
+                                    }else{
+                                        Toast.makeText(v.getContext(), "You already reported this post", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                 }
                             });
                         }

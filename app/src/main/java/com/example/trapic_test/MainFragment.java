@@ -63,6 +63,7 @@ public class MainFragment extends AppCompatActivity {
         setContentView(R.layout.mainfragment_layout);
         init();
         loadUserInfo();
+        checkStatus();
 
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -84,18 +85,17 @@ public class MainFragment extends AppCompatActivity {
                 if(FirebaseAuth.getInstance().getCurrentUser() != null){
                     if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
                         FirebaseAuth.getInstance().signOut();
-                        finish();
+
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }else if(FirebaseAuth.getInstance().getCurrentUser() != null || FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
                         FirebaseAuth.getInstance().signOut();
-                        finish();
+
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }else{
-                        finish();
+
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
                 }else{
-                    finish();
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 }
             }
@@ -122,10 +122,20 @@ public class MainFragment extends AppCompatActivity {
             }
         });
     }
+
+    private void checkStatus(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            if(user.isEmailVerified()){
+                loadUserInfo();
+            }else{
+                loadUserInfo();
+            }
+        }
+
+    }
+
     private void loadUserInfo(){
-
-
-
         if(FirebaseAuth.getInstance().getCurrentUser() != null){
             if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
                 status_mode_txt.setText("Verified User");
@@ -223,5 +233,10 @@ public class MainFragment extends AppCompatActivity {
 
     public void set(int i){
         viewPager.setCurrentItem(i, true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(getApplicationContext(), "Back btn is disabled", Toast.LENGTH_SHORT).show();
     }
 }

@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,14 +16,23 @@ import android.widget.Toast;
 
 import com.example.trapic_test.MainActivity;
 import com.example.trapic_test.MainFragment;
+import com.example.trapic_test.Model.Log;
 import com.example.trapic_test.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Date;
+import java.util.HashMap;
 
 public class LoginFragment extends AppCompatActivity {
     Button logBtn, regBtn, guestBtn;
@@ -59,8 +68,6 @@ public class LoginFragment extends AppCompatActivity {
         logBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
 
                 dialog.show();
                 loginValidation();
@@ -98,7 +105,21 @@ public class LoginFragment extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if(task.isSuccessful()){
+                        dialog.dismiss();
+                        updateUserStatus(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
 
+                        com.example.trapic_test.Model.Log log = new Log(FirebaseAuth.getInstance().getCurrentUser().getUid(), " just logged in.", date_time);
+                        DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference();
+
+
+                        Task<Void> databaseReference = FirebaseDatabase.getInstance().getReference("Logs")
+                                .child(dbRefs.push().getKey()).setValue(log).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                    }
+                                });
                         finish();
                         startActivity(new Intent(getApplicationContext(), MainFragment.class));
 
@@ -122,6 +143,16 @@ public class LoginFragment extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    private void updateUserStatus(String id){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(id).child("user_status");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user.isEmailVerified()){
+            databaseReference.setValue("verified");
+        }else{
+            databaseReference.setValue("unverified");
+        }
     }
 
     public boolean loginValidation(){

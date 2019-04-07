@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -34,19 +35,23 @@ import android.widget.Toast;
 
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.R;
+import com.example.trapic_test.SingleFeedActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -205,7 +210,6 @@ public class MapFragment extends Fragment implements PermissionsListener{
         swipeRefreshLayout = view.findViewById(R.id.swipe);
 
         close_txt = dialog.findViewById(R.id.close_txt);
-
         viewNewsfeedBtn = dialog.findViewById(R.id.view_to_newsfeed);
         cat_img = dialog.findViewById(R.id.cat_img);
         event_type_txt = dialog.findViewById(R.id.event_cat_txt);
@@ -224,17 +228,17 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                loadAllMarkers();
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+                loadAllMarkers();
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                loadAllMarkers();
             }
 
             @Override
@@ -252,22 +256,22 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                loadAllMarkers();
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+                loadAllMarkers();
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                loadAllMarkers();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                loadAllMarkers();
             }
         });
     }
@@ -365,17 +369,44 @@ public class MapFragment extends Fragment implements PermissionsListener{
             }
         });
 
-        yesBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(view.getTag().equals("Not Voted")){
-                    databaseReference.child(post_id).child(user_id).setValue(true);
-                }else{
-                    yesBtn.setVisibility(View.INVISIBLE);
-                    noBtn.setVisibility(View.INVISIBLE);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null && user.isEmailVerified()){
+            yesBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(view.getTag().equals("Not Voted")){
+                        databaseReference.child(post_id).child(user_id).setValue(true);
+                    }else{
+                        yesBtn.setVisibility(View.INVISIBLE);
+                        noBtn.setVisibility(View.INVISIBLE);
+                    }
                 }
-            }
-        });
+            });
+
+            viewNewsfeedBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), SingleFeedActivity.class);
+                    intent.putExtra("PostID", post_id);
+                    startActivity(intent);
+                }
+            });
+        }else{
+            yesBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), "You are not a verified user.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+            noBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), "You are not a verified user.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
     }
 
     public void loadAllMarkers() {
@@ -409,7 +440,44 @@ public class MapFragment extends Fragment implements PermissionsListener{
 
         if(latLng1 != null){
 
-            double distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
+            //check if the event approval is 10 and
+            final DatabaseReference databaseReference1 = FirebaseDatabase
+                    .getInstance()
+                    .getReference("Posts")
+                    .child(event[i].getEvent_id());
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Approval").child(event[i].getEvent_id());
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.getChildrenCount() == 10){
+                        dataSnapshot.getChildren();
+
+
+                        databaseReference1.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getChildren();
+                                    Event event2 = dataSnapshot.getValue(Event.class);
+                                    FirebaseDatabase.getInstance().getReference("Posts").child(event2.getEvent_id()).removeValue();
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            final double distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
             final double roundedDistance = Math.round(distance * 100.0) / 100.0;
             final double roundedKm;
             if(roundedDistance > 1000.0){
@@ -419,6 +487,8 @@ public class MapFragment extends Fragment implements PermissionsListener{
                 markerOptions.setTitle(event[i].getEvent_type() + ": " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
             }
             if(distance <= 50){
+
+
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
 
                 if(event[i].getEvent_type().equals("Construction Area")){
@@ -503,8 +573,11 @@ public class MapFragment extends Fragment implements PermissionsListener{
                         cat_img.setImageResource(R.drawable.ic_construction_marker);
                     }
 
-                    isVoted(marker.getSnippet(), yesBtn);
-                    loadOnClicks(marker.getSnippet(), yesBtn);
+
+
+                        isVoted(marker.getSnippet(), yesBtn);
+                        loadOnClicks(marker.getSnippet(), yesBtn);
+
                     dialog.show();
                     return true;
                 }

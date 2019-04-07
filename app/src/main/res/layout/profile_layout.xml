@@ -73,12 +73,14 @@
                     android:background="@drawable/profile_info_holder"
                     android:layout_width="80dp"
                     android:layout_height="70dp">
+
                     <TextView
-                        android:textColor="#fff"
-                        android:textSize="20sp"
+                        android:id="@+id/post_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"/>
+                        android:text="0"
+                        android:textColor="#fff"
+                        android:textSize="20sp" />
                     <TextView
                         android:gravity="center"
                         android:layout_marginStart="5dp"
@@ -103,6 +105,7 @@
                     android:layout_height="70dp">
                     <TextView
                         android:textColor="#fff"
+                        android:id="@+id/report_count2"
                         android:textSize="20sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -145,7 +148,6 @@
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
-
             android:gravity="end|center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -173,6 +175,12 @@
 
 
             </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="#111">
+
         </LinearLayout>
     </LinearLayout>
 

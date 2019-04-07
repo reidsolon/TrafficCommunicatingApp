@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.example.trapic_test.Model.Comment;
 import com.example.trapic_test.Model.Event;
+import com.example.trapic_test.Model.Log;
 import com.example.trapic_test.Model.Notification;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -336,7 +337,9 @@ public class PostActivity extends AppCompatActivity {
 
                             }
                         });
-
+                        Log log = new Log("post", id3, FirebaseAuth.getInstance().getCurrentUser().getUid(), " just posted an event.", date_time);
+                        DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference();
+                        FirebaseDatabase.getInstance().getReference("Logs").child(dbRefs.push().getKey()).setValue(log);
                         Snackbar.make(layout, "Event Posted Successfully", Snackbar.LENGTH_LONG).show();
 
                         Handler handler = new Handler();

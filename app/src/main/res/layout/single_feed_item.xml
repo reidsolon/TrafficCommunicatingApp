@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:layout_marginTop="25dp"
+    android:layout_marginTop="20dp"
     android:layout_marginBottom="5dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -79,12 +79,6 @@
                 android:gravity="right|center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <Button
-                    android:id="@+id/delete_btn"
-                    android:background="#0111"
-                    android:layout_width="40dp"
-                    android:drawableStart="@drawable/ic_delete_black_24dp"
-                    android:layout_height="35dp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -117,17 +111,6 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"/>
-
-            <TextView
-                android:id="@+id/trust_rate"
-                android:layout_width="match_parent"
-                android:text="Rate: "
-                android:textColor="#fff"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:layout_alignParentBottom="true"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"/>
             <TextView
                 android:drawableStart="@drawable/ic_access_time_black_24dp"
                 android:id="@+id/timestamp"
@@ -210,120 +193,6 @@
                 android:background="#f1f1f1"
                 android:layout_width="match_parent"
                 android:layout_height="0.01dp">
-
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/view_map_holder"
-                android:paddingBottom="10dp"
-                android:layout_below="@+id/dash_line"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/cmt_txt"
-                    android:paddingTop="15dp"
-                    android:layout_marginStart="15dp"
-                    android:paddingBottom="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="View all 0 comments"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:gravity="end|center_vertical"
-                    android:layout_height="match_parent">
-                    <LinearLayout
-                        android:id="@+id/viewMapBtn"
-                        android:gravity="center_vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="View on Map"/>
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/ic_near_me_black_24dp"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_margin="5dp"
-                android:id="@+id/like_holder"
-                android:layout_below="@+id/footer_container"
-                android:weightSum="100"
-                android:layout_width="match_parent"
-                android:layout_height="40dp">
-
-                <LinearLayout
-                    android:layout_weight="100"
-                    android:weightSum="40"
-                    android:layout_width="0dp"
-                    android:gravity="start|center_vertical"
-                    android:layout_height="match_parent">
-                    <LinearLayout
-                        android:id="@+id/like_btn"
-                        android:gravity="center"
-                        android:layout_weight="10"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:id="@+id/like_img"
-                            android:src="@drawable/ic_thumb_up_black_24dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/comment_btn"
-                        android:gravity="center"
-                        android:layout_weight="10"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:src="@drawable/ic_mode_comment_black_24dp"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/report_btn"
-                        android:gravity="center"
-                        android:layout_weight="10"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_report_black_24dp" />
-
-                    </LinearLayout>
-                    <LinearLayout
-                        android:gravity="center"
-                        android:layout_weight="10"
-                        android:orientation="vertical"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
-                        <TextView
-                            android:text="0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/like_txt"/>
-                        <TextView
-                            android:text="0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/report_count_txt"/>
-                    </LinearLayout>
-                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>

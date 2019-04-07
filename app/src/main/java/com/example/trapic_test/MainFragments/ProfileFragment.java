@@ -21,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.apache.commons.lang3.text.WordUtils;
@@ -36,7 +37,7 @@ public class ProfileFragment extends Fragment {
     FirebaseDatabase firebaseDatabase;
     private LinearLayout send_feedback_link;
     private ImageView user_status_img;
-    private TextView user_fullname_txt, user_email, activate_btn;
+    private TextView user_fullname_txt, user_email, activate_btn, report_count, post_count;
 
 
     public ProfileFragment(){
@@ -80,6 +81,8 @@ public class ProfileFragment extends Fragment {
         user_status_img = v.findViewById(R.id.user_status_img);
         user_fullname_txt = v.findViewById(R.id.user_full_name);
         user_email = v.findViewById(R.id.user_email);
+        post_count = v.findViewById(R.id.post_count);
+        report_count = v.findViewById(R.id.report_count2);
 
         send_feedback_link.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +111,42 @@ public class ProfileFragment extends Fragment {
                     activate_btn.setVisibility(View.VISIBLE);
                 }
                 user_fullname_txt.setText(WordUtils.capitalize(user.getUser_firstname()+" "+user.getUser_lastname()));
+                user_email.setText(user.getUser_eMail());
 
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        Query databaseReference = FirebaseDatabase
+                .getInstance()
+                .getReference("Posts")
+                .child("user_id").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+
+                post_count.setText(""+ dataSnapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reports");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+                dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                report_count.setText(dataSnapshot.getChildrenCount()+"");
             }
 
             @Override

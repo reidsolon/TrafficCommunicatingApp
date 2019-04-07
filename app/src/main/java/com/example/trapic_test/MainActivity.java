@@ -15,29 +15,24 @@ import com.google.firebase.auth.FirebaseAuth;
 public class MainActivity extends AppCompatActivity {
 
     private Button regBtn, logBtn, guestBtn;
-    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseApp.initializeApp(MainActivity.this);
-
-        auth = FirebaseAuth.getInstance();
-
         if(FirebaseAuth.getInstance().getCurrentUser() != null){
-            finish();
             startActivity(new Intent(MainActivity.this, MainFragment.class));
         }
 
-        regBtn = (Button) findViewById(R.id.register_link);
-        logBtn = (Button) findViewById(R.id.login_link);
+        regBtn = findViewById(R.id.register_link);
+        logBtn = findViewById(R.id.login_link);
         guestBtn = findViewById(R.id.guest_btn);
 
         regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(MainActivity.this, RegisterFragment.class));
             }
         });
@@ -45,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         logBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(MainActivity.this, LoginFragment.class));
             }
         });
@@ -52,9 +48,11 @@ public class MainActivity extends AppCompatActivity {
         guestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(MainActivity.this, GuestActivity.class));
             }
         });
 
     }
+
 }

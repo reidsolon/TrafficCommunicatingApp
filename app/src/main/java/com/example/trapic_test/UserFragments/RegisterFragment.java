@@ -181,7 +181,7 @@ public class RegisterFragment extends AppCompatActivity {
                         String push_id = firebaseAuth.getUid();
 
                         Date d = new Date();
-                        final String d_date = (String) DateFormat.format("MMMM d, yyyy", d.getDate());
+                        final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
                         String account_status;
                         user = new User(id, fname_reg, lname_reg, pw1_reg, email_reg, d_date, "unverified");
 
@@ -199,6 +199,11 @@ public class RegisterFragment extends AppCompatActivity {
                                 String id = dbRef.push().getKey();
 
                                         Intent activation = new Intent(RegisterFragment.this, AccountActivation.class);
+
+                                com.example.trapic_test.Model.Log log = new com.example.trapic_test.Model.Log(2,FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                                        " just registered its account!", d_date);
+
+                                FirebaseDatabase.getInstance().getReference("Logs").child("test").setValue(log);
 
                                         activation.putExtra("Email" , email.getText().toString());
                                         finish();
