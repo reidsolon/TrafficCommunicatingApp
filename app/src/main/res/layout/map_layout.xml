@@ -37,6 +37,8 @@
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/user_count"
+            android:gravity="center"
+            android:paddingEnd="4dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:drawableStart="@drawable/ic_person_black_24dp"/>
@@ -49,7 +51,7 @@
         android:layout_above="@+id/select_type_holder"
         android:layout_height="wrap_content">
         <Button
-            android:text=" I AM HERE "
+            android:text=" I am here "
             android:fontFamily="@font/mooka"
             android:textColor="#fff"
             android:drawableStart="@drawable/ic_person_pin_circle_black_24dp"
@@ -67,7 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:text=" Select Map Type "
+            android:text=" Select map type "
             android:textColor="#fff"
             android:fontFamily="@font/mooka"
             android:drawableStart="@drawable/ic_palette_black_24dp"

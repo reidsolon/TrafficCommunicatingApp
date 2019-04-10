@@ -16,8 +16,8 @@ public class User {
     private String user_address;
     private boolean user_isOnline;
     private String user_lastOnline;
-    private long user_lat;
-    private long user_lng;
+    private double user_lat;
+    private double user_lng;
     private LatLng user_latLng;
 
     public User(){
@@ -34,11 +34,11 @@ public class User {
        this.user_eMail = eMail;
     }
 
-    public long getUser_lat() {
+    public double getUser_lat() {
         return user_lat;
     }
 
-    public long getUser_lng() {
+    public double getUser_lng() {
         return user_lng;
     }
 

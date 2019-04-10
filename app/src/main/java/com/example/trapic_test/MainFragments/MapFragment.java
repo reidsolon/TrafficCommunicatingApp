@@ -635,8 +635,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                             event_type_txt.setText(marker.getTitle());
                             event_caption_txt.setText(marker.getSnippet());
                             dialog.show();
-                        }else{
+                        }else if(marker.getTitle() == "Destination"){
                             Toast.makeText(getContext(), "Your destination!", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(getContext(), "TraPic Online User ", Toast.LENGTH_LONG).show();
                         }
 
 
@@ -686,18 +688,32 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             if (latLng1 != null) {
 
                 cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
-                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
 
-                try{
-                    List<Address> addresses = geocoder.getFromLocation(latLng1.getLatitude(), latLng1.getLongitude(), 1);
-                    String my_address = addresses.get(0).getThoroughfare()+" "+addresses.get(0).getLocality()+" "+addresses.get(0).getAdminArea();
-                    status_mode.setText("Current Location: "+my_address);
+                    FirebaseDatabase.getInstance().getReference("Users")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    List<Address> addresses = null;
+                                    try {
+                                        addresses = geocoder.getFromLocation(latLng1.getLatitude(), latLng1.getLongitude(), 1);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    String my_address = addresses.get(0).getThoroughfare()+" "+addresses.get(0).getLocality()+" "+addresses.get(0).getAdminArea();
+                                    status_mode.setText("Current Location: "+my_address);
 
-                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .child("user_address").setValue(my_address);
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
+                                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .child("user_address").setValue(my_address);
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
             }
 
             FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_isOnline").equalTo(true).addValueEventListener(new ValueEventListener() {
@@ -836,7 +852,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         if(destinationLocation != null){
             mMap.removeMarker(destinationLocation);
         }
-        destinationLocation = mMap.addMarker(new MarkerOptions().position(point));
+        destinationLocation = mMap.addMarker(new MarkerOptions().position(point).setTitle("Destination"));
 
         destinationPoint = Point.fromLngLat(point.getLongitude(), point.getLatitude());
         originPoint = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
@@ -873,13 +889,52 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                int i=0;
+                IconFactory iconFactory = IconFactory.getInstance(getActivity());
+                Icon user_icon = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_user_marker));
                 for(DataSnapshot snapshot :dataSnapshot.getChildren() ) {
+
                     User user = snapshot.getValue(User.class);
+                    if(!user.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) && user.isUser_isOnline()){
 
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(user.getUser_lat(), user.getUser_lng())));
+                        if(user_marker[i] != null){
+                            mMap.removeMarker(user_marker[i]);
+                        }
 
+                        if(user.isUser_isOnline() == false){
+                            mMap.removeMarker(user_marker[i]);
+                            displayUsers();
+                        }
+                        user_marker[i] = mMap.addMarker(new MarkerOptions().setIcon(user_icon).position(new LatLng(user.getUser_lat(), user.getUser_lng())));
+                        i++;
+                    }
                 }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        FirebaseDatabase.getInstance().getReference("Users").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
             }
 
