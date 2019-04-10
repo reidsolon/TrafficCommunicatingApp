@@ -16,6 +16,9 @@ public class Event {
     private String event_time;
     private String event_date;
     private String event_date_time;
+    private double event_trust_rate;
+    private double event_report_count;
+    private double event_thank_count;
 
     public Event(){
 
@@ -33,6 +36,18 @@ public class Event {
         this.event_lat = lat;
         this.event_lng = lng;
         this.event_date_time = date_time;
+    }
+
+    public double getEvent_report_count() {
+        return event_report_count;
+    }
+
+    public double getEvent_thank_count() {
+        return event_thank_count;
+    }
+
+    public double getEvent_trust_rate() {
+        return event_trust_rate;
     }
 
     public String getEvent_caption() {

@@ -12,11 +12,14 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
@@ -36,6 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.trapic_test.Model.Event;
+import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
 import com.example.trapic_test.SingleFeedActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -53,6 +57,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -76,6 +81,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.services.android.navigation.ui.v5.location.LocationEngineConductorListener;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 import com.nabinbhandari.android.permissions.PermissionHandler;
@@ -83,36 +89,44 @@ import com.nabinbhandari.android.permissions.Permissions;
 
 import org.apache.commons.lang3.text.WordUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MapFragment extends Fragment implements PermissionsListener, MapboxMap.OnMapClickListener {
+public class MapFragment extends Fragment implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
 
     private MapboxMap mMap;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
-    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt;
+    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count;
     private ImageView cat_img;
     private String[] list;
     private double lat, lng;
     private LatLng latLng1;
     private Event[] event = new Event[200];
+    private User[] user = new User[200];
     private BottomSheetDialog dialog;
     private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
-    private int i=0;
+    private int i=0, user_count_num, user_i=0;
     private MarkerOptions markerOptions;
     private String event_user_id, event_user_fullname;
     private Marker[] event_marker = new Marker[200];
+    private Marker[] user_marker = new Marker[200];
     private HashMap<Marker, Event> map = new HashMap<Marker, Event>();
+
+
+    // Get instance of Vibrator from current Context
+    Vibrator v;
 
 //    Location Change
     private Location originLocation;
@@ -137,6 +151,8 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
         super.onViewCreated(view, savedInstanceState);
         dialog = new BottomSheetDialog(getContext());
         dialog.setContentView(R.layout.marker_dialog);
+
+        v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
         initViews(view);
 
@@ -170,8 +186,8 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
                         loadAllMarkers();
                         callPermission();
                         enableLocationComponent();
+                        displayUsers();
                         mMap.setMinZoomPreference(12);
-
 
                     }
                 });
@@ -232,6 +248,8 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
         myLocBtn = view.findViewById(R.id.my_loc);
         myLocBtn2 = view.findViewById(R.id.my_loc2);
         swipeRefreshLayout = view.findViewById(R.id.swipe);
+         status_mode = view.findViewById(R.id.status_mode_txt);
+         user_count = view.findViewById(R.id.user_count);
 
         close_txt = dialog.findViewById(R.id.close_txt);
         viewNewsfeedBtn = dialog.findViewById(R.id.view_to_newsfeed);
@@ -458,6 +476,7 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
 
                     event[i] = dataSnapshot1.getValue(Event.class);
                     loadMarkerDatas();
+
                 }
             }
 
@@ -538,6 +557,7 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
                     NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
                     manager.notify(1, notification);
+                    v.vibrate(200);
                 }else if(event[i].getEvent_type().equals("Traffic Jams")){
                     builder.setContentTitle(event[i].getEvent_type())
                             .setContentText("There is a event within" + roundedDistance +"m near you.")
@@ -549,6 +569,7 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
                     NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
                     manager.notify(2, notification);
+                    v.vibrate(200);
                 }else{
                     builder.setContentTitle(event[i].getEvent_type())
                             .setContentText("There is a event within" + roundedDistance +"m near you.")
@@ -560,6 +581,7 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
                     NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
                     manager.notify(3, notification);
+                    v.vibrate(200);
                 }
             }
 
@@ -632,7 +654,6 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             callPermission();
         }else {
-
             FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
 
             locationRequest = new LocationRequest();
@@ -650,13 +671,46 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
 
                     latLng1 = new LatLng(lat, lng);
 
+                    FirebaseDatabase.getInstance().getReference("Users")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .child("user_latLng").setValue(latLng1);
+                    FirebaseDatabase.getInstance().getReference("Users")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .child("user_lat").setValue(lat);
+                    FirebaseDatabase.getInstance().getReference("Users")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .child("user_lng").setValue(lng);
                 }
             }, Looper.getMainLooper());
             // setting up my location
             if (latLng1 != null) {
+
                 cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+
+                try{
+                    List<Address> addresses = geocoder.getFromLocation(latLng1.getLatitude(), latLng1.getLongitude(), 1);
+                    String my_address = addresses.get(0).getThoroughfare()+" "+addresses.get(0).getLocality()+" "+addresses.get(0).getAdminArea();
+                    status_mode.setText("Current Location: "+my_address);
+
+                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .child("user_address").setValue(my_address);
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
             }
 
+            FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_isOnline").equalTo(true).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    user_count.setText(""+dataSnapshot.getChildrenCount());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }
     }
 
@@ -788,6 +842,7 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
         originPoint = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
 
         getRoute(originPoint, destinationPoint);
+
         return false;
     }
 
@@ -806,5 +861,32 @@ public class MapFragment extends Fragment implements PermissionsListener, Mapbox
 
                     }
                 });
+    }
+
+    @Override
+    public void onLocationUpdate(Location location) {
+        originLocation = location;
+
+    }
+
+    private void displayUsers(){
+        FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot snapshot :dataSnapshot.getChildren() ) {
+                    User user = snapshot.getValue(User.class);
+
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(user.getUser_lat(), user.getUser_lng())));
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

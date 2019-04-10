@@ -41,6 +41,9 @@ import com.squareup.picasso.Picasso;
 import org.apache.commons.lang3.text.WordUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,11 +72,33 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     @Override
     public void onBindViewHolder(@NonNull final NewsfeedHolder holder, int position) {
 
+
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final Event event = eventList.get(position);
+
         Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
         PrettyTime p = new PrettyTime();
         String pretty = p.format(new Date(event.getEvent_date_time()));
+
+        FirebaseDatabase.getInstance().getReference("Users").child(event.getUser_id()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+
+                User user = dataSnapshot.getValue(User.class);
+                if(user.isUser_isOnline()){
+                    holder.isOnline.setVisibility(View.VISIBLE);
+                }else{
+                    holder.isOnline.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         holder.timestamp.setText(pretty);
         holder.caption.setText(event.getEvent_caption());
         holder.caption.setCompoundDrawables(ctx.getResources().getDrawable(R.drawable.ic_construction_marker), null, null, null);
@@ -81,14 +106,18 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         holder.setUserInfo(event.getUser_id());
         holder.location.setText(event.getEvent_location());
         holder.cmt_btn.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(ctx, CommentsActivity.class);
                 intent.putExtra("PostId", event.getEvent_id());
                 intent.putExtra("PostBy", holder.user_name.getText().toString());
                 intent.putExtra("PublisherId", event.getUser_id());
                 ctx.startActivity(intent);
+
             }
+
         });
         holder.isLike(event.getEvent_id(), holder.like_img);
         holder.countReport(event.getEvent_id(), holder.report_txt);
@@ -180,9 +209,10 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt, report_txt, trust_rate_txt;
         LinearLayout like_btn, cmt_btn, viewMapBtn, report_btn;
         Button deleteBtn, dialog_send_btn;
-        ImageView imageView, like_img;
+        ImageView imageView, like_img, isOnline;
         public NewsfeedHolder(View itemView) {
             super(itemView);
+            isOnline = itemView.findViewById(R.id.isOnline);
             trust_rate_txt = itemView.findViewById(R.id.trust_rate);
             report_txt = itemView.findViewById(R.id.report_count_txt);
             like_img = itemView.findViewById(R.id.like_img);

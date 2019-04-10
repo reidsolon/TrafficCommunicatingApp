@@ -106,7 +106,6 @@ public class LoginFragment extends AppCompatActivity {
 
                     if(task.isSuccessful()){
                         dialog.dismiss();
-                        updateUserStatus(FirebaseAuth.getInstance().getCurrentUser().getUid());
                         final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
 
                         com.example.trapic_test.Model.Log log = new Log(FirebaseAuth.getInstance().getCurrentUser().getUid(), " just logged in.", date_time);
@@ -143,16 +142,6 @@ public class LoginFragment extends AppCompatActivity {
         }
 
         return false;
-    }
-
-    private void updateUserStatus(String id){
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(id).child("user_status");
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user.isEmailVerified()){
-            databaseReference.setValue("verified");
-        }else{
-            databaseReference.setValue("unverified");
-        }
     }
 
     public boolean loginValidation(){

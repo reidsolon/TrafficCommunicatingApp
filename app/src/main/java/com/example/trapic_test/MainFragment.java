@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -39,6 +40,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.apache.commons.lang3.text.WordUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainFragment extends AppCompatActivity {
     private TextView test, status_mode_txt;
@@ -77,19 +81,39 @@ public class MainFragment extends AppCompatActivity {
 
         setupTabIcons();
 
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
 
 
-        logout.setOnClickListener(new View.OnClickListener() {
+            final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+
+            updateUserStatus(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            makeUserOnline(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            FirebaseDatabase.getInstance().getReference("Users")
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").onDisconnect().setValue(false);
+            FirebaseDatabase.getInstance().getReference("Users")
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .child("user_lastOnline").onDisconnect().setValue(date_time);
+        }
+        final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+            logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(FirebaseAuth.getInstance().getCurrentUser() != null){
                     if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
-                        FirebaseAuth.getInstance().signOut();
 
+                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child("user_isOnline").setValue(false);
+                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child("user_lastOnline").setValue(date_time);
+                        FirebaseAuth.getInstance().signOut();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }else if(FirebaseAuth.getInstance().getCurrentUser() != null || FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
-                        FirebaseAuth.getInstance().signOut();
 
+                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child("user_isOnline").setValue(false);
+                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child("user_lastOnline").setValue(date_time);
+                        FirebaseAuth.getInstance().signOut();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }else{
 
@@ -122,7 +146,11 @@ public class MainFragment extends AppCompatActivity {
             }
         });
     }
-
+    private void makeUserOnline(String id){
+        FirebaseDatabase.getInstance().getReference("Users").child(id).child("user_isOnline").setValue(true);
+        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("user_lastOnline").setValue("0");
+    }
     private void checkStatus(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(FirebaseAuth.getInstance().getCurrentUser() != null){
@@ -238,5 +266,15 @@ public class MainFragment extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Toast.makeText(getApplicationContext(), "Back btn is disabled", Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateUserStatus(String id){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(id).child("user_status");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user.isEmailVerified()){
+            databaseReference.setValue("verified");
+        }else{
+            databaseReference.setValue("unverified");
+        }
     }
 }

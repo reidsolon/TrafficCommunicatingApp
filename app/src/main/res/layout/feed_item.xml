@@ -12,8 +12,6 @@
         android:layout_height="wrap_content">
         <LinearLayout
             android:background="@drawable/feed_header"
-            android:layout_marginEnd="6dp"
-            android:layout_marginStart="6dp"
             android:id="@+id/name_area"
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -39,6 +37,7 @@
                     </LinearLayout>
 
                     <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/isOnline"
                         app:civ_border_color="#fff"
                         app:civ_border_width="3dp"
                         app:civ_border_overlay="true"
@@ -90,8 +89,6 @@
 
         <RelativeLayout
             android:background="@drawable/feed_body"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
             android:gravity="center"
             android:id="@+id/img_holder"
             android:layout_below="@+id/name_area"
@@ -177,8 +174,6 @@
             android:layout_below="@id/img_holder"
             android:orientation="vertical"
             android:background="@drawable/feed_footer"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <LinearLayout

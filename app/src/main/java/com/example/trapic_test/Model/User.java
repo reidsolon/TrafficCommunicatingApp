@@ -1,5 +1,10 @@
 package com.example.trapic_test.Model;
 
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+
+import java.sql.Date;
+
 public class User {
     public String user_id = null;
     public String user_firstname = null;
@@ -8,6 +13,12 @@ public class User {
     public String user_eMail = null;
     private String user_created = null;
     private String user_status;
+    private String user_address;
+    private boolean user_isOnline;
+    private String user_lastOnline;
+    private long user_lat;
+    private long user_lng;
+    private LatLng user_latLng;
 
     public User(){
 
@@ -21,6 +32,34 @@ public class User {
        this.user_status = account_status;
        this.user_created = created;
        this.user_eMail = eMail;
+    }
+
+    public long getUser_lat() {
+        return user_lat;
+    }
+
+    public long getUser_lng() {
+        return user_lng;
+    }
+
+    public LatLng getUser_latLng() {
+        return user_latLng;
+    }
+
+    public String getUser_lastOnline() {
+        return user_lastOnline;
+    }
+
+    public String getDate() {
+        return user_lastOnline;
+    }
+
+    public String getUser_address() {
+        return user_address;
+    }
+
+    public boolean isUser_isOnline() {
+        return user_isOnline;
     }
 
     public String getUser_id() {
