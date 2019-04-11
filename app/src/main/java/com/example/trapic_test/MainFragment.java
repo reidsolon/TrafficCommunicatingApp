@@ -277,4 +277,34 @@ public class MainFragment extends AppCompatActivity {
             databaseReference.setValue("unverified");
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        FirebaseDatabase.getInstance().getReference("Users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").setValue(false);
+
+        final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("user_lastOnline").setValue(date_time);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        FirebaseDatabase.getInstance().getReference("Users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").setValue(true);
+    }
+
+    private void removeLatLng(){
+        FirebaseDatabase.getInstance().getReference("Users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("user_lat").removeValue();
+
+        FirebaseDatabase.getInstance().getReference("Users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("user_lat").removeValue();
+    }
 }

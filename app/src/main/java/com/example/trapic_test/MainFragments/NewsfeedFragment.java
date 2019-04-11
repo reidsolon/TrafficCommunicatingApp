@@ -89,7 +89,7 @@ public class NewsfeedFragment extends Fragment {
                         Notification notification = builder.build();
                         NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-                        manager.notify(3, notification);
+                        manager.notify(4, notification);
                     }
 
                     @Override

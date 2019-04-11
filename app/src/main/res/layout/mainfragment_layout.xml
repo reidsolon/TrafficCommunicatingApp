@@ -66,12 +66,12 @@
         android:weightSum="100"
         android:paddingBottom="2dp"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="50dp">
 
         <LinearLayout
             android:weightSum="100"
             android:orientation="horizontal"
-            android:layout_width="250dp"
+            android:layout_width="240dp"
             android:background="@drawable/mainfragment_nameholder"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
@@ -100,11 +100,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent">
                 <TextView
-                    android:fontFamily="@font/pinchik"
-                    android:layout_marginTop="8dp"
                     android:textColor="#111"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:textSize="15sp"
                     android:id="@+id/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -114,6 +111,7 @@
                     android:layout_height="wrap_content">
                     <TextView
                         android:textColor="#111"
+                        android:gravity="center"
                         android:background="@drawable/event_count"
                         android:paddingEnd="2dp"
                         android:paddingStart="2dp"
@@ -122,12 +120,6 @@
                         android:layout_height="match_parent"
                         android:text="test"/>
                 </LinearLayout>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_weight="25"
-                android:gravity="center"
-                android:layout_width="0dp"
-                android:layout_height="match_parent">
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
@@ -139,7 +131,7 @@
                 android:layout_width="80dp"
                 android:textStyle="bold"
                 android:fontFamily="@font/pinchik"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:text="Sign Out"
                 android:textColor="#111"
                 android:background="@drawable/signout_btn"
