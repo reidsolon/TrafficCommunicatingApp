@@ -30,6 +30,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.trapic_test.Model.Comment;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
@@ -50,6 +52,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -92,6 +95,7 @@ import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -106,7 +110,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
-    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count;
+    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt;
     private ImageView cat_img;
     private String[] list;
     private double lat, lng;
@@ -114,7 +118,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private Event[] event = new Event[200];
     private User[] user = new User[200];
     private BottomSheetDialog dialog;
-    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn;
+    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
@@ -165,6 +169,60 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 animateLocation();
             }
         });
+        marker_comment_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!marker_comment_txt.equals("")){
+
+                    final String[] fullname = new String[1];
+                    FirebaseDatabase.getInstance().getReference("Users")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getChildren();
+                                    User user = dataSnapshot.getValue(User.class);
+                                    fullname[0] = user.getUser_firstname()+" "+user.getUser_lastname();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                    final String[] publisherId = new String[1];
+                    FirebaseDatabase.getInstance().getReference("Posts")
+                            .child(event_caption_txt.getText().toString())
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getChildren();
+                                    Event event = dataSnapshot.getValue(Event.class);
+                                    publisherId[0] = event.getUser_id();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                    final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
+                    final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
+                    final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+                    String postId = event_caption_txt.getText().toString();
+                    Comment comment1 = new Comment(publisherId[0], postId, marker_comment_txt.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getUid(), fullname[0], d_date, d_time,date_time);
+                    String id = FirebaseDatabase.getInstance().getReference("Comments").push().getKey();
+                    FirebaseDatabase.getInstance().getReference("Comments").child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(getContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
+                            marker_comment_txt.setText("");
+                        }
+                    });
+                }
+            }
+        });
         myLocBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,7 +235,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMap = mapboxMap;
 
-                mapboxMap.setStyle(Style.TRAFFIC_NIGHT, new Style.OnStyleLoaded() {
+                mapboxMap.setStyle(Style.TRAFFIC_DAY, new Style.OnStyleLoaded() {
 
 
                     @Override
@@ -251,6 +309,8 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
          status_mode = view.findViewById(R.id.status_mode_txt);
          user_count = view.findViewById(R.id.user_count);
 
+         marker_comment_btn = dialog.findViewById(R.id.comment_btn);
+         marker_comment_txt = dialog.findViewById(R.id.comment_txt);
         close_txt = dialog.findViewById(R.id.close_txt);
         viewNewsfeedBtn = dialog.findViewById(R.id.view_to_newsfeed);
 //        cat_img = dialog.findViewById(R.id.cat_img);
@@ -272,7 +332,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                loadAllMarkers();
+
             }
 
             @Override
@@ -722,12 +782,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
                                     FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                             .child("user_address").setValue(my_address);
-
                                 }
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
                                 }
                             });
             }

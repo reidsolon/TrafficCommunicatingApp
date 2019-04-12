@@ -82,11 +82,46 @@ public class CommentsActivity extends AppCompatActivity {
         cmtBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final String[] fullname = new String[1];
                 if(!comment_edittext.getText().toString().equals("")){
-                    addComment();
+                    final String comment = comment_edittext.getText().toString();
+                    com.google.firebase.database.Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_id").equalTo(auth.getCurrentUser().getUid());
+
+                    final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
+                    final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
+                    final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+
+
+                    query.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            dataSnapshot.getChildren();
+                            User user = dataSnapshot.getValue(User.class);
+
+                             fullname[0] = user.getUser_firstname()+" "+user.getUser_lastname();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname[0], d_date, d_time,date_time);
+                    String id = dbRefs.push().getKey();
+                    dbRefs.child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
+                            comment_edittext.setText("");
+
+                            setupRecycleView();
+                        }
+                    });
                 }else{
                     Toast.makeText(getApplicationContext(), "Please enter your comment message!", Toast.LENGTH_LONG).show();
                 }
+                Toast.makeText(getApplicationContext(), "Ehm", Toast.LENGTH_SHORT).show();
             }
         });
         setupRecycleView();
@@ -101,40 +136,7 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     public void addComment(){
-        final String comment = comment_edittext.getText().toString();
-        com.google.firebase.database.Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_id").equalTo(auth.getCurrentUser().getUid());
 
-        final String d_date = (String) DateFormat.format("MMMM d, yyyy", new Date());
-        final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
-        final String date_time = (String) DateFormat.format("MMMM d, yyyy hh:mm:ss a", new Date());
-
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataSnapshot.getChildren();
-                User user = dataSnapshot.getValue(User.class);
-
-                String fullname = user.getUser_firstname()+" "+user.getUser_lastname();
-                Comment comment1 = new Comment(publisherID, postId, comment, auth.getUid(), fullname, d_date, d_time,date_time);
-                String id = dbRefs.push().getKey();
-                dbRefs.child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
-                        comment_edittext.setText("");
-
-                        setupRecycleView();
-                    }
-                });
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
 
     }

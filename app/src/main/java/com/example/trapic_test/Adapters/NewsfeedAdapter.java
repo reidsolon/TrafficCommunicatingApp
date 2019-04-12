@@ -119,6 +119,37 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             }
 
         });
+//        FirebaseDatabase.getInstance().getReference("Reports").child(event.getEvent_id()).child(event.getEvent_id())
+//            .addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                    FirebaseDatabase.getInstance().getReference("Posts").child(event.getEvent_id()).child("event_report_count")
+//                            .setValue(dataSnapshot.getChildrenCount());
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
+//
+//
+//        FirebaseDatabase.getInstance().getReference("Likes").child(event.getEvent_id())
+//                .addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                        FirebaseDatabase.getInstance().getReference("Posts").child(event.getEvent_id()).child("event_thank_count")
+//                                .setValue(dataSnapshot.getChildrenCount());
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                    }
+//                });
+
         holder.isLike(event.getEvent_id(), holder.like_img);
         holder.countReport(event.getEvent_id(), holder.report_txt);
         holder.countLike(event.getEvent_id(), holder.like_txt);
@@ -136,21 +167,19 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             }
         });
 
-        double rate = (thank_num + report_num) * 100.0;
+        double rate = (Double.parseDouble(holder.report_txt.getText().toString()) + Double.parseDouble(holder.like_txt.getText().toString())) * 100.0;
 
         holder.trust_rate_txt.setText("Trust rate: "+rate+"%");
 
         holder.viewMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(ctx, ViewMapActivity.class);
                 intent.putExtra("Lat", event.getEvent_lat());
                 intent.putExtra("Lng", event.getEvent_lng());
                 intent.putExtra("Location", event.getEvent_location());
                 intent.putExtra("Time", event.getEvent_time());
                 ctx.startActivity(intent);
-
             }
         });
 

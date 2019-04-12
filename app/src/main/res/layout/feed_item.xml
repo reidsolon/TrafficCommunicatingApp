@@ -24,56 +24,12 @@
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:gravity="center"
-                        android:layout_height="match_parent">
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:foregroundGravity="center"
-                            android:src="@drawable/profile_picture"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:id="@+id/user_img"/>
-                    </LinearLayout>
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/isOnline"
-                        app:civ_border_color="#fff"
-                        app:civ_border_width="3dp"
-                        app:civ_border_overlay="true"
-                        android:layout_width="20dp"
-                        android:layout_marginStart="30dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="4dp"
-                        android:layout_marginBottom="7dp"
-                        android:layout_alignParentBottom="true"
-                        android:src="@drawable/ic_fiber_manual_record_black_24dp"/>
                 </RelativeLayout>
 
 
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:textColor="#111"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="10dp"
-                    android:textSize="18sp"
-                    android:text="Fetching names..."
-                    android:layout_height="wrap_content"
-                    android:id="@+id/user_name"/>
-                <TextView
-                    android:layout_marginLeft="5dp"
-                    android:textSize="12sp"
-                    android:textColor="#708BBF"
-                    android:id="@+id/posted_by"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="fetching email..."/>
-            </LinearLayout>
+
             <LinearLayout
                 android:gravity="right|center_vertical"
                 android:layout_width="match_parent"
@@ -93,7 +49,7 @@
             android:id="@+id/img_holder"
             android:layout_below="@+id/name_area"
             android:layout_width="match_parent"
-            android:layout_height="440dp">
+            android:layout_height="520dp">
 
             <ImageView
                 android:id="@+id/post_img"
@@ -101,6 +57,87 @@
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
                 android:background="@drawable/image_holder" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_above="@+id/location_holder"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="20dp"
+                android:background="#4111"
+                android:layout_marginStart="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:gravity="center"
+                        android:layout_marginStart="3dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/isOnline"
+                            app:civ_border_color="#fff"
+                            app:civ_border_width="3dp"
+                            app:civ_border_overlay="true"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="4dp"
+                            android:layout_alignParentBottom="true"
+                            android:src="@drawable/ic_fiber_manual_record_black_24dp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:textColor="#fff"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="10dp"
+                            android:textSize="18sp"
+                            android:text="Fetching names..."
+                            android:layout_height="wrap_content"
+                            android:id="@+id/user_name"/>
+                        <TextView
+                            android:layout_marginLeft="5dp"
+                            android:textSize="12sp"
+                            android:textColor="#708BBF"
+                            android:id="@+id/posted_by"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="fetching email..."/>
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/caption"
+                        android:text="Fetching caption"
+                        android:layout_marginStart="10dp"
+                        android:textColor="#fff"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+                    <TextView
+                        android:id="@+id/trust_rate"
+                        android:layout_width="match_parent"
+                        android:text="Rate: "
+                        android:textColor="#fff"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="17sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
             <TextView
                 android:id="@+id/event_type"
                 android:layout_marginBottom="10dp"
@@ -114,19 +151,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"/>
-
             <TextView
-                android:id="@+id/trust_rate"
-                android:layout_width="match_parent"
-                android:text="Rate: "
-                android:textColor="#fff"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:layout_alignParentBottom="true"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"/>
-            <TextView
-                android:drawableStart="@drawable/ic_access_time_black_24dp"
                 android:id="@+id/timestamp"
                 android:background="@drawable/timestamp_holder"
                 android:layout_alignParentTop="true"
@@ -140,8 +165,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"
                 android:paddingRight="5dp"
-                android:paddingLeft="1dp"/>
+                android:paddingLeft="5dp"/>
             <LinearLayout
+                android:id="@+id/location_holder"
                 android:background="@drawable/timestamp_holder"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
@@ -177,23 +203,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <LinearLayout
+                android:orientation="vertical"
                 android:id="@+id/caption_holder"
                 android:layout_below="@+id/img_holder"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <TextView
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="30dp"
-                    android:paddingTop="5dp"
-                    android:textSize="17sp"
-                    android:textColor="#111"
-                    android:paddingBottom="5dp"
-                    android:text="Fetching caption..."
-                    android:id="@+id/caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+
+
+
             </LinearLayout>
 
             <LinearLayout

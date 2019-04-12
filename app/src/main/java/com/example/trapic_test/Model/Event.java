@@ -17,8 +17,8 @@ public class Event {
     private String event_date;
     private String event_date_time;
     private double event_trust_rate;
-    private double event_report_count;
-    private double event_thank_count;
+    private long event_report_count;
+    private long event_thank_count;
 
     public Event(){
 
@@ -38,11 +38,11 @@ public class Event {
         this.event_date_time = date_time;
     }
 
-    public double getEvent_report_count() {
+    public long getEvent_report_count() {
         return event_report_count;
     }
 
-    public double getEvent_thank_count() {
+    public long getEvent_thank_count() {
         return event_thank_count;
     }
 
