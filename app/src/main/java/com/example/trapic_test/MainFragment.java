@@ -265,7 +265,8 @@ public class MainFragment extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Toast.makeText(getApplicationContext(), "Back btn is disabled", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "Back btn is disabled", Toast.LENGTH_SHORT).show();
+        viewPager.setCurrentItem(0);
     }
 
     private void updateUserStatus(String id){

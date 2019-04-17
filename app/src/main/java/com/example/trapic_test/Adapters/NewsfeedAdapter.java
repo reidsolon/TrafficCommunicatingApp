@@ -44,6 +44,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,13 +54,15 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     View v;
     List<Event> eventList;
     FirebaseUser firebaseUser;
+    PrettyTime prettyTime;
 
-    private double thank_num, report_num;
+    private long thank_num, report_num;
 
 
     public NewsfeedAdapter(Context context, List<Event> eventList){
         this.ctx = context;
         this.eventList = eventList;
+        Collections.reverse(this.eventList);
     }
     @NonNull
     @Override
@@ -78,7 +81,28 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
         Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
         PrettyTime p = new PrettyTime();
-        String pretty = p.format(new Date(event.getEvent_date_time()));
+        final String pretty = p.format(new Date(event.getEvent_date_time()));
+
+        FirebaseDatabase.getInstance().getReference("Posts").child(event.getEvent_id()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+                Event event = dataSnapshot.getValue(Event.class);
+                if(event.getEvent_status().equals("closed")){
+                    prettyTime = new PrettyTime();
+                    String date = prettyTime.format(new Date(event.getEvent_closed_time()));
+                    holder.event_status_txt.setText("Event is closed "+date);
+                    holder.event_status_txt.setBackgroundResource(R.drawable.eventtype_holder);
+                }else{
+                    holder.event_status_txt.setText("Event is still ongoing");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         FirebaseDatabase.getInstance().getReference("Users").child(event.getUser_id()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -98,7 +122,22 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
             }
         });
+        switch(event.getEvent_type()){
+            case "Traffic Jams":{
+                holder.event_cat_img.setImageResource(R.drawable.ic_traffic_jam);
+                break;
+            }
 
+            case "Road Crash":{
+                holder.event_cat_img.setImageResource(R.drawable.ic_road_crash);
+                break;
+            }
+
+            case "Construction Area":{
+                holder.event_cat_img.setImageResource(R.drawable.ic_construction_marker);
+                break;
+            }
+        }
         holder.timestamp.setText(pretty);
         holder.caption.setText(event.getEvent_caption());
         holder.caption.setCompoundDrawables(ctx.getResources().getDrawable(R.drawable.ic_construction_marker), null, null, null);
@@ -119,36 +158,6 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             }
 
         });
-//        FirebaseDatabase.getInstance().getReference("Reports").child(event.getEvent_id()).child(event.getEvent_id())
-//            .addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//                    FirebaseDatabase.getInstance().getReference("Posts").child(event.getEvent_id()).child("event_report_count")
-//                            .setValue(dataSnapshot.getChildrenCount());
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                }
-//            });
-//
-//
-//        FirebaseDatabase.getInstance().getReference("Likes").child(event.getEvent_id())
-//                .addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//                        FirebaseDatabase.getInstance().getReference("Posts").child(event.getEvent_id()).child("event_thank_count")
-//                                .setValue(dataSnapshot.getChildrenCount());
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
 
         holder.isLike(event.getEvent_id(), holder.like_img);
         holder.countReport(event.getEvent_id(), holder.report_txt);
@@ -166,10 +175,6 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 }
             }
         });
-
-        double rate = (Double.parseDouble(holder.report_txt.getText().toString()) + Double.parseDouble(holder.like_txt.getText().toString())) * 100.0;
-
-        holder.trust_rate_txt.setText("Trust rate: "+rate+"%");
 
         holder.viewMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,6 +230,12 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             }
         });
 
+
+        long rate = report_num+thank_num;
+
+        holder.trust_rate_txt.setText("Trust rate: "+rate+"%");
+
+
     }
 
 
@@ -235,12 +246,13 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     }
 
     public class NewsfeedHolder extends RecyclerView.ViewHolder{
-        TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt, report_txt, trust_rate_txt;
+        TextView email, user_name, caption, type, timestamp, location, like_txt, cmt_txt, report_txt, trust_rate_txt, event_status_txt;
         LinearLayout like_btn, cmt_btn, viewMapBtn, report_btn;
         Button deleteBtn, dialog_send_btn;
-        ImageView imageView, like_img, isOnline;
+        ImageView imageView, like_img, isOnline, event_cat_img;
         public NewsfeedHolder(View itemView) {
             super(itemView);
+            event_cat_img = itemView.findViewById(R.id.event_cat_img);
             isOnline = itemView.findViewById(R.id.isOnline);
             trust_rate_txt = itemView.findViewById(R.id.trust_rate);
             report_txt = itemView.findViewById(R.id.report_count_txt);
@@ -259,9 +271,10 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             viewMapBtn = itemView.findViewById(R.id.viewMapBtn);
             deleteBtn = itemView.findViewById(R.id.delete_btn);
             report_btn = itemView.findViewById(R.id.report_btn);
+            event_status_txt = itemView.findViewById(R.id.event_status);
         }
         public void countReport(String post_id, final TextView view){
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reports").child(post_id);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reports").child(post_id).child(post_id);
 
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -429,7 +442,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                         User user = snapshot.getValue(User.class);
 
                         email.setText(user.getUser_eMail());
-                        user_name.setText(WordUtils.capitalize(user.getUser_firstname()+" "+user.getUser_lastname()));
+                        user_name.setText(WordUtils.capitalize(user.getUser_firstname())+" Lv. 1");
                     }
                 }
 

@@ -156,9 +156,6 @@ public class CommentsActivity extends AppCompatActivity {
                     Comment event = snapshot.getValue(Comment.class);
                     if(event.getPost_id().equals(postId)){
                         list.add(event);
-
-                        Collections.reverse(list);
-
                     }
                 }
                 userCommentAdapter = new UserCommentAdapter(getApplicationContext(), list);

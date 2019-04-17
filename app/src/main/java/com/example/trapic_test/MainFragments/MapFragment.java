@@ -92,6 +92,7 @@ import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -107,6 +108,10 @@ import retrofit2.Response;
 public class MapFragment extends Fragment implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
 
     private MapboxMap mMap;
+
+    private double distance;
+    double roundedDistance;
+    double roundedKm;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
@@ -449,6 +454,32 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             }
         });
     }
+    private void isClosed(final String post_id, final Button view){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts").child(post_id);
+        final String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+                Event event = dataSnapshot.getValue(Event.class);
+                if(event.getEvent_status().equals("closed")){
+                    yesBtn.setVisibility(View.INVISIBLE);
+                    noBtn.setVisibility(View.INVISIBLE);
+
+                    PrettyTime prettyTime = new PrettyTime();
+                    String ago = prettyTime.format(new Date(event.getEvent_closed_time()));
+                    close_txt.setText("This event is closed since - "+ago+"!");
+                }else{
+                    isVoted(post_id, view);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
     private void loadOnClicks(final String post_id, final Button view){
 
         final String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -571,7 +602,15 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     dataSnapshot.getChildren();
                                     Event event2 = dataSnapshot.getValue(Event.class);
-                                    FirebaseDatabase.getInstance().getReference("Posts").child(event2.getEvent_id()).removeValue();
+                                    FirebaseDatabase.getInstance().getReference("Posts").child(event2.getEvent_id())
+                                            .child("event_status").setValue("closed");
+
+                                final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+                                    FirebaseDatabase.getInstance().getReference("Posts")
+                                            .child(event2.getEvent_id())
+                                            .child("event_closed_time").setValue(date_time);
+                                    FirebaseDatabase.getInstance().getReference("Approval")
+                                            .child(event2.getEvent_id()).removeValue();
 
                             }
 
@@ -606,16 +645,15 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                     });
 
             if(latLng1 != null){
-                final double distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
-                final double roundedDistance = Math.round(distance * 100.0) / 100.0;
-                final double roundedKm;
+                 distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
+                 roundedDistance = Math.round(distance * 100.0) / 100.0;
                 if(roundedDistance > 1000.0){
                     roundedKm = Math.round((roundedDistance / 100.0) * 100.0)/100.0;
                     markerOptions.setTitle("[ "+event[i].getEvent_type() + " ]: " + event[i].getEvent_location()+" "+roundedKm+" km away from you");
                 }else{
                     markerOptions.setTitle("[ "+event[i].getEvent_type() + " ]: " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
                 }
-                if(distance <= 50){
+                if(distance <= 50 && event[i].getEvent_status().equals("open")){
 
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
@@ -706,7 +744,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 //                        cat_img.setImageResource(R.drawable.ic_construction_marker);
 //                    }
                         if(marker.getSnippet() != null){
-                            isVoted(marker.getSnippet(), yesBtn);
+                            isClosed(marker.getSnippet(), yesBtn);
                             loadOnClicks(marker.getSnippet(), yesBtn);
                             event_type_txt.setText(marker.getTitle());
                             event_caption_txt.setText(marker.getSnippet());

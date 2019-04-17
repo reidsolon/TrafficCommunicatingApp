@@ -317,7 +317,7 @@ public class PostActivity extends AppCompatActivity {
                 final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
                 final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
 
-                Event event = new Event(caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date, location_lat, location_lng, date_time);
+                Event event = new Event("open", caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date, location_lat, location_lng, date_time);
                 dbRefs.child(id3).setValue(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

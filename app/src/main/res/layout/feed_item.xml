@@ -13,23 +13,66 @@
         <LinearLayout
             android:background="@drawable/feed_header"
             android:id="@+id/name_area"
+            android:paddingBottom="4dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="50dp">
             <LinearLayout
                 android:layout_width="60dp"
                 android:gravity="center"
-                android:layout_height="60dp">
+                android:paddingBottom="5dp"
+                android:layout_height="50dp">
                 <RelativeLayout
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
+                    <ImageView
+                        android:id="@+id/event_cat_img"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginBottom="0dp" />
+
                 </RelativeLayout>
-
-
             </LinearLayout>
-
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <TextView
+                    android:paddingTop="2dp"
+                    android:gravity="center"
+                    android:id="@+id/event_type"
+                    android:background="@drawable/eventtype_holder"
+                    android:textColor="#fff"
+                    android:textSize="18sp"
+                    android:paddingBottom="2dp"
+                    android:layout_width="wrap_content"
+                    android:text="@string/app_name"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_height="match_parent">
+                <TextView
+                    android:paddingTop="2dp"
+                    android:gravity="center"
+                    android:id="@+id/event_status"
+                    android:background="@drawable/event_status_holder"
+                    android:textColor="#fff"
+                    android:textSize="18sp"
+                    android:paddingBottom="2dp"
+                    android:layout_width="wrap_content"
+                    android:text="@string/app_name"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"/>
+            </LinearLayout>
             <LinearLayout
                 android:gravity="right|center_vertical"
                 android:layout_width="match_parent"
@@ -62,9 +105,9 @@
                 android:orientation="vertical"
                 android:layout_above="@+id/location_holder"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="20dp"
-                android:background="#4111"
+                android:background="#7111"
                 android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <LinearLayout
@@ -102,55 +145,41 @@
                         <TextView
                             android:layout_marginLeft="5dp"
                             android:textSize="12sp"
-                            android:textColor="#708BBF"
+                            android:textColor="#fff"
                             android:id="@+id/posted_by"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="fetching email..."/>
                     </LinearLayout>
                 </LinearLayout>
+
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_marginBottom="10dp"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/caption"
-                        android:text="Fetching caption"
-                        android:layout_marginStart="10dp"
-                        android:textColor="#fff"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        />
+                        android:layout_marginStart="10dp"
+                        android:text="Fetching caption"
+                        android:textColor="#fff"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/trust_rate"
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="10dp"
                         android:text="Rate: "
                         android:textColor="#fff"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginStart="5dp"
-                        android:layout_height="wrap_content"
-                        android:textSize="17sp"/>
+                        android:textSize="17sp" />
                 </LinearLayout>
             </LinearLayout>
 
-
-            <TextView
-                android:id="@+id/event_type"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/eventtype_holder"
-                android:textColor="#fff"
-                android:layout_marginTop="10dp"
-                android:textSize="18sp"
-                android:layout_marginStart="10dp"
-                android:layout_width="wrap_content"
-                android:text="@string/app_name"
-                android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"/>
             <TextView
                 android:id="@+id/timestamp"
                 android:background="@drawable/timestamp_holder"
@@ -158,8 +187,8 @@
                 android:layout_width="wrap_content"
                 android:textColor="#fff"
                 android:gravity="center"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="2dp"
                 android:layout_height="wrap_content"

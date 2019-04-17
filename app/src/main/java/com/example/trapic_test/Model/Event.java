@@ -18,13 +18,15 @@ public class Event {
     private String event_date_time;
     private double event_trust_rate;
     private long event_report_count;
+    private String event_status;
     private long event_thank_count;
+    private String event_closed_time = null;
 
     public Event(){
 
     }
 
-    public Event(String caption, String type, String location, String image, String id, String event_id, String time, String date, double lat, double lng, String date_time){
+    public Event(String status, String caption, String type, String location, String image, String id, String event_id, String time, String date, double lat, double lng, String date_time){
         this.event_caption = caption;
         this.event_type = type;
         this.event_location = location;
@@ -36,6 +38,15 @@ public class Event {
         this.event_lat = lat;
         this.event_lng = lng;
         this.event_date_time = date_time;
+        this.event_status = status;
+    }
+
+    public String getEvent_closed_time() {
+        return event_closed_time;
+    }
+
+    public String getEvent_status() {
+        return event_status;
     }
 
     public long getEvent_report_count() {

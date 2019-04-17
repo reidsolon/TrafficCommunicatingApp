@@ -35,6 +35,8 @@ public class UserCommentAdapter extends RecyclerView.Adapter<UserCommentAdapter.
     public UserCommentAdapter(Context context, @Nullable List<Comment> list) {
         this.ctx = context;
        this.list = list;
+
+       Collections.reverse(this.list);
     }
 
     @NonNull
@@ -46,6 +48,7 @@ public class UserCommentAdapter extends RecyclerView.Adapter<UserCommentAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull UserCommentHolder holder, int position) {
+
         Comment comment = list.get(position);
 
         PrettyTime p = new PrettyTime();

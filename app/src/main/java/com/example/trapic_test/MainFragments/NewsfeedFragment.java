@@ -142,9 +142,6 @@ public class NewsfeedFragment extends Fragment {
 
                     Event event = snapshot.getValue(Event.class);
                     list.add(event);
-
-                    Collections.reverse(list);
-
                 }
 
                 newsfeedAdapter = new NewsfeedAdapter(getContext(), list);
