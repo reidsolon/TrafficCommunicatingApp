@@ -30,7 +30,7 @@
                     android:textStyle="bold"
                     android:layout_marginTop="25dp"
                     android:text="@string/Loading_name"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:textColor="#111"
                     android:id="@+id/event_cat_txt"
                     android:layout_width="match_parent"
@@ -41,6 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
+                    android:textSize="10sp"
                     android:layout_marginStart="20dp"
                     android:text="@string/Loading_name"
                     android:id="@+id/event_cap"
@@ -72,7 +73,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/close_txt"
-                android:textSize="17sp"
+                android:textSize="14sp"
                 android:layout_marginBottom="10dp"
                 android:textStyle="bold"
                 android:layout_width="wrap_content"
@@ -91,6 +92,7 @@
                 android:id="@+id/yes_btn"
                 android:textColor="#fff"
                 android:text="Yes"
+                android:textSize="10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <Button
@@ -98,11 +100,12 @@
                 android:textColor="#fff"
                 android:text="no"
                 android:id="@+id/no_btn"
+                android:textSize="10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="15dp"
             android:gravity="center"
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -112,6 +115,7 @@
                 android:background="@drawable/viewmap_btn_stype"
                 android:id="@+id/view_to_newsfeed"
                 android:textColor="#fff"
+                android:textSize="10sp"
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
             <Button
@@ -120,6 +124,7 @@
                 android:background="@drawable/viewmap_btn_stype"
                 android:id="@+id/comment_to_newsfeed"
                 android:textColor="#fff"
+                android:textSize="10sp"
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
             <LinearLayout
@@ -132,8 +137,9 @@
                     android:paddingStart="10dp"
                     android:background="@drawable/marker_comment_bg"
                     android:hint="Comment on this event"
-                    android:layout_weight="90"
+                    android:layout_weight="95"
                     android:layout_width="0dp"
+                    android:textSize="10sp"
                     android:layout_height="40dp" />
                 <Button
                     android:id="@+id/comment_btn"

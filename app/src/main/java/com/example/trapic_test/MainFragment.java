@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,6 +26,7 @@ import com.example.trapic_test.MainFragments.MapFragment;
 import com.example.trapic_test.MainFragments.NewsfeedFragment;
 import com.example.trapic_test.MainFragments.NotificationFragment;
 import com.example.trapic_test.MainFragments.ProfileFragment;
+import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,13 +47,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainFragment extends AppCompatActivity {
-    private TextView test, status_mode_txt;
+    private TextView test, status_mode_txt, user_fullname, user_email, profile_btn, help_btn, feedback_btn, settings_btn;
     private Button logout;
 
-    private LinearLayout postLink;
+    private LinearLayout postLink,user_settings_btn, dialog_close_btn;
     private FirebaseAuth auth;
     private FirebaseDatabase db;
     private DatabaseReference dbRefs;
+    private BottomSheetDialog dialog1;
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -125,6 +128,25 @@ public class MainFragment extends AppCompatActivity {
             }
         });
 
+        setupOnClicks();
+    }
+    private void makeUserOnline(String id){
+        FirebaseDatabase.getInstance().getReference("Users").child(id).child("user_isOnline").setValue(true);
+        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("user_lastOnline").setValue("0");
+    }
+    private void checkStatus(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            if(user.isEmailVerified()){
+                loadUserInfo();
+            }else{
+                loadUserInfo();
+            }
+        }
+
+    }
+    private void setupOnClicks(){
         postLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,22 +167,49 @@ public class MainFragment extends AppCompatActivity {
 
             }
         });
-    }
-    private void makeUserOnline(String id){
-        FirebaseDatabase.getInstance().getReference("Users").child(id).child("user_isOnline").setValue(true);
-        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("user_lastOnline").setValue("0");
-    }
-    private void checkStatus(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
-            if(user.isEmailVerified()){
-                loadUserInfo();
-            }else{
-                loadUserInfo();
-            }
-        }
 
+        user_settings_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog1.show();
+
+                FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                dataSnapshot.getChildren();
+                                User user = dataSnapshot.getValue(User.class);
+
+                                user_fullname.setText(WordUtils.capitalize(user.getUser_firstname()+" " +user.getUser_lastname()));
+                                user_email.setText(user.getUser_eMail());
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+            }
+        });
+        dialog_close_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog1.dismiss();
+            }
+        });
+        profile_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewPager.setCurrentItem(3);
+            }
+        });
+        feedback_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainFragment.this, SendFeedbackActivity.class));
+            }
+        });
     }
 
     private void loadUserInfo(){
@@ -186,7 +235,7 @@ public class MainFragment extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     dataSnapshot.getChildren();
                     User user = dataSnapshot.getValue(User.class);
-                    String firstname = "Hi, "+ WordUtils.capitalize(user.getUser_firstname());
+                    String firstname = "Hi, "+ WordUtils.capitalize(user.getUser_firstname()+" Lv. 1");
                     test.setText(firstname);
 
                 }
@@ -203,6 +252,23 @@ public class MainFragment extends AppCompatActivity {
             status_mode_txt.setText("Guest mode");
         }
 
+        FirebaseDatabase.getInstance().getReference("Posts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildren();
+                Event event = dataSnapshot.getValue(Event.class);
+                final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+//                if(event.getEvent_closed_time() <= date_time){
+//
+//                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
     public void init(){
 
@@ -211,7 +277,7 @@ public class MainFragment extends AppCompatActivity {
         test =  findViewById(R.id.test);
         postLink =  findViewById(R.id.post_link);
         logout =  findViewById(R.id.logout_btn);
-
+        user_settings_btn = findViewById(R.id.user_settings_btn);
         status_mode_txt = findViewById(R.id.status_mode_txt);
 
         auth = FirebaseAuth.getInstance();
@@ -219,6 +285,16 @@ public class MainFragment extends AppCompatActivity {
 
         dbRefs = db.getReference("User");
         FirebaseUser user = auth.getCurrentUser();
+
+        dialog1 = new BottomSheetDialog(this);
+        dialog1.setContentView(R.layout.user_settings_layout);
+        user_fullname = dialog1.findViewById(R.id.user_fullname);
+        user_email = dialog1.findViewById(R.id.user_email);
+        dialog_close_btn = dialog1.findViewById(R.id.dialog_close_btn);
+        feedback_btn = dialog1.findViewById(R.id.feedback_btn);
+        profile_btn = dialog1.findViewById(R.id.myprofile_btn);
+        help_btn = dialog1.findViewById(R.id.help_btn);
+        settings_btn = dialog1.findViewById(R.id.settings_btn);
 
     }
 

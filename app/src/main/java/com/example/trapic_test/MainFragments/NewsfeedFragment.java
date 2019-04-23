@@ -1,5 +1,6 @@
 package com.example.trapic_test.MainFragments;
 
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -13,6 +14,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.trapic_test.Adapters.FeedAdapter;
 import com.example.trapic_test.Adapters.NewsfeedAdapter;
@@ -56,6 +59,7 @@ public class NewsfeedFragment extends Fragment {
     private FirebaseAuth auth;
     private List<Event> list;
     private FirebaseUser user;
+    private Button act_acct_btn;
     View view;
     public NewsfeedFragment(){
 
@@ -114,9 +118,11 @@ public class NewsfeedFragment extends Fragment {
                 });
             }else{
                 view = inflater.inflate(R.layout.unverified_newsfeed, container, false);
+                initViewsUnverified();
             }
         }else{
             view = inflater.inflate(R.layout.unverified_newsfeed, container, false);
+            initViewsUnverified();
         }
 
         return view;
@@ -131,6 +137,29 @@ public class NewsfeedFragment extends Fragment {
         list = new ArrayList<>();
     }
 
+    public void initViewsUnverified(){
+        act_acct_btn = view.findViewById(R.id.act_acct_btn);
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if(!user.isEmailVerified() && user != null){
+            act_acct_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    user.sendEmailVerification();
+                    Dialog dialog = new Dialog(getContext());
+                    dialog.setTitle("Verification link is sent to your account. Please check your email and try to relog your account here." +
+                            "- Trapic Team.");
+                    dialog.show();
+                }
+            });
+        }else{
+            Toast.makeText(getContext(), "Register your own account!", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
     private void readPosts(){
         Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("event_date_time");
         query.addValueEventListener(new ValueEventListener() {
@@ -141,7 +170,11 @@ public class NewsfeedFragment extends Fragment {
                 for(DataSnapshot snapshot :  dataSnapshot.getChildren()) {
 
                     Event event = snapshot.getValue(Event.class);
-                    list.add(event);
+
+                    if(event.getEvent_deleted() == false){
+                        list.add(event);
+                    }
+
                 }
 
                 newsfeedAdapter = new NewsfeedAdapter(getContext(), list);
@@ -153,6 +186,7 @@ public class NewsfeedFragment extends Fragment {
 
             }
         });
+
 
     }
 

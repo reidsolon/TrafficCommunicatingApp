@@ -68,7 +68,9 @@ import org.w3c.dom.Text;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import static android.os.Build.ID;
@@ -311,13 +313,25 @@ public class PostActivity extends AppCompatActivity {
                 final String id = auth.getUid();
                 final String id3 = dbRefs.push().getKey();
                 Uri uri2 = task.getResult();
-                Date d = new Date();
                 final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
-                Date time = new Date();
                 final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
                 final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
 
-                Event event = new Event("open", caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date, location_lat, location_lng, date_time);
+//                Add 1 hour for deletion
+                java.text.DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy hh:mm:ss a");
+                Calendar calendar = null;
+                Date date;
+                try {
+                    date = dateFormat.parse(date_time);
+                    calendar = Calendar.getInstance();
+                    calendar.setTime(date);
+                    calendar.add(Calendar.HOUR, 1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+
+                Event event = new Event(calendar.getTime().toString(), "open", caption_txt, type_txt, location_txt, uri2.toString(), id, id3, d_time, d_date, location_lat, location_lng, date_time);
                 dbRefs.child(id3).setValue(event).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

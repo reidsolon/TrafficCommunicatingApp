@@ -7,6 +7,7 @@
         android:layout_height="200dp">
 
     </android.support.v4.widget.SwipeRefreshLayout>
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
@@ -21,6 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <TextView
+            android:textSize="10sp"
             android:textColor="#111"
             android:id="@+id/status_mode_txt"
             android:layout_width="match_parent"
@@ -29,6 +31,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/user_count_holder"
         android:layout_marginEnd="4dp"
         android:layout_marginStart="5dp"
         android:background="@drawable/event_count"
@@ -46,6 +49,65 @@
             android:drawableStart="@drawable/ic_person_black_24dp"/>
     </LinearLayout>
     <LinearLayout
+        android:layout_below="@id/user_count_holder"
+        android:id="@+id/cons_count_holder"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/event_count"
+        android:layout_marginTop="5dp"
+        android:paddingEnd="3dp"
+        android:paddingLeft="3dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/cons_count"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_construction_marker"
+            android:gravity="center"
+            android:paddingEnd="4dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_below="@id/cons_count_holder"
+        android:id="@+id/traffic_count_holder"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/event_count"
+        android:layout_marginTop="5dp"
+        android:paddingEnd="3dp"
+        android:paddingLeft="3dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/road_count"
+            android:gravity="center"
+            android:paddingEnd="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_road_crash"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@id/traffic_count_holder"
+        android:id="@+id/road_count_holder"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/event_count"
+        android:layout_marginTop="5dp"
+        android:paddingEnd="3dp"
+        android:paddingLeft="3dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/traffic_count"
+            android:gravity="center"
+            android:paddingEnd="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_traffic_jam"/>
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/iamhere"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -55,6 +117,7 @@
         <Button
             android:text=" I am here "
             android:textColor="#fff"
+            android:textSize="10sp"
             android:drawableStart="@drawable/ic_person_pin_circle_black_24dp"
             android:paddingStart="10dp"
             android:background="@drawable/selectmap_layout"
@@ -71,6 +134,7 @@
         android:layout_height="wrap_content">
         <Button
             android:text=" Select map type "
+            android:textSize="10sp"
             android:textColor="#fff"
             android:drawableStart="@drawable/ic_palette_black_24dp"
             android:paddingStart="10dp"

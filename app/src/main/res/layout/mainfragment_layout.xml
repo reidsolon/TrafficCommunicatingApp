@@ -61,7 +61,22 @@
             </LinearLayout>
 
         </RelativeLayout>
+    <!--<LinearLayout-->
+        <!--android:id="@+id/header_main"-->
+        <!--android:layout_marginBottom="70dp"-->
+        <!--android:layout_marginStart="-300dp"-->
+        <!--android:gravity="center"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:src="@drawable/ic_trapiclogo4"/>-->
+    <!--</LinearLayout>-->
     <LinearLayout
+        android:layout_below="@+id/tape_layout"
+        android:background="#fff"
         android:id="@+id/signout_section"
         android:weightSum="100"
         android:paddingBottom="2dp"
@@ -72,7 +87,6 @@
             android:weightSum="100"
             android:orientation="horizontal"
             android:layout_width="240dp"
-            android:background="@drawable/mainfragment_nameholder"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
             android:layout_height="match_parent">
@@ -83,6 +97,7 @@
                 android:layout_marginLeft="5dp"
                 android:layout_height="match_parent">
                 <LinearLayout
+                    android:id="@+id/user_settings_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -101,7 +116,7 @@
                 android:layout_height="match_parent">
                 <TextView
                     android:textColor="#111"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:id="@+id/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -111,6 +126,7 @@
                     android:layout_height="wrap_content">
                     <TextView
                         android:textColor="#111"
+                        android:textSize="9sp"
                         android:gravity="center"
                         android:background="@drawable/event_count"
                         android:paddingEnd="2dp"
@@ -122,20 +138,97 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:layout_height="match_parent">
             <Button
+                android:layout_alignParentEnd="true"
                 android:id="@+id/logout_btn"
                 android:layout_width="80dp"
                 android:textStyle="bold"
                 android:fontFamily="@font/pinchik"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:text="Sign Out"
                 android:textColor="#111"
                 android:background="@drawable/signout_btn"
                 android:layout_height="30dp" />
+        </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/tape_layout"
+        android:weightSum="10"
+        android:layout_width="match_parent"
+        android:layout_height="5dp">
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#FAEC11"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#111"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#FAEC11"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#111"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#FAEC11"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#111"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#FAEC11"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#111"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#FAEC11"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:background="#111"
+            android:layout_height="match_parent">
+
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

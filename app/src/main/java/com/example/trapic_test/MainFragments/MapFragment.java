@@ -67,6 +67,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
+import com.mapbox.api.directions.v5.MapboxDirections;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Point;
@@ -95,7 +97,10 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +109,7 @@ import java.util.Locale;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class MapFragment extends Fragment implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
 
@@ -115,7 +121,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
-    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt;
+    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt, cons_count, road_count, traffic_count;
     private ImageView cat_img;
     private String[] list;
     private double lat, lng;
@@ -127,6 +133,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
+    private boolean event_status;
     private int i=0, user_count_num, user_i=0;
     private MarkerOptions markerOptions;
     private String event_user_id, event_user_fullname;
@@ -165,7 +172,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
         initViews(view);
-
 //        refreshAll();
 
         myLocBtn2.setOnClickListener(new View.OnClickListener() {
@@ -256,7 +262,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 });
             }
         });
-
 //        navigationMapRoute = new NavigationMapRoute(null, mapView, mMap);
 
 
@@ -313,6 +318,9 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         swipeRefreshLayout = view.findViewById(R.id.swipe);
          status_mode = view.findViewById(R.id.status_mode_txt);
          user_count = view.findViewById(R.id.user_count);
+         cons_count = view.findViewById(R.id.cons_count);
+         road_count = view.findViewById(R.id.road_count);
+         traffic_count = view.findViewById(R.id.traffic_count);
 
          marker_comment_btn = dialog.findViewById(R.id.comment_btn);
          marker_comment_txt = dialog.findViewById(R.id.comment_txt);
@@ -323,7 +331,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         event_caption_txt = dialog.findViewById(R.id.event_cap);
         yesBtn = dialog.findViewById(R.id.yes_btn);
         noBtn = dialog.findViewById(R.id.no_btn);
-
 
 
     }
@@ -435,10 +442,15 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child(user_id).exists()){
+                if(dataSnapshot.child("yes").child(user_id).exists()){
                     yesBtn.setVisibility(View.INVISIBLE);
                     noBtn.setVisibility(View.INVISIBLE);
                     close_txt.setText("You just said that this event is closed. Thank you for giving us information.");
+                    view.setTag("Voted");
+                }else if(dataSnapshot.child("no").child(user_id).exists()){
+                    yesBtn.setVisibility(View.INVISIBLE);
+                    noBtn.setVisibility(View.INVISIBLE);
+                    close_txt.setText("You just said that this event is still ongoing. Thank you for giving us information.");
                     view.setTag("Voted");
                 }else{
                     view.setTag("Not Voted");
@@ -468,7 +480,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
                     PrettyTime prettyTime = new PrettyTime();
                     String ago = prettyTime.format(new Date(event.getEvent_closed_time()));
-                    close_txt.setText("This event is closed since - "+ago+"!");
+                    close_txt.setText("This event is closed "+ago+" and approved by the users.");
                 }else{
                     isVoted(post_id, view);
                 }
@@ -488,12 +500,11 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         databaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                loadAllMarkers();
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                loadAllMarkers();
+
             }
 
             @Override
@@ -503,7 +514,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                loadAllMarkers();
+
             }
 
             @Override
@@ -518,7 +529,34 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 @Override
                 public void onClick(View v) {
                     if(view.getTag().equals("Not Voted")){
-                        databaseReference.child(post_id).child(user_id).setValue(true);
+                        databaseReference.child(post_id).child("yes").child(user_id).setValue(true);
+                    }else{
+                        yesBtn.setVisibility(View.INVISIBLE);
+                        noBtn.setVisibility(View.INVISIBLE);
+                    }
+                }
+            });
+
+            noBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(view.getTag().equals("Not Voted")){
+                        databaseReference.child(post_id).child("no").child(user_id).setValue(true);
+                        final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+
+//                Add 1 hour for deletion
+                        java.text.DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy hh:mm:ss a");
+                        Calendar calendar = null;
+                        Date date;
+                        try {
+                            date = dateFormat.parse(date_time);
+                            calendar = Calendar.getInstance();
+                            calendar.setTime(date);
+                            calendar.add(Calendar.HOUR, 2);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        FirebaseDatabase.getInstance().getReference("Posts").child(post_id).child("event_closed_time").setValue(calendar.getTime().toString());
                     }else{
                         yesBtn.setVisibility(View.INVISIBLE);
                         noBtn.setVisibility(View.INVISIBLE);
@@ -563,8 +601,9 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
                     event[i] = dataSnapshot1.getValue(Event.class);
-                    loadMarkerDatas();
-
+                    if(event[i].getEvent_deleted() == false){
+                        loadMarkerDatas();
+                    }
                 }
             }
 
@@ -580,6 +619,17 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private void loadMarkerDatas(){
 
         event_user_id = event[i].getUser_id();
+
+        if(event[i].getEvent_status().equals("closed")){
+            PrettyTime p = new PrettyTime();
+            String p2 = p.format(new Date(event[i].getEvent_closed_time()));
+
+            if(p2.equals("20 minutes ago")){
+                FirebaseDatabase.getInstance().getReference("Posts")
+                        .child(event[i].getEvent_id()).child("event_deleted").setValue(true);
+            }
+        }
+
         markerOptions = new MarkerOptions();
 
         if(latLng1 != null){
@@ -589,14 +639,12 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                     .getInstance()
                     .getReference("Posts")
                     .child(event[i].getEvent_id());
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Approval").child(event[i].getEvent_id());
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Approval").child(event[i].getEvent_id()).child("yes");
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.getChildrenCount() == 10){
                         dataSnapshot.getChildren();
-
-
                         databaseReference1.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -606,9 +654,22 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                             .child("event_status").setValue("closed");
 
                                 final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+
+//                Add 1 hour for deletion
+                                java.text.DateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy hh:mm:ss a");
+                                Calendar calendar = null;
+                                Date date;
+                                try {
+                                    date = dateFormat.parse(date_time);
+                                    calendar = Calendar.getInstance();
+                                    calendar.setTime(date);
+                                    calendar.add(Calendar.MINUTE, 20);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
                                     FirebaseDatabase.getInstance().getReference("Posts")
                                             .child(event2.getEvent_id())
-                                            .child("event_closed_time").setValue(date_time);
+                                            .child("event_closed_time").setValue(calendar.getTime().toString());
                                     FirebaseDatabase.getInstance().getReference("Approval")
                                             .child(event2.getEvent_id()).removeValue();
 
@@ -653,8 +714,8 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 }else{
                     markerOptions.setTitle("[ "+event[i].getEvent_type() + " ]: " + event[i].getEvent_location()+" "+roundedDistance+" m away from you");
                 }
-                if(distance <= 50 && event[i].getEvent_status().equals("open")){
 
+                if(distance <= 50 && event[i].getEvent_status().equals("open")){
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
 
@@ -730,30 +791,43 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
 
             markerOptions.position(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
-            event_marker[i] = mMap.addMarker(markerOptions);
+            if(event[i].getEvent_deleted() == false){
+                event_marker[i] = mMap.addMarker(markerOptions);
+            }
+
 
             mMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(@NonNull Marker marker) {
 
-//                    if(marker.getIcon().equals(roadcrash_marker)){
-//                        cat_img.setImageResource(R.drawable.ic_road_crash);
-//                    }else if(marker.getIcon().equals(trafficjam_marker)){
-//                        cat_img.setImageResource(R.drawable.ic_traffic_jam);
-//                    }else{
-//                        cat_img.setImageResource(R.drawable.ic_construction_marker);
-//                    }
+
                         if(marker.getSnippet() != null){
-                            isClosed(marker.getSnippet(), yesBtn);
-                            loadOnClicks(marker.getSnippet(), yesBtn);
-                            event_type_txt.setText(marker.getTitle());
-                            event_caption_txt.setText(marker.getSnippet());
-                            dialog.show();
-                        }else if(marker.getTitle() == "Destination"){
-                            Toast.makeText(getContext(), "Your destination!", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(getContext(), "TraPic Online User ", Toast.LENGTH_LONG).show();
+                            String post_id = marker.getSnippet();
+                            FirebaseDatabase.getInstance().getReference("Posts").child(post_id)
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            dataSnapshot.getChildren();
+                                            Event event = dataSnapshot.getValue(Event.class);
+                                            event_status = event.getEvent_deleted();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                            if(event_status == false){
+                                isClosed(marker.getSnippet(), yesBtn);
+                                loadOnClicks(marker.getSnippet(), yesBtn);
+                                event_type_txt.setText(marker.getTitle());
+                                event_caption_txt.setText(marker.getSnippet());
+                                dialog.show();
                         }
+                    }else{
+                        mMap.removeMarker(marker);
+                    }
+
 
 
 
@@ -828,17 +902,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                             });
             }
 
-            FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_isOnline").equalTo(true).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    user_count.setText(""+dataSnapshot.getChildrenCount());
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+            loadSideAreaCount();
         }
     }
 
@@ -975,20 +1039,36 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     }
 
     public void getRoute(Point origin, Point destination){
-        NavigationRoute.builder()
-                .accessToken("pk.eyJ1IjoicmVpZHNvbG9uIiwiYSI6ImNqcnZpZThzMTAyN2Ezemx4eHMzM2RoZGwifQ.j65VGpYO6g84DnR1koippQ")
+        MapboxDirections client = MapboxDirections.builder()
                 .origin(origin)
                 .destination(destination)
-                .build()
-                .getRoute(new Callback<DirectionsResponse>() {
-                    @Override
-                    public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
-                    }
-                    @Override
-                    public void onFailure(Call<DirectionsResponse> call, Throwable t) {
+                .overview(DirectionsCriteria.OVERVIEW_FULL)
+                .profile(DirectionsCriteria.PROFILE_CYCLING)
 
-                    }
-                });
+                .accessToken("pk.eyJ1IjoicmVpZHNvbG9uIiwiYSI6ImNqcnZpZThzMTAyN2Ezemx4eHMzM2RoZGwifQ.j65VGpYO6g84DnR1koippQ")
+                .build();
+        client.enqueueCall(new Callback<DirectionsResponse>() {
+            @Override public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+
+                if (response.body() == null) {
+                    Log.e("Map","No routes found, make sure you set the right user and access token.");
+                    return;
+                } else if (response.body().routes().size() < 1) {
+                    Log.e("Map","No routes found");
+                    return;
+                }
+
+// Retrieve the directions route from the API response
+                currentRoute = response.body().routes().get(0);
+
+            }
+
+            @Override public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+
+                Timber.e("Error: " + throwable.getMessage());
+
+            }
+        });
     }
 
     @Override
@@ -1055,5 +1135,37 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
             }
         });
+    }
+
+    private void loadSideAreaCount(){
+        int i_traffic;
+        int i_con;
+        int i_road;
+        FirebaseDatabase.getInstance().getReference("Users").orderByChild("user_isOnline").equalTo(true).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                user_count.setText(""+dataSnapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("Posts").orderByChild("event_type").equalTo("Traffic Jams")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        traffic_count.setText(""+dataSnapshot.getChildrenCount());
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 }

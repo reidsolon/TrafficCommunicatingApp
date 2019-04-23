@@ -19,6 +19,7 @@ public class User {
     private double user_lat;
     private double user_lng;
     private LatLng user_latLng;
+    private String user_auth = "basic_auth";
 
     public User(){
 
@@ -32,6 +33,10 @@ public class User {
        this.user_status = account_status;
        this.user_created = created;
        this.user_eMail = eMail;
+    }
+
+    public String getUser_auth() {
+        return user_auth;
     }
 
     public double getUser_lat() {

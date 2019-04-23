@@ -75,14 +75,29 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
     @Override
     public void onBindViewHolder(@NonNull final NewsfeedHolder holder, int position) {
 
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final Event event = eventList.get(position);
 
         Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
         PrettyTime p = new PrettyTime();
         final String pretty = p.format(new Date(event.getEvent_date_time()));
+//        Integer num1 = Integer.parseInt(pretty);
+//        Integer num2 = Integer.parseInt("2 hours ago");
+//        if(num1 >= num2){
+//
+//            FirebaseDatabase.getInstance().getReference("Posts")
+//                    .child(event.getEvent_id())
+//                    .child("event_deleted").setValue(true);
+//        }
 
+//        if(event.getEvent_status()=="closed"){
+//            Integer close_num1 = Integer.parseInt(pretty);
+//            Integer close_num2 = Integer.parseInt("20 minutes ago");
+//            if(num1 >= num2){
+//                FirebaseDatabase.getInstance().getReference("Posts").child(event.getEvent_id())
+//                        .child("event_deleted").setValue(true);
+//            }
+//        }
         FirebaseDatabase.getInstance().getReference("Posts").child(event.getEvent_id()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

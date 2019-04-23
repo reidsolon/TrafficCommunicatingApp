@@ -21,6 +21,7 @@ import com.example.trapic_test.Adapters.NewsfeedAdapter;
 import com.example.trapic_test.Adapters.UserCommentAdapter;
 import com.example.trapic_test.Model.Comment;
 import com.example.trapic_test.Model.Event;
+import com.example.trapic_test.Model.Notification;
 import com.example.trapic_test.Model.User;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -82,6 +83,7 @@ public class CommentsActivity extends AppCompatActivity {
         cmtBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 final String[] fullname = new String[1];
                 if(!comment_edittext.getText().toString().equals("")){
                     final String comment = comment_edittext.getText().toString();
@@ -114,8 +116,9 @@ public class CommentsActivity extends AppCompatActivity {
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(getApplicationContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
                             comment_edittext.setText("");
-
                             setupRecycleView();
+                            String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            commentNotification("comment", user_id, postId, publisherID);
                         }
                     });
                 }else{
@@ -189,6 +192,14 @@ public class CommentsActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void commentNotification(String type, String user_id, String post_id, String pub_id){
+
+        com.example.trapic_test.Model.Notification notif = new Notification(type, user_id, post_id, pub_id);
+        String push_id = FirebaseDatabase.getInstance().getReference("Notifications").push().getKey();
+
+        FirebaseDatabase.getInstance().getReference("Notifications").child(push_id).setValue(notif);
     }
 
 }

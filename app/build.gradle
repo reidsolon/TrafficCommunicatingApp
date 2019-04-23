@@ -46,7 +46,8 @@ dependencies {
 //    MAPBOX
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:7.3.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation:0.13.0'
-    implementation'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.13.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-navigation-ui:0.13.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:4.6.0'
 
 
     implementation 'com.google.firebase:firebase-storage:16.1.0'

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:id="@+id/dialog_close_btn"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_close_black_24dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginStart="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:textColor="#111"
+                    android:textSize="13sp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_height="match_parent"
+                    android:text="My Account"/>
+            </LinearLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            android:background="@drawable/gradient_shadow"
+            android:layout_width="match_parent"
+            android:layout_height="2dp">
+
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="70dp"
+                    android:src="@drawable/profile_picture"
+                    android:layout_height="70dp" />
+                <TextView
+                    android:id="@+id/user_fullname"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Fetching name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#111"
+                    android:textSize="12sp"/>
+                <TextView
+                    android:id="@+id/user_email"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="Fetching email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#111"
+                    android:textSize="10sp"/>
+
+                <TextView
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="Trapic Lv. 1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#111"
+                    android:textSize="13sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                android:background="#f333"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp">
+
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/myprofile_btn"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#111"
+                    android:textSize="12sp"
+                    android:drawableStart="@drawable/myprofile_dialog"
+                    android:text="   My Profile"/>
+                <TextView
+                    android:id="@+id/settings_btn"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#111"
+                    android:textSize="12sp"
+                    android:drawableStart="@drawable/settings_dialog"
+                    android:text="   Settings"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                android:background="#f333"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/help_btn"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#111"
+                    android:textSize="12sp"
+                    android:drawableStart="@drawable/help_dialog"
+                    android:text="   Help"/>
+                <TextView
+                    android:id="@+id/feedback_btn"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#111"
+                    android:textSize="12sp"
+                    android:drawableStart="@drawable/feedback_dialog"
+                    android:text="   Feedback"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:src="@drawable/trapic_logo2"/>
+        <TextView
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trapic v.1 develop by Trapic Team"/>
+    </LinearLayout>
+</RelativeLayout>
