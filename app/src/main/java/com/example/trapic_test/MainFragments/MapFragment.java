@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Camera;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -71,12 +72,19 @@ import com.mapbox.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.MapboxDirections;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
+import com.mapbox.api.directions.v5.models.LegAnnotation;
+import com.mapbox.api.directions.v5.models.RouteLeg;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Polyline;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -87,6 +95,12 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.light.Position;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import com.mapbox.services.android.navigation.ui.v5.location.LocationEngineConductorListener;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
@@ -110,6 +124,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
+
+import static com.mapbox.core.constants.Constants.PRECISION_6;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
 public class MapFragment extends Fragment implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
 
@@ -140,7 +163,9 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private Marker[] event_marker = new Marker[200];
     private Marker[] user_marker = new Marker[200];
     private HashMap<Marker, Event> map = new HashMap<Marker, Event>();
-
+    private DirectionsRoute currentRoute;
+    private Style mapStyle;
+    private Polyline polyline;
 
     // Get instance of Vibrator from current Context
     Vibrator v;
@@ -256,6 +281,8 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                         callPermission();
                         enableLocationComponent();
                         displayUsers();
+
+                        mapStyle = style;
                         // Get an instance of the component
 
                     }
@@ -1033,17 +1060,50 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         destinationPoint = Point.fromLngLat(point.getLongitude(), point.getLatitude());
         originPoint = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
 
-        getRoute(originPoint, destinationPoint);
+        getRoute(mapStyle, originPoint, destinationPoint);
 
         return false;
     }
+    public void initSource(Style style, Point point1, Point point2){
+        style.addSource(new GeoJsonSource("route-source-id",
+                FeatureCollection.fromFeatures(new Feature[] {})));
 
-    public void getRoute(Point origin, Point destination){
+        GeoJsonSource iconGeoJsonSource = new GeoJsonSource("route-source-id", FeatureCollection.fromFeatures(new Feature[] {
+                Feature.fromGeometry(Point.fromLngLat(point1.longitude(), point2.latitude())),
+                Feature.fromGeometry(Point.fromLngLat(point1.longitude(), point2.latitude()))}));
+        style.addSource(iconGeoJsonSource);
+    }
+    public void initLayers(Style style, Point point1, Point point2){
+        LineLayer routeLayer = new LineLayer("route_layer_id", "route_source_id");
+
+// Add the LineLayer to the map. This layer will display the directions route.
+        routeLayer.setProperties(
+                lineCap(Property.LINE_CAP_ROUND),
+                lineJoin(Property.LINE_JOIN_ROUND),
+                lineWidth(5f),
+                lineColor(Color.parseColor("#009688"))
+        );
+        style.addLayer(routeLayer);
+
+// Add the red marker icon image to the map
+        style.addImage("red-pin-icon-id", BitmapUtils.getBitmapFromDrawable(
+                getResources().getDrawable(R.drawable.ic_user_marker)));
+
+// Add the red marker icon SymbolLayer to the map
+        style.addLayer(new SymbolLayer("icon-layer-id", "icon-source-id").withProperties(
+                iconImage("red-pin-icon-id"),
+                iconIgnorePlacement(true),
+                iconIgnorePlacement(true),
+                iconOffset(new Float[] {0f, -4f})));
+    }
+    public void getRoute(final Style style, Point origin, Point destination){
+//        initSource(style, origin, destination);
+//        initLayers(style, origin, destination);
         MapboxDirections client = MapboxDirections.builder()
                 .origin(origin)
                 .destination(destination)
                 .overview(DirectionsCriteria.OVERVIEW_FULL)
-                .profile(DirectionsCriteria.PROFILE_CYCLING)
+                .profile(DirectionsCriteria.PROFILE_DRIVING_TRAFFIC)
 
                 .accessToken("pk.eyJ1IjoicmVpZHNvbG9uIiwiYSI6ImNqcnZpZThzMTAyN2Ezemx4eHMzM2RoZGwifQ.j65VGpYO6g84DnR1koippQ")
                 .build();
@@ -1060,6 +1120,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
 // Retrieve the directions route from the API response
                 currentRoute = response.body().routes().get(0);
+                drawRoute(currentRoute);
 
             }
 
@@ -1069,8 +1130,28 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
             }
         });
-    }
 
+    }
+    public void drawRoute(DirectionsRoute route1){
+        // Convert LineString coordinates into LatLng[]
+        LineString lineString = LineString.fromPolyline(route1.geometry(), PRECISION_6);
+        List<Point> coordinates = lineString.coordinates();
+        LatLng[] points = new LatLng[coordinates.size()];
+        for (int i = 0; i < coordinates.size(); i++) {
+            points[i] = new LatLng(
+                    coordinates.get(i).latitude(),
+                    coordinates.get(i).longitude());
+        }
+        if(polyline != null){
+            polyline.remove();
+        }
+        // Draw Points on MapView
+        polyline = mMap.addPolyline(new PolylineOptions()
+                .add(points)
+                .color(Color.parseColor("#009688"))
+                .width(5));
+
+    }
     @Override
     public void onLocationUpdate(Location location) {
         originLocation = location;
