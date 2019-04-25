@@ -3,8 +3,10 @@ package com.example.trapic_test.MainFragments;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -81,7 +83,13 @@ public class NewsfeedFragment extends Fragment {
             }
         }else{
             view = inflater.inflate(R.layout.unverified_newsfeed, container, false);
-            initViewsUnverified();
+            act_acct_btn = view.findViewById(R.id.act_acct_btn);
+            act_acct_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), "You are not even logged in or registered!", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         return view;
@@ -97,8 +105,8 @@ public class NewsfeedFragment extends Fragment {
     }
 
     public void initViewsUnverified(){
-        act_acct_btn = view.findViewById(R.id.act_acct_btn);
 
+        act_acct_btn = view.findViewById(R.id.act_acct_btn);
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user != null){
             if(!user.isEmailVerified() && user != null){
@@ -106,10 +114,17 @@ public class NewsfeedFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         user.sendEmailVerification();
-                        Dialog dialog = new Dialog(getContext());
-                        dialog.setTitle("Verification link is sent to your account. Please check your email and try to relog your account here." +
-                                "- Trapic Team.");
+                        final ProgressDialog dialog = new ProgressDialog(getContext());
+                        dialog.setMessage("Sending account activation link...");
                         dialog.show();
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.dismiss();
+                                Toast.makeText(getContext(), "Verification is sent to your email", Toast.LENGTH_SHORT).show();
+                            }
+                        }, 1500);
                     }
                 });
             }else{

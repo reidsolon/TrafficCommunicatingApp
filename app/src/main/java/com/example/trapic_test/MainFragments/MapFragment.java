@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.TrafficStats;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,6 +97,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.traffic.TrafficPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -138,6 +141,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 public class MapFragment extends Fragment implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
 
     private MapboxMap mMap;
+    private TrafficPlugin trafficPlugin;
 
     private double distance;
     double roundedDistance;
@@ -145,15 +149,16 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
-    private TextView cmt_user_name, cmt_msg, dest_dur, dest_dis, event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt, cons_count, road_count, traffic_count;
+    private TextView cmt_user_name, cmt_msg, dest_ad,dest_dur, dest_dis, event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt, cons_count, road_count, traffic_count;
     private ImageView cat_img;
     private String[] list;
+    private LinearLayout route_info;
     private double lat, lng;
     private LatLng latLng1, myLatLng;
     private Event[] event = new Event[200];
     private User[] user = new User[200];
     private BottomSheetDialog dialog, destination_dialog;
-    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn, remove_route_btn;
+    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn, remove_route_btn, assist_btn, start_route_btn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
@@ -366,6 +371,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     private void initViews(View view){
         mapView = view.findViewById(R.id.mapView);
         myLocBtn = view.findViewById(R.id.my_loc);
@@ -377,9 +383,22 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
          road_count = view.findViewById(R.id.road_count);
          traffic_count = view.findViewById(R.id.traffic_count);
          remove_route_btn = view.findViewById(R.id.remove_route_btn);
+         start_route_btn = view.findViewById(R.id.start_route);
+         dest_ad = view.findViewById(R.id.dest_ad);
+         dest_dis = view.findViewById(R.id.dest_dis);
+         dest_dur = view.findViewById(R.id.dest_dur);
+         route_info = view.findViewById(R.id.route_info);
+         route_info.setVisibility(View.INVISIBLE);
 
          remove_route_btn.setVisibility(View.INVISIBLE);
-
+         start_route_btn.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
+                 locationComponent.setRenderMode(RenderMode.GPS);
+                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 2000);
+             }
+         });
          remove_route_btn.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
@@ -387,6 +406,9 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                      mMap.removeMarker(destinationLocation);
                      polyline.remove();
                      remove_route_btn.setVisibility(View.INVISIBLE);
+                     route_info.setVisibility(View.INVISIBLE);
+                     locationComponent.setCameraMode(CameraMode.TRACKING);
+                     locationComponent.setRenderMode(RenderMode.COMPASS);
                  }
              }
          });
@@ -506,10 +528,9 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             if(FirebaseAuth.getInstance().getCurrentUser() != null){
                 myLocation();
             }
-
+            mMap.addOnMapClickListener(this);
             loadAllMarkers();
 
-            mMap.addOnMapClickListener(this);
 
         } else {
 
@@ -1297,13 +1318,15 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                     double rounded_km;
                     if(distance_rounded > 1000.0){
                          rounded_km = Math.round((currentRoute.distance() / 100.0) * 100.0)/100.0;
+                         dest_dis.setText("Distance: "+rounded_km+" km");
                          destinationLocation.setSnippet(destination_address+"\n"+"Travel time: "+currentRoute.duration()+"\n"+"Distance: "+rounded_km+" km");
                     }else{
                         destinationLocation.setSnippet(destination_address+"\n"+"Travel time: "+currentRoute.duration()+"\n"+"Distance: "+distance_rounded+" m");
+                        dest_dis.setText("Distance: "+distance_rounded+" m");
                     }
 
-
-
+                    dest_ad.setText(destination_address);
+                    dest_dur.setText("Travel Time: "+currentRoute.duration());
 
                 final ProgressDialog progressDialog = new ProgressDialog(getContext());
                 progressDialog.setMessage("Finding best route...");
@@ -1315,7 +1338,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "Route displayed!", Toast.LENGTH_SHORT).show();
                         remove_route_btn.setVisibility(View.VISIBLE);
-
+                        route_info.setVisibility(View.VISIBLE);
                     }
                 }, 1500);
 

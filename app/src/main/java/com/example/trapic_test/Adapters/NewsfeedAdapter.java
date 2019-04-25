@@ -217,7 +217,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Posts");
-                            dbRefs.child(event.getEvent_id()).removeValue();
+                            dbRefs.child(event.getEvent_id()).child("event_deleted").setValue(true);
                         }
                     });
 

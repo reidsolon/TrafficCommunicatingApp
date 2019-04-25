@@ -54,9 +54,9 @@
                     android:layout_alignParentBottom="true"
                     android:layout_height="70dp">
                     <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/ic_camera_black_24dp"/>
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/trapic_logo"/>
                 </LinearLayout>
             </LinearLayout>
 
