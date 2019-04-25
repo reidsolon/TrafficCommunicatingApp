@@ -138,22 +138,7 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            android:layout_height="match_parent">
-            <Button
-                android:layout_alignParentEnd="true"
-                android:id="@+id/logout_btn"
-                android:layout_width="80dp"
-                android:textStyle="bold"
-                android:fontFamily="@font/pinchik"
-                android:textSize="10sp"
-                android:text="Sign Out"
-                android:textColor="#111"
-                android:background="@drawable/signout_btn"
-                android:layout_height="30dp" />
-        </RelativeLayout>
+
     </LinearLayout>
     <LinearLayout
         android:id="@+id/tape_layout"

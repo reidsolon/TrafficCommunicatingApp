@@ -53,8 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainFragment extends AppCompatActivity {
-    private TextView test, status_mode_txt, user_fullname, user_email, profile_btn, help_btn, feedback_btn, settings_btn;
-    private Button logout;
+    private TextView test, status_mode_txt, user_fullname, user_email, profile_btn, help_btn, feedback_btn, settings_btn, logout;
 
     private LinearLayout postLink,user_settings_btn, dialog_close_btn;
     private FirebaseAuth auth;
@@ -103,36 +102,6 @@ public class MainFragment extends AppCompatActivity {
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .child("user_lastOnline").onDisconnect().setValue(date_time);
         }
-        final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
-            logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(FirebaseAuth.getInstance().getCurrentUser() != null){
-                    if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
-
-                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .child("user_isOnline").setValue(false);
-                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .child("user_lastOnline").setValue(date_time);
-                        FirebaseAuth.getInstance().signOut();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    }else if(FirebaseAuth.getInstance().getCurrentUser() != null || FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
-
-                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .child("user_isOnline").setValue(false);
-                        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .child("user_lastOnline").setValue(date_time);
-                        FirebaseAuth.getInstance().signOut();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    }else{
-
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    }
-                }else{
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                }
-            }
-        });
 
         setupOnClicks();
     }
@@ -222,23 +191,73 @@ public class MainFragment extends AppCompatActivity {
             public void onClick(View v) {
 
                 dialog1.show();
+                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    dataSnapshot.getChildren();
+                                    User user = dataSnapshot.getValue(User.class);
 
-                FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                dataSnapshot.getChildren();
-                                User user = dataSnapshot.getValue(User.class);
+                                    user_fullname.setText(WordUtils.capitalize(user.getUser_firstname()+" " +user.getUser_lastname()));
+                                    user_email.setText(user.getUser_eMail());
 
-                                user_fullname.setText(WordUtils.capitalize(user.getUser_firstname()+" " +user.getUser_lastname()));
-                                user_email.setText(user.getUser_eMail());
-                            }
+                                    final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+                                    logout.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                                                if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                            .child("user_isOnline").setValue(false);
+                                                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                            .child("user_lastOnline").setValue(date_time);
+                                                    FirebaseAuth.getInstance().signOut();
+                                                    finish();
+                                                    startActivity(new Intent(MainFragment.this, MainActivity.class));
+                                                }else if(FirebaseAuth.getInstance().getCurrentUser() != null || FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
 
-                            }
-                        });
+                                                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                            .child("user_isOnline").setValue(false);
+                                                    FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                            .child("user_lastOnline").setValue(date_time);
+                                                    FirebaseAuth.getInstance().signOut();
+                                                    finish();
+                                                    startActivity(new Intent(MainFragment.this, MainActivity.class));
+                                                }else{
+                                                    finish();
+                                                    startActivity(new Intent(MainFragment.this, MainActivity.class));
+                                                }
+                                            }else{
+                                                finish();
+                                                startActivity(new Intent(MainFragment.this, MainActivity.class));
+                                            }
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                }else{
+                    Intent intent = getIntent();
+                    String name = intent.getStringExtra("Guest_name");
+                    user_fullname.setText(WordUtils.capitalize(name));
+                    user_email.setText("Guest User");
+                    profile_btn.setVisibility(View.INVISIBLE);
+                    feedback_btn.setVisibility(View.INVISIBLE);
+                    logout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            finish();
+                            startActivity(new Intent(MainFragment.this, MainActivity.class));
+                        }
+                    });
+                }
+
             }
         });
         dialog_close_btn.setOnClickListener(new View.OnClickListener() {
@@ -247,18 +266,22 @@ public class MainFragment extends AppCompatActivity {
                 dialog1.dismiss();
             }
         });
-        profile_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(3);
-            }
-        });
-        feedback_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainFragment.this, SendFeedbackActivity.class));
-            }
-        });
+
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            profile_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewPager.setCurrentItem(3);
+                }
+            });
+            feedback_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(MainFragment.this, SendFeedbackActivity.class));
+                }
+            });
+        }
+
     }
 
     private void loadUserInfo(){
@@ -325,7 +348,6 @@ public class MainFragment extends AppCompatActivity {
         tabLayout =  findViewById(R.id.tabLayout);
         test =  findViewById(R.id.test);
         postLink =  findViewById(R.id.post_link);
-        logout =  findViewById(R.id.logout_btn);
         user_settings_btn = findViewById(R.id.user_settings_btn);
         status_mode_txt = findViewById(R.id.status_mode_txt);
 
@@ -344,6 +366,7 @@ public class MainFragment extends AppCompatActivity {
         profile_btn = dialog1.findViewById(R.id.myprofile_btn);
         help_btn = dialog1.findViewById(R.id.help_btn);
         settings_btn = dialog1.findViewById(R.id.settings_btn);
+        logout =  dialog1.findViewById(R.id.logout_btn);
 
     }
 
@@ -405,23 +428,36 @@ public class MainFragment extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            FirebaseDatabase.getInstance().getReference("Users")
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").setValue(false);
 
-        FirebaseDatabase.getInstance().getReference("Users")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").setValue(false);
+            final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+            FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .child("user_lastOnline").setValue(date_time);
+        }
 
-        final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
-        FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("user_lastOnline").setValue(date_time);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 
-        FirebaseDatabase.getInstance().getReference("Users")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").setValue(true);
+            FirebaseDatabase.getInstance().getReference("Users")
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").setValue(true);
+            FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .child("user_lastOnline").setValue(null);
+
+        }
+
     }
 
     private void removeLatLng(){

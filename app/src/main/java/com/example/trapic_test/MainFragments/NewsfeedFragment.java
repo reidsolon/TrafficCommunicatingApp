@@ -100,21 +100,23 @@ public class NewsfeedFragment extends Fragment {
         act_acct_btn = view.findViewById(R.id.act_acct_btn);
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if(!user.isEmailVerified() && user != null){
-            act_acct_btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    user.sendEmailVerification();
-                    Dialog dialog = new Dialog(getContext());
-                    dialog.setTitle("Verification link is sent to your account. Please check your email and try to relog your account here." +
-                            "- Trapic Team.");
-                    dialog.show();
-                }
-            });
-        }else{
-            Toast.makeText(getContext(), "Register your own account!", Toast.LENGTH_SHORT).show();
+        if(user != null){
+            if(!user.isEmailVerified() && user != null){
+                act_acct_btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        user.sendEmailVerification();
+                        Dialog dialog = new Dialog(getContext());
+                        dialog.setTitle("Verification link is sent to your account. Please check your email and try to relog your account here." +
+                                "- Trapic Team.");
+                        dialog.show();
+                    }
+                });
+            }else{
+                Toast.makeText(getContext(), "Register your own account!", Toast.LENGTH_SHORT).show();
+            }
         }
+
 
 
     }

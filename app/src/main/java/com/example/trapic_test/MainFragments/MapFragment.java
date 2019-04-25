@@ -145,7 +145,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
-    private TextView dest_dur, dest_dis, event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt, cons_count, road_count, traffic_count;
+    private TextView cmt_user_name, cmt_msg, dest_dur, dest_dis, event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt, cons_count, road_count, traffic_count;
     private ImageView cat_img;
     private String[] list;
     private double lat, lng;
@@ -205,61 +205,80 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         myLocBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                animateLocation();
+                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                    animateLocation();
+                }else{
+                    Toast.makeText(getContext(), "Not available on guest mode.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         marker_comment_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!marker_comment_txt.equals("")){
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                        if(!marker_comment_txt.getText().toString().equals("") && marker_comment_txt.getText().length() > 7){
 
-                    final String[] fullname = new String[1];
-                    FirebaseDatabase.getInstance().getReference("Users")
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .addValueEventListener(new ValueEventListener() {
+                            final String[] fullname = new String[1];
+                            FirebaseDatabase.getInstance().getReference("Users")
+                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            dataSnapshot.getChildren();
+                                            User user = dataSnapshot.getValue(User.class);
+                                            fullname[0] = user.getUser_firstname()+" "+user.getUser_lastname();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                            final String[] publisherId = new String[1];
+                            FirebaseDatabase.getInstance().getReference("Posts")
+                                    .child(event_caption_txt.getText().toString())
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            dataSnapshot.getChildren();
+                                            Event event = dataSnapshot.getValue(Event.class);
+                                            publisherId[0] = event.getUser_id();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                            final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
+                            final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
+                            final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+                            String postId = event_caption_txt.getText().toString();
+
+
+                            Comment comment1 = new Comment(publisherId[0], postId, marker_comment_txt.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getUid(), fullname[0], d_date, d_time,date_time);
+                            String id = FirebaseDatabase.getInstance().getReference("Comments").push().getKey();
+                            FirebaseDatabase.getInstance().getReference("Comments").child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    dataSnapshot.getChildren();
-                                    User user = dataSnapshot.getValue(User.class);
-                                    fullname[0] = user.getUser_firstname()+" "+user.getUser_lastname();
-                                }
+                                public void onSuccess(Void aVoid) {
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                    marker_comment_txt.setText("");
+                                    Toast.makeText(getContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                    final String[] publisherId = new String[1];
-                    FirebaseDatabase.getInstance().getReference("Posts")
-                            .child(event_caption_txt.getText().toString())
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    dataSnapshot.getChildren();
-                                    Event event = dataSnapshot.getValue(Event.class);
-                                    publisherId[0] = event.getUser_id();
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-
-                    final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
-                    final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
-                    final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
-                    String postId = event_caption_txt.getText().toString();
-                    Comment comment1 = new Comment(publisherId[0], postId, marker_comment_txt.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getUid(), fullname[0], d_date, d_time,date_time);
-                    String id = FirebaseDatabase.getInstance().getReference("Comments").push().getKey();
-                    FirebaseDatabase.getInstance().getReference("Comments").child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(getContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
-                            marker_comment_txt.setText("");
+                        }else{
+                            marker_comment_txt.setError("Please provide comment and make sure it is atleast 10 characters");
                         }
-                    });
+                    }else{
+                        Toast.makeText(getContext(), "Not available in unverfied user.", Toast.LENGTH_LONG).show();
+                    }
+
+                }else{
+                    Toast.makeText(getContext(), "Not available in guest mode.", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
         myLocBtn.setOnClickListener(new View.OnClickListener() {
@@ -279,11 +298,20 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
                     @Override
                     public void onStyleLoaded(@NonNull Style style) {
-                        myLocation();
+
+                        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                            myLocation();
+                        }else{
+                            guestLocation();
+                        }
+
                         loadAllMarkers();
                         callPermission();
                         enableLocationComponent();
-                        displayUsers();
+                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                            displayUsers();
+                        }
+
                         mapStyle = style;
                     }
                 });
@@ -375,6 +403,9 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
         dest_dur = view.findViewById(R.id.dest_dur);
         dest_dis = view.findViewById(R.id.dest_dis);
+
+        cmt_user_name = dialog.findViewById(R.id.cmt_user_id);
+        cmt_msg = dialog.findViewById(R.id.cmt_msg);
     }
     private void refreshAll(){
         DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("Posts");
@@ -436,9 +467,16 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private void animateLocation(){
 
         if (latLng1 != null) {
-            myLocation();
+            if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                myLocation();
+            }
+
             mMap.setMinZoomPreference(12);
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3000);
+
+            if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 3000);
+            }
+
         }
 
     }
@@ -465,7 +503,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             locationComponent.setRenderMode(RenderMode.COMPASS);
 
             originLocation = locationComponent.getLastKnownLocation();
-            myLocation();
+            if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                myLocation();
+            }
+
             loadAllMarkers();
 
             mMap.addOnMapClickListener(this);
@@ -510,7 +551,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     }
     private void isClosed(final String post_id, final Button view){
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts").child(post_id);
-        final String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -598,7 +638,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        FirebaseDatabase.getInstance().getReference("Posts").child(post_id).child("event_closed_time").setValue(calendar.getTime().toString());
+                        FirebaseDatabase.getInstance().getReference("Posts").child(post_id).child("event_closed_time").setValue(date_time);
                     }else{
                         yesBtn.setVisibility(View.INVISIBLE);
                         noBtn.setVisibility(View.INVISIBLE);
@@ -730,22 +770,25 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
                 }
             });
-            FirebaseDatabase.getInstance().getReference("Users")
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            dataSnapshot.getChildren();
-                            User user = dataSnapshot.getValue(User.class);
 
-                            myLatLng = new LatLng(user.getUser_lat(), user.getUser_lng());
-                        }
+            if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                FirebaseDatabase.getInstance().getReference("Users")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                dataSnapshot.getChildren();
+                                User user = dataSnapshot.getValue(User.class);
+                                myLatLng = new LatLng(user.getUser_lat(), user.getUser_lng());
+                            }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+            }
+
 
             if(latLng1 != null){
                  distance = latLng1.distanceTo(new LatLng(event[i].getEvent_lat(), event[i].getEvent_lng()));
@@ -842,7 +885,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 @Override
                 public boolean onMarkerClick(@NonNull Marker marker) {
 
-
                         if(marker.getSnippet() != null && marker.getTitle() != "Destination"){
                             String post_id = marker.getSnippet();
                             FirebaseDatabase.getInstance().getReference("Posts").child(post_id)
@@ -860,15 +902,54 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                         }
                                     });
                             if(event_status == false){
-                                isClosed(marker.getSnippet(), yesBtn);
-                                loadOnClicks(marker.getSnippet(), yesBtn);
+                                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                    isClosed(marker.getSnippet(), yesBtn);
+                                    loadOnClicks(marker.getSnippet(), yesBtn);
+                                }
+
                                 event_type_txt.setText(marker.getTitle());
                                 event_caption_txt.setText(marker.getSnippet());
                                 dialog.show();
+                                FirebaseDatabase.getInstance().getReference("Comments").child(post_id).limitToLast(1)
+                                        .addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                if(dataSnapshot.getChildrenCount() > 0){
+                                                    for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
+                                                        final Comment comment = dataSnapshot1.getValue(Comment.class);
+                                                        FirebaseDatabase.getInstance().getReference("Users")
+                                                                .child(comment.getComment_user_id()).addValueEventListener(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                User user = dataSnapshot.getValue(User.class);
+                                                                cmt_user_name.setText(user.getUser_firstname()+" said,");
+                                                                cmt_msg.setText(comment.getCmt_msg());
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+                                                    }
+                                                }else{
+                                                    cmt_user_name.setText("There is no comment on this post yet.");
+                                                    cmt_msg.setText("There is no comment on this post yet.");
+                                                }
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
                             }
 
-                        }else{
+                        }else if(marker.getSnippet() == "Destination"){
                             destinationLocation.showInfoWindow(mMap, mapView);
+                        }else{
+
                         }
 //                        end if
 
@@ -942,8 +1023,57 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                 }
                             });
             }
+        }
+    }
 
-            loadSideAreaCount();
+    private void guestLocation(){
+        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            callPermission();
+        }else {
+            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
+
+            locationRequest = new LocationRequest();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(4000);
+            locationRequest.setFastestInterval(2000);
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    super.onLocationResult(locationResult);
+
+                    lat = locationResult.getLastLocation().getLatitude();
+                    lng = locationResult.getLastLocation().getLongitude();
+                    originLocation = locationResult.getLastLocation();
+
+                    latLng1 = new LatLng(lat, lng);
+                }
+            }, Looper.getMainLooper());
+            // setting up my location
+            if (latLng1 != null) {
+
+                cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
+                final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+
+                FirebaseDatabase.getInstance().getReference("Users")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                List<Address> addresses = null;
+                                try {
+                                    addresses = geocoder.getFromLocation(latLng1.getLatitude(), latLng1.getLongitude(), 1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                String my_address = addresses.get(0).getThoroughfare()+" "+addresses.get(0).getLocality()+" "+addresses.get(0).getAdminArea();
+                                status_mode.setText("I am here at "+my_address);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
+                        });
+            }
         }
     }
 
@@ -951,15 +1081,21 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         Permissions.check(getActivity()/*context*/, Manifest.permission.ACCESS_FINE_LOCATION, null, new PermissionHandler() {
             @Override
             public void onGranted() {
-                myLocation();
+                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                    myLocation();
+                }
+
                 Handler handler = new Handler();
+                final ProgressDialog dialog = new ProgressDialog(getActivity());
+                dialog.setMessage("Retrieving current location");
+                dialog.show();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        ProgressDialog dialog = new ProgressDialog(getActivity());
-                        dialog.setMessage("Retrieving current location");
+                        dialog.dismiss();
                         enableLocationComponent();
                         loadAllMarkers();
+                        loadSideAreaCount();
                     }
                 },1000);
 
@@ -1065,14 +1201,19 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
-        if(destinationLocation != null){
-            mMap.removeMarker(destinationLocation);
+        if(FirebaseAuth.getInstance().getCurrentUser() != null && FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()){
+            if(destinationLocation != null){
+                mMap.removeMarker(destinationLocation);
+            }
+            destinationPoint = Point.fromLngLat(point.getLongitude(), point.getLatitude());
+            originPoint = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
+
+            getRoute(mapStyle, originPoint, destinationPoint);
+
+
+        }else{
+            Toast.makeText(getContext(), "You cannot use this feature yet.", Toast.LENGTH_SHORT).show();
         }
-        destinationPoint = Point.fromLngLat(point.getLongitude(), point.getLatitude());
-        originPoint = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
-
-        getRoute(mapStyle, originPoint, destinationPoint);
-
         return false;
     }
     public void initSource(Style style, Point point1, Point point2){
@@ -1293,11 +1434,38 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
         FirebaseDatabase.getInstance().getReference("Posts").orderByChild("event_type").equalTo("Traffic Jams")
                 .addValueEventListener(new ValueEventListener() {
+
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                         traffic_count.setText(""+dataSnapshot.getChildrenCount());
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        FirebaseDatabase.getInstance().getReference("Posts").orderByChild("event_type").equalTo("Construction Area")
+                .addValueEventListener(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        cons_count.setText(""+dataSnapshot.getChildrenCount());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        FirebaseDatabase.getInstance().getReference("Posts").orderByChild("event_type").equalTo("Road Crash")
+                .addValueEventListener(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        road_count.setText(""+dataSnapshot.getChildrenCount());
                     }
 
                     @Override
