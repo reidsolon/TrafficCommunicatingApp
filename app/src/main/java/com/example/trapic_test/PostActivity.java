@@ -337,7 +337,7 @@ public class PostActivity extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         dialog.dismiss();
 
-                        Notification notification = new Notification(id3);
+                        Notification notification = new Notification("post", id, id3, id, d_date);
                         dbRefs = FirebaseDatabase.getInstance().getReference("Notifications");
 
                         dbRefs.child(id3).setValue(notification).addOnSuccessListener(new OnSuccessListener<Void>() {

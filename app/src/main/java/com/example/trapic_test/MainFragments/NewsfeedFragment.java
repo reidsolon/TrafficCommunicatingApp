@@ -74,48 +74,7 @@ public class NewsfeedFragment extends Fragment {
                 view = inflater.inflate(R.layout.newsfeed_layout, container, false);
                 initViews();
                 readPosts();
-                Query query = FirebaseDatabase.getInstance().getReference("Posts");
-                query.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                        dataSnapshot.getChildren();
-                        Event event = dataSnapshot.getValue(Event.class);
-
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
-
-                        builder.setContentTitle("Someone posted an event!")
-                                .setContentText("Click here to view")
-                                .setSmallIcon(R.drawable.trapic_logo)
-                                .setTicker("There is an event posted near you!")
-                                .setAutoCancel(true);
-
-                        Notification notification = builder.build();
-                        NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
-                        manager.notify(4, notification);
-                    }
-
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
             }else{
                 view = inflater.inflate(R.layout.unverified_newsfeed, container, false);
                 initViewsUnverified();

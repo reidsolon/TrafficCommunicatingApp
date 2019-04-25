@@ -28,7 +28,7 @@
                 <TextView
                     android:layout_marginStart="20dp"
                     android:textStyle="bold"
-                    android:layout_marginTop="25dp"
+                    android:layout_marginTop="10dp"
                     android:text="@string/Loading_name"
                     android:textSize="15sp"
                     android:textColor="#111"
@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:gravity="center"
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -115,18 +115,58 @@
                 android:background="@drawable/viewmap_btn_stype"
                 android:id="@+id/view_to_newsfeed"
                 android:textColor="#fff"
-                android:textSize="10sp"
+                android:textSize="14sp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
                 android:layout_width="match_parent"
-                android:layout_height="40dp" />
+                android:layout_height="wrap_content" />
             <Button
                 android:layout_marginTop="5dp"
                 android:text="View comments on this event"
                 android:background="@drawable/viewmap_btn_stype"
                 android:id="@+id/comment_to_newsfeed"
                 android:textColor="#fff"
-                android:textSize="10sp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:textSize="14sp"
                 android:layout_width="match_parent"
-                android:layout_height="40dp" />
+                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Latest comment: "/>
+                <LinearLayout
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="50dp"
+                        android:src="@drawable/profile_picture"
+                        android:layout_height="50dp" />
+                    <LinearLayout
+                        android:layout_marginStart="5dp"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:textColor="#111"
+                            android:text="User said,"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:layout_marginTop="3dp"
+                            android:layout_width="match_parent"
+                            android:text="Latest comment test..."
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
             <LinearLayout
                 android:layout_marginTop="10dp"
                 android:weightSum="100"

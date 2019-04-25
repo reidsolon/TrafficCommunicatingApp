@@ -119,6 +119,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -144,15 +145,15 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private SwipeRefreshLayout swipeRefreshLayout;
     private MapView mapView;
     private LocationRequest locationRequest;
-    private TextView event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt, cons_count, road_count, traffic_count;
+    private TextView dest_dur, dest_dis, event_type_txt, event_caption_txt, event_time_txt, close_txt,status_mode, user_count, marker_comment_txt, cons_count, road_count, traffic_count;
     private ImageView cat_img;
     private String[] list;
     private double lat, lng;
     private LatLng latLng1, myLatLng;
     private Event[] event = new Event[200];
     private User[] user = new User[200];
-    private BottomSheetDialog dialog;
-    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn;
+    private BottomSheetDialog dialog, destination_dialog;
+    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn, remove_route_btn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
@@ -192,8 +193,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         dialog = new BottomSheetDialog(getContext());
-        dialog.setContentView(R.layout.marker_dialog);
+        destination_dialog = new BottomSheetDialog(getContext());
 
+        dialog.setContentView(R.layout.marker_dialog);
+        destination_dialog.setContentView(R.layout.destination_dialog);
         v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
         initViews(view);
@@ -281,10 +284,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                         callPermission();
                         enableLocationComponent();
                         displayUsers();
-
                         mapStyle = style;
-                        // Get an instance of the component
-
                     }
                 });
             }
@@ -348,6 +348,20 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
          cons_count = view.findViewById(R.id.cons_count);
          road_count = view.findViewById(R.id.road_count);
          traffic_count = view.findViewById(R.id.traffic_count);
+         remove_route_btn = view.findViewById(R.id.remove_route_btn);
+
+         remove_route_btn.setVisibility(View.INVISIBLE);
+
+         remove_route_btn.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 if(destinationLocation != null && polyline != null){
+                     mMap.removeMarker(destinationLocation);
+                     polyline.remove();
+                     remove_route_btn.setVisibility(View.INVISIBLE);
+                 }
+             }
+         });
 
          marker_comment_btn = dialog.findViewById(R.id.comment_btn);
          marker_comment_txt = dialog.findViewById(R.id.comment_txt);
@@ -359,7 +373,8 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         yesBtn = dialog.findViewById(R.id.yes_btn);
         noBtn = dialog.findViewById(R.id.no_btn);
 
-
+        dest_dur = view.findViewById(R.id.dest_dur);
+        dest_dis = view.findViewById(R.id.dest_dis);
     }
     private void refreshAll(){
         DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("Posts");
@@ -828,7 +843,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 public boolean onMarkerClick(@NonNull Marker marker) {
 
 
-                        if(marker.getSnippet() != null){
+                        if(marker.getSnippet() != null && marker.getTitle() != "Destination"){
                             String post_id = marker.getSnippet();
                             FirebaseDatabase.getInstance().getReference("Posts").child(post_id)
                                     .addValueEventListener(new ValueEventListener() {
@@ -850,13 +865,12 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                 event_type_txt.setText(marker.getTitle());
                                 event_caption_txt.setText(marker.getSnippet());
                                 dialog.show();
+                            }
+
+                        }else{
+                            destinationLocation.showInfoWindow(mMap, mapView);
                         }
-                    }else{
-                        mMap.removeMarker(marker);
-                    }
-
-
-
+//                        end if
 
                     return true;
                 }
@@ -917,7 +931,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                         e.printStackTrace();
                                     }
                                     String my_address = addresses.get(0).getThoroughfare()+" "+addresses.get(0).getLocality()+" "+addresses.get(0).getAdminArea();
-                                    status_mode.setText("Current Location: "+my_address);
+                                    status_mode.setText("I am here at "+my_address);
 
                                     FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                             .child("user_address").setValue(my_address);
@@ -1051,12 +1065,9 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
-
         if(destinationLocation != null){
             mMap.removeMarker(destinationLocation);
         }
-        destinationLocation = mMap.addMarker(new MarkerOptions().position(point).setTitle("Destination"));
-
         destinationPoint = Point.fromLngLat(point.getLongitude(), point.getLatitude());
         originPoint = Point.fromLngLat(originLocation.getLongitude(), originLocation.getLatitude());
 
@@ -1096,7 +1107,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 iconIgnorePlacement(true),
                 iconOffset(new Float[] {0f, -4f})));
     }
-    public void getRoute(final Style style, Point origin, Point destination){
+    public void getRoute(final Style style, Point origin, final Point destination){
 //        initSource(style, origin, destination);
 //        initLayers(style, origin, destination);
         MapboxDirections client = MapboxDirections.builder()
@@ -1120,7 +1131,53 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
 // Retrieve the directions route from the API response
                 currentRoute = response.body().routes().get(0);
+
+//                Converts mills to hh mm ss and the distance
+
                 drawRoute(currentRoute);
+                LatLng routeLatLng = new LatLng(destination.latitude(), destination.longitude());
+                if(destinationLocation != null){
+                    mMap.removeMarker(destinationLocation);
+                }
+
+                final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+
+                                List<Address> addresses = null;
+                                try {
+                                    addresses = geocoder.getFromLocation(destination.latitude(), destination.longitude(), 1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                String destination_address = addresses.get(0).getFeatureName()+" "+addresses.get(0).getThoroughfare()+" "+addresses.get(0).getLocality()+" "+addresses.get(0).getAdminArea();
+                    destinationLocation = mMap.addMarker(new MarkerOptions().position(routeLatLng)
+                        .setTitle("Destination"));
+
+                    double distance_rounded = Math.round(currentRoute.distance() * 100.0) / 100.0;
+                    double rounded_km;
+                    if(distance_rounded > 1000.0){
+                         rounded_km = Math.round((currentRoute.distance() / 100.0) * 100.0)/100.0;
+                         destinationLocation.setSnippet(destination_address+"\n"+"Travel time: "+currentRoute.duration()+"\n"+"Distance: "+rounded_km+" km");
+                    }else{
+                        destinationLocation.setSnippet(destination_address+"\n"+"Travel time: "+currentRoute.duration()+"\n"+"Distance: "+distance_rounded+" m");
+                    }
+
+
+
+
+                final ProgressDialog progressDialog = new ProgressDialog(getContext());
+                progressDialog.setMessage("Finding best route...");
+                progressDialog.show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "Route displayed!", Toast.LENGTH_SHORT).show();
+                        remove_route_btn.setVisibility(View.VISIBLE);
+
+                    }
+                }, 1500);
+
 
             }
 

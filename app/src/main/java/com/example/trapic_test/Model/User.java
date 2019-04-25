@@ -20,6 +20,7 @@ public class User {
     private double user_lng;
     private LatLng user_latLng;
     private String user_auth = "basic_auth";
+    private String user_profile_state = "default";
 
     public User(){
 

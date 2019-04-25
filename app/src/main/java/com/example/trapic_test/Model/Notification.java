@@ -5,10 +5,11 @@ public class Notification {
     private String notif_id;
     private String notif_user_id;
 
-    private String type;
-    private String post_id;
-    private String user_id;
-    private String pub_id;
+    private String notif_type;
+    private String notif_post_id;
+    private String notif_userId;
+    private String notif_pub_id;
+    private String notif_time;
 
 
     public Notification(){
@@ -20,27 +21,32 @@ public class Notification {
 
     }
 
-    public Notification(String type, String user_id, String post_id, String pub_id){
-        this.type = type;
-        this.post_id = post_id;
-        this.user_id = user_id;
-        this.pub_id = pub_id;
+    public Notification(String type, String user_id, String post_id, String pub_id, String time){
+       this.notif_type = type;
+       this.notif_post_id = post_id;
+        this.notif_userId = user_id;
+        this.notif_pub_id = pub_id;
+        this.notif_time = time;
     }
 
-    public String getPub_id() {
-        return pub_id;
+    public String getNotif_post_id() {
+        return notif_post_id;
     }
 
-    public String getType() {
-        return type;
+    public String getNotif_pub_id() {
+        return notif_pub_id;
     }
 
-    public String getPost_id() {
-        return post_id;
+    public String getNotif_time() {
+        return notif_time;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getNotif_type() {
+        return notif_type;
+    }
+
+    public String getNotif_userId() {
+        return notif_userId;
     }
 
     public String getNotif_id() {

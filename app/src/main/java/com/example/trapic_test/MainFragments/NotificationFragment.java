@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.trapic_test.Adapters.NewsfeedAdapter;
+import com.example.trapic_test.Adapters.NotificationAdapter;
+import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.Notification;
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
@@ -19,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -27,8 +31,10 @@ import java.util.List;
 import java.util.zip.Inflater;
 
 public class NotificationFragment extends Fragment {
+
     private RecyclerView recyclerView;
     private View v;
+    private NotificationAdapter notificationAdapter;
     private List<Notification> list;
     private FirebaseAuth auth;
     private FirebaseUser user;
@@ -66,21 +72,37 @@ public class NotificationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        loadNotification();
+        loadNotification();
 
 
     }
 
     private void loadNotification(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference dbRefs = FirebaseDatabase.getInstance().getReference("Notifications").child(user.getUid());
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        Query dbRefs = FirebaseDatabase.getInstance().getReference("Notifications").orderByChild("notif_time");
 
         dbRefs.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                dataSnapshot.getChildren();
-                User user = dataSnapshot.getValue(User.class);
+                list.clear();
+
+                for(DataSnapshot snapshot :  dataSnapshot.getChildren()) {
+
+                        Notification event = snapshot.getValue(Notification.class);
+
+                        if(event.getNotif_pub_id().equals(user.getUid())){
+
+                            if(event.getNotif_userId() != user.getUid()){
+                                list.add(event);
+                            }
+
+                        }
+
+                }
+
+                notificationAdapter = new NotificationAdapter(getContext(), list);
+                recyclerView.setAdapter(notificationAdapter);
             }
 
             @Override

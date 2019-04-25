@@ -195,8 +195,8 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     private void commentNotification(String type, String user_id, String post_id, String pub_id){
-
-        com.example.trapic_test.Model.Notification notif = new Notification(type, user_id, post_id, pub_id);
+        final String d_date = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+        com.example.trapic_test.Model.Notification notif = new Notification(type, user_id, post_id, pub_id, d_date);
         String push_id = FirebaseDatabase.getInstance().getReference("Notifications").push().getKey();
 
         FirebaseDatabase.getInstance().getReference("Notifications").child(push_id).setValue(notif);
