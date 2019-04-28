@@ -38,6 +38,20 @@ public class GuestActivity extends Activity {
                 addGuest();
             }
         });
+
+        regBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(GuestActivity.this, RegisterFragment.class));
+            }
+        });
+
+        logBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(GuestActivity.this, LoginFragment.class));
+            }
+        });
     }
 
     private void initViews(){

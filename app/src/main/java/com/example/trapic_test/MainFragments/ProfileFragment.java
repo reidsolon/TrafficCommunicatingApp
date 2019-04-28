@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
 import com.example.trapic_test.R;
 import com.example.trapic_test.SendFeedbackActivity;
@@ -190,9 +191,7 @@ public class ProfileFragment extends Fragment {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                dataSnapshot.getChildren();
-                dataSnapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                report_count.setText(dataSnapshot.getChildrenCount()+"");
+
             }
 
             @Override

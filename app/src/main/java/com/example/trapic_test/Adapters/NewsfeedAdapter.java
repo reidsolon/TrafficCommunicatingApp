@@ -289,7 +289,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
             event_status_txt = itemView.findViewById(R.id.event_status);
         }
         public void countReport(String post_id, final TextView view){
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reports").child(post_id).child(post_id);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Reports").child(post_id);
 
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -351,7 +351,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 Date time = new Date();
                 final String d_time = (String) DateFormat.format("hh:mm:ss a", time.getTime());
 
-                final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Reports").child(event_id);
+                final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Reports");
 
                 final HashMap<String, Object> map = new HashMap<>();
                 String msg = report_txt.getText().toString();
