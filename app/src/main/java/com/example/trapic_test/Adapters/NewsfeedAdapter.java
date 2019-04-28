@@ -78,7 +78,7 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final Event event = eventList.get(position);
 
-        Picasso.get().load(event.getEvent_image()).fit().into(holder.imageView);
+        Picasso.with(ctx).load(event.getEvent_image()).fit().into(holder.imageView);
         PrettyTime p = new PrettyTime();
         final String pretty = p.format(new Date(event.getEvent_date_time()));
 //        Integer num1 = Integer.parseInt(pretty);

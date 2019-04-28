@@ -67,7 +67,7 @@ public class FeedAdapter extends FirestoreRecyclerAdapter<Event, FeedAdapter.Fee
 
         final DocumentReference documentReference2 = firebaseFirestore.collection("Posts").document();
 
-                Picasso.get().load(model.getEvent_image()).fit().into(holder.imageView);
+                Picasso.with(ctx).load(model.getEvent_image()).fit().into(holder.imageView);
                 holder.caption.setText(model.getEvent_caption());
                 final DocumentReference documentReference = firebaseFirestore.collection("Users").document(id);
                 holder.type.setText(model.getEvent_type());

@@ -55,7 +55,7 @@ public class SingleFeedActivity extends Activity {
                     event_type.setText(event.getEvent_type());
                     timestamp.setText(event.getEvent_time());
                     location.setText(event.getEvent_location());
-                    Picasso.get().load(event.getEvent_image()).fit().into(post_img);
+                    Picasso.with(getApplicationContext()).load(event.getEvent_image()).fit().into(post_img);
                     caption.setText(event.getEvent_caption());
             }
 

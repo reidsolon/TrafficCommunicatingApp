@@ -246,7 +246,7 @@ public class PostActivity extends AppCompatActivity {
             Bitmap bitmap = BitmapFactory.decodeFile(currentImagePath, options);
             uri = getImageUri(this, bitmap);
 
-            Picasso.get().load(uri).fit().into(img1);
+            Picasso.with(getApplicationContext()).load(uri).fit().into(img1);
 
         }
     }

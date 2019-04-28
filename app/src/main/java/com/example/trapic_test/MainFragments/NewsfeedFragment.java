@@ -76,7 +76,6 @@ public class NewsfeedFragment extends Fragment {
                 view = inflater.inflate(R.layout.newsfeed_layout, container, false);
                 initViews();
                 readPosts();
-
             }else{
                 view = inflater.inflate(R.layout.unverified_newsfeed, container, false);
                 initViewsUnverified();

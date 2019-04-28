@@ -49,7 +49,6 @@ public class LoginFragment extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         if(auth.getCurrentUser() != null){
-
             finish();
             startActivity(new Intent(getApplicationContext(), MainFragment.class));
         }
@@ -151,8 +150,6 @@ public class LoginFragment extends AppCompatActivity {
 
         boolean check_email;
         boolean check_pw;
-
-
 
         if(TextUtils.isEmpty(email_txt)){
             email.setError("Please enter email address");

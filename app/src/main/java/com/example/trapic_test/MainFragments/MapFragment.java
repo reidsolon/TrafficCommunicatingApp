@@ -97,7 +97,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.plugins.traffic.TrafficPlugin;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -141,7 +140,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 public class MapFragment extends Fragment implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
 
     private MapboxMap mMap;
-    private TrafficPlugin trafficPlugin;
 
     private double distance;
     double roundedDistance;
