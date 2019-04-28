@@ -248,8 +248,8 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
 
         long rate = report_num+thank_num;
 
-        holder.trust_rate_txt.setText("Trust rate: "+rate+"%");
-
+//        holder.trust_rate_txt.setText("Trust rate: "+rate+"%");
+        holder.trust_rate_txt.setVisibility(View.INVISIBLE);
 
     }
 
