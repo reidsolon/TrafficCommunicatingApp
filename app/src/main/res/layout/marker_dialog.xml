@@ -83,6 +83,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:weightSum="2"
             android:orientation="horizontal"
             android:gravity="center"
             android:layout_width="match_parent"
@@ -92,16 +93,21 @@
                 android:id="@+id/yes_btn"
                 android:textColor="#fff"
                 android:text="Yes"
+                android:textStyle="bold"
                 android:textSize="10sp"
-                android:layout_width="wrap_content"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <Button
                 android:background="#3F84F8"
                 android:textColor="#fff"
                 android:text="no"
                 android:id="@+id/no_btn"
+                android:textStyle="bold"
                 android:textSize="10sp"
-                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <LinearLayout
@@ -116,6 +122,7 @@
                 android:id="@+id/view_to_newsfeed"
                 android:textColor="#fff"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp"
                 android:layout_width="match_parent"
@@ -128,6 +135,7 @@
                 android:textColor="#fff"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp"
+                android:textStyle="bold"
                 android:textSize="14sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

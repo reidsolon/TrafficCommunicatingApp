@@ -1,26 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    android:padding="10dp"
     android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="300dp"
     android:layout_height="wrap_content">
     <TextView
         android:layout_width="match_parent"
         android:text="You are about to report this event"
         android:layout_height="wrap_content" />
-    <EditText
-        android:id="@+id/report_msg"
-        android:hint="Report message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:backgroundTint="#fff"/>
 
-    <Button
-        android:id="@+id/report_btn"
-        android:text="Report this event"
-        android:layout_marginBottom="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:padding="10dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:background="@drawable/comment_layout_top"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/report_msg"
+                    android:hint="Report message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#fff"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:background="@drawable/comment_layout_btm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_marginStart="10dp"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="5dp"
+                    android:text="You are about to report this event"
+                    android:textColor="#fff"
+                    android:textSize="10sp"
+                    android:id="@+id/publisher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:background="@drawable/comment_layout_time"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="35dp"
+            android:layout_marginTop="55dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:padding="5dp"
+                android:background="@drawable/comment_layout_time"
+                android:id="@+id/report_btn"
+                android:text=" Send Report "
+                android:textSize="10sp"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </RelativeLayout>
+
 </LinearLayout>

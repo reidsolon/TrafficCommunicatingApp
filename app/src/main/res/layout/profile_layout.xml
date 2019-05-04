@@ -110,7 +110,7 @@
                         android:textSize="20sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"/>
+                        android:text="1"/>
                     <TextView
                         android:gravity="center"
                         android:textSize="10sp"
@@ -119,7 +119,7 @@
                         android:textColor="#fff"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Report Sent"/>
+                        android:text="Trapic Lv"/>
                 </LinearLayout>
             </LinearLayout>
 

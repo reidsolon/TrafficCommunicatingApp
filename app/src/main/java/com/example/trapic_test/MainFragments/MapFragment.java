@@ -43,6 +43,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.trapic_test.CommentsActivity;
 import com.example.trapic_test.Model.Comment;
 import com.example.trapic_test.Model.Event;
 import com.example.trapic_test.Model.User;
@@ -156,7 +157,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private Event[] event = new Event[200];
     private User[] user = new User[200];
     private BottomSheetDialog dialog, destination_dialog;
-    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn, remove_route_btn, assist_btn, start_route_btn;
+    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn, remove_route_btn, assist_btn, start_route_btn, view_all_comments_btn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
@@ -179,7 +180,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private Point originPoint;
     private Point destinationPoint;
     private Marker destinationLocation;
-    private NavigationMapRoute navigationMapRoute;
 
     public MapFragment() {
 
@@ -213,6 +213,12 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 }else{
                     Toast.makeText(getContext(), "Not available on guest mode.", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        view_all_comments_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
         marker_comment_btn.setOnClickListener(new View.OnClickListener() {
@@ -410,7 +416,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                  }
              }
          });
-
+            view_all_comments_btn = dialog.findViewById(R.id.comment_to_newsfeed);
          marker_comment_btn = dialog.findViewById(R.id.comment_btn);
          marker_comment_txt = dialog.findViewById(R.id.comment_txt);
         close_txt = dialog.findViewById(R.id.close_txt);
@@ -673,6 +679,29 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                     startActivity(intent);
                 }
             });
+
+            view_all_comments_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Intent intent = new Intent(getActivity(), CommentsActivity.class);
+                    FirebaseDatabase.getInstance().getReference("Posts").child(post_id)
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Event event = dataSnapshot.getValue(Event.class);
+                                    intent.putExtra("PostId",event.getEvent_id());
+                                    intent.putExtra("PostBy", event.getUser_id());
+                                    intent.putExtra("PublisherId", event.getEvent_id());
+                                    startActivity(intent);
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                }
+            });
         }else{
             yesBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -869,7 +898,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             Icon construction_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_construction_marker));
             final Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_road_crash));
             final Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
-
 
             switch(event[i].getEvent_type()){
                 case "Congestion":{
@@ -1367,8 +1395,8 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         // Draw Points on MapView
         polyline = mMap.addPolyline(new PolylineOptions()
                 .add(points)
-                .color(Color.parseColor("#009688"))
-                .width(5));
+                .color(Color.parseColor("#7e4ccc"))
+                .width(6));
 
     }
     @Override

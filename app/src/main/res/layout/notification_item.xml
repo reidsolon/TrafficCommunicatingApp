@@ -1,45 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <LinearLayout
-        android:orientation="horizontal"
-        android:weightSum="100"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <LinearLayout
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_weight="25"
-            android:layout_width="0dp"
-            android:gravity="center"
-            android:layout_height="match_parent">
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="50dp"
-                android:src="@drawable/profile_picture"
-                android:layout_height="50dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_weight="75"
+            android:padding="10dp"
             android:orientation="vertical"
-            android:layout_width="0dp"
-            android:gravity="center_vertical"
-            android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/notification_time"
-                android:gravity="end"
-                android:layout_marginEnd="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:background="@drawable/comment_layout_top"
                 android:layout_width="match_parent"
-                android:text="50min ago"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/notification_type"
-                android:layout_width="match_parent"
-                android:text="Test posted an event."
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="50dp"
+                    app:civ_border_color="#fff"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/profile_picture"
+                    android:layout_height="50dp" />
+                <TextView
+                    android:padding="10dp"
+                    android:textSize="13sp"
+                    android:id="@+id/notification_type"
+                    android:text="Fetching msg"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
+            </LinearLayout>
+            <LinearLayout
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:background="@drawable/comment_layout_btm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="5dp"
+                    android:text="Notification"
+                    android:textColor="#fff"
+                    android:textSize="10sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/notification_time"
+                    android:gravity="end"
+                    android:textColor="#fff"
+                    android:textSize="10sp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="match_parent"
+                    android:text="50min ago"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
         </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

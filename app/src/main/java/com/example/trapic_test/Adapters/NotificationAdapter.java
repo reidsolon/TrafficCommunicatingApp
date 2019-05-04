@@ -43,13 +43,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull NotificationHolder holder, int position) {
         Notification notif = list.get(position);
 
-//        if(notif.getNotif_type().equals("comment")){
-//            holder.loadUserInfo(notif.getNotif_userId());
-//
-//            holder.notification_time.setText(notif.getNotif_time());
-//        }
-
-        holder.notification_time.setText(notif.getNotif_time());
+        if(notif.getNotif_type().equals("comment")){
+            holder.loadUserInfo(notif.getNotif_userId());
+            holder.notification_time.setText(notif.getNotif_time());
+        }else{
+            holder.loadUserInfo2(notif.getNotif_userId());
+            holder.notification_time.setText(notif.getNotif_time());
+        }
     }
 
     @Override
@@ -69,6 +69,24 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
 
         public void loadUserInfo(String id){
+            FirebaseDatabase.getInstance().getReference("Users").child(id)
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            dataSnapshot.getChildren();
+
+                            User user = dataSnapshot.getValue(User.class);
+                            notification_type.setText(user.getUser_firstname()+" commented on your post.");
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+        }
+
+        public void loadUserInfo2(String id){
             FirebaseDatabase.getInstance().getReference("Users").child(id)
                     .addValueEventListener(new ValueEventListener() {
                         @Override

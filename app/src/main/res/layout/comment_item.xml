@@ -1,76 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:background="@drawable/comment_holder"
     android:layout_marginTop="8dp"
     android:layout_marginStart="6dp"
     android:layout_marginEnd="6dp"
     android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<RelativeLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
     <LinearLayout
-        android:layout_margin="4dp"
-        android:weightSum="100"
-        android:orientation="horizontal"
+        android:padding="10dp"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="80dp">
-
+        android:layout_height="wrap_content">
         <LinearLayout
-            android:layout_weight="20"
-            android:layout_width="0dp"
-            android:layout_height="match_parent">
-            <ImageView
-                android:layout_margin="8dp"
-                android:layout_width="match_parent"
-                android:src="@drawable/profile_picture"
-                android:layout_height="match_parent" />
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/comment_layout_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:padding="10dp"
+                android:textSize="13sp"
+                android:text="Fetching msg"
+                android:id="@+id/comment_msg"
+                android:layout_marginStart="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
-
         <LinearLayout
-            android:layout_weight="80"
-            android:layout_width="0dp"
-            android:weightSum="100"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:gravity="left"
-                android:layout_weight="90"
-                android:orientation="vertical"
+            android:background="@drawable/comment_layout_btm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="30dp"
+                app:civ_border_color="#fff"
+                app:civ_border_width="1dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/profile_picture"
+                android:layout_height="30dp" />
+            <TextView
+                android:paddingEnd="10dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="start"
+                android:layout_marginTop="5dp"
+                android:text="Fetching name"
+                android:textColor="#fff"
+                android:textSize="10sp"
+                android:id="@+id/publisher"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-                <TextView
-                    android:layout_marginStart="10dp"
-                    android:layout_gravity="start"
-                    android:layout_marginTop="5dp"
-                    android:text="Fetching name"
-                    android:textColor="#111"
-                    android:id="@+id/publisher"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                android:layout_height="wrap_content" />
 
-                <TextView
-                    android:text="Fetching msg"
-                    android:id="@+id/comment_msg"
-                    android:layout_marginStart="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_weight="10"
-                android:gravity="right"
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/comment_time"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="10dp"
-                    android:text="Fetching time"
-                    android:gravity="right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
+    <LinearLayout
+        android:background="@drawable/comment_layout_time"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="35dp"
+        android:layout_marginTop="55dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:padding="5dp"
+            android:drawableStart="@drawable/ic_check_black_24dp"
+            android:id="@+id/comment_time"
+            android:text="Fetching time"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</RelativeLayout>
+
 </LinearLayout>
