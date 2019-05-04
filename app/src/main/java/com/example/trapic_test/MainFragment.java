@@ -79,7 +79,7 @@ public class MainFragment extends AppCompatActivity {
 
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        pagerAdapter.addFragment(new MapFragment(), "");
+//        pagerAdapter.addFragment(new MapFragment(), "");
         pagerAdapter.addFragment(new NewsfeedFragment(), "");
         pagerAdapter.addFragment(new NotificationFragment(), "");
         pagerAdapter.addFragment(new ProfileFragment(), "");
@@ -390,7 +390,7 @@ public class MainFragment extends AppCompatActivity {
     }
 
     public void setupTabIcons(){
-        tabLayout.getTabAt(0).setIcon(R.drawable.map_logo);
+//        tabLayout.getTabAt(0).setIcon(R.drawable.map_logo);
         tabLayout.getTabAt(1).setIcon(R.drawable.newsfeed_logo);
         tabLayout.getTabAt(2).setIcon(R.drawable.notif_logo);
         tabLayout.getTabAt(3).setIcon(R.drawable.profile_logo);
