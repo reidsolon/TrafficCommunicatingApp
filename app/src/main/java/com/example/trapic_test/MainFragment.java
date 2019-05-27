@@ -60,6 +60,7 @@ public class MainFragment extends AppCompatActivity {
     private FirebaseDatabase db;
     private DatabaseReference dbRefs;
     private BottomSheetDialog dialog1;
+    private Button mapLink;
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -182,7 +183,16 @@ public class MainFragment extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Unverified account/Guest cannot use this feature.", Toast.LENGTH_LONG).show();
                 }
 
+            }
 
+        });
+
+        mapLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainFragment.this, MapFragment.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
 
@@ -350,6 +360,7 @@ public class MainFragment extends AppCompatActivity {
         postLink =  findViewById(R.id.post_link);
         user_settings_btn = findViewById(R.id.user_settings_btn);
         status_mode_txt = findViewById(R.id.status_mode_txt);
+        mapLink = findViewById(R.id.main_view_map);
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
@@ -391,9 +402,9 @@ public class MainFragment extends AppCompatActivity {
 
     public void setupTabIcons(){
 //        tabLayout.getTabAt(0).setIcon(R.drawable.map_logo);
-        tabLayout.getTabAt(1).setIcon(R.drawable.newsfeed_logo);
-        tabLayout.getTabAt(2).setIcon(R.drawable.notif_logo);
-        tabLayout.getTabAt(3).setIcon(R.drawable.profile_logo);
+        tabLayout.getTabAt(0).setIcon(R.drawable.newsfeed_logo);
+        tabLayout.getTabAt(1).setIcon(R.drawable.notif_logo);
+        tabLayout.getTabAt(2).setIcon(R.drawable.profile_logo);
     }
 
     @Override
@@ -435,6 +446,7 @@ public class MainFragment extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
         if(FirebaseAuth.getInstance().getCurrentUser() != null){
             FirebaseDatabase.getInstance().getReference("Users")
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_isOnline").setValue(false);

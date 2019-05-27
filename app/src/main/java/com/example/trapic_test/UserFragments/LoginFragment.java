@@ -70,7 +70,9 @@ public class LoginFragment extends AppCompatActivity {
 
                 dialog.show();
                 loginValidation();
-                checkUser();
+                String email_txt = email.getText().toString();
+                String pw_txt = pw.getText().toString();
+                checkUser(email_txt, pw_txt);
 
             }
         });
@@ -92,11 +94,24 @@ public class LoginFragment extends AppCompatActivity {
 
     }
 
-    public boolean checkUser(){
+//    FOR TESTING //
+    public String validate(String name, String pw){
+        if(name.equals("Calderon") && pw.equals("Shit")){
+            return "Success Login";
+        }else{
+            return "Fail Login";
+        }
+
+    }
+    /////////////
+
+    public String checkUser(String email, String pw){
 
         boolean loginValidation = loginValidation();
-        String email_txt = email.getText().toString();
-        String pw_txt = pw.getText().toString();
+        String email_txt = email;
+        String pw_txt = pw;
+        final String[] msg_success = {null};
+        String msg_fail = null;
 
         if(loginValidation){
             auth.signInWithEmailAndPassword(email_txt, pw_txt).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -121,12 +136,16 @@ public class LoginFragment extends AppCompatActivity {
                         finish();
                         startActivity(new Intent(getApplicationContext(), MainFragment.class));
 
+                        msg_success[0] = "Login Success";
+
                     }else{
                         dialog.dismiss();
                         Toast.makeText(getApplicationContext(), "Login failed" ,Toast.LENGTH_LONG).show();
                     }
                 }
             });
+
+            return msg_success[0];
         }else{
             Handler handler = new Handler();
 
@@ -138,9 +157,9 @@ public class LoginFragment extends AppCompatActivity {
             }, 1000);
 
             Toast.makeText(getApplicationContext(), "Login failed" ,Toast.LENGTH_LONG).show();
-        }
 
-        return false;
+            return "Fail Login";
+        }
     }
 
     public boolean loginValidation(){

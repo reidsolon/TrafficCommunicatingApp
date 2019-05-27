@@ -1,6 +1,7 @@
 package com.example.trapic_test.MainFragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -37,6 +38,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -138,7 +141,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
-public class MapFragment extends Fragment implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
+public class MapFragment extends Activity implements LocationEngineConductorListener,PermissionsListener, MapboxMap.OnMapClickListener {
 
     private MapboxMap mMap;
 
@@ -171,6 +174,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private DirectionsRoute currentRoute;
     private Style mapStyle;
     private Polyline polyline;
+    private Animation fromBottom, fromTop, fromLeft, fromRight;
 
     // Get instance of Vibrator from current Context
     Vibrator v;
@@ -181,28 +185,22 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private Point destinationPoint;
     private Marker destinationLocation;
 
-    public MapFragment() {
-
-    }
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Mapbox.getInstance(getContext(), "pk.eyJ1IjoicmVpZHNvbG9uIiwiYSI6ImNqcnZpZThzMTAyN2Ezemx4eHMzM2RoZGwifQ.j65VGpYO6g84DnR1koippQ");
-        return inflater.inflate(R.layout.map_layout, container, false);
-    }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Mapbox.getInstance(MapFragment.this, "pk.eyJ1IjoicmVpZHNvbG9uIiwiYSI6ImNqcnZpZThzMTAyN2Ezemx4eHMzM2RoZGwifQ.j65VGpYO6g84DnR1koippQ");
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        dialog = new BottomSheetDialog(getContext());
-        destination_dialog = new BottomSheetDialog(getContext());
+        setContentView(R.layout.map_layout);
+
+        dialog = new BottomSheetDialog(this);
+        destination_dialog = new BottomSheetDialog(this);
 
         dialog.setContentView(R.layout.marker_dialog);
         destination_dialog.setContentView(R.layout.destination_dialog);
-        v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        initViews(view);
+        initViews();
+        initAnims();
 //        refreshAll();
 
         myLocBtn2.setOnClickListener(new View.OnClickListener() {
@@ -211,7 +209,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 if(FirebaseAuth.getInstance().getCurrentUser() != null){
                     animateLocation();
                 }else{
-                    Toast.makeText(getContext(), "Not available on guest mode.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapFragment.this, "Not available on guest mode.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -266,7 +264,6 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                             final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
                             String postId = event_caption_txt.getText().toString();
 
-
                             Comment comment1 = new Comment(publisherId[0], postId, marker_comment_txt.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getUid(), fullname[0], d_date, d_time,date_time);
                             String id = FirebaseDatabase.getInstance().getReference("Comments").push().getKey();
                             FirebaseDatabase.getInstance().getReference("Comments").child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -274,26 +271,27 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                 public void onSuccess(Void aVoid) {
 
                                     marker_comment_txt.setText("");
-                                    Toast.makeText(getContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MapFragment.this, "Commented Successfully", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }else{
                             marker_comment_txt.setError("Please provide comment and make sure it is atleast 10 characters");
                         }
                     }else{
-                        Toast.makeText(getContext(), "Not available in unverfied user.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MapFragment.this, "Not available in unverfied user.", Toast.LENGTH_LONG).show();
                     }
 
                 }else{
-                    Toast.makeText(getContext(), "Not available in guest mode.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapFragment.this, "Not available in guest mode.", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
+
         myLocBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               selectType();
+                selectType();
             }
         });
         mapView.onCreate(savedInstanceState);
@@ -326,15 +324,158 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 });
             }
         });
-//        navigationMapRoute = new NavigationMapRoute(null, mapView, mMap);
-
-
     }
+//
+//    @Nullable
+//    @Override
+//    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+//        Mapbox.getInstance(MapFragment.this, "pk.eyJ1IjoicmVpZHNvbG9uIiwiYSI6ImNqcnZpZThzMTAyN2Ezemx4eHMzM2RoZGwifQ.j65VGpYO6g84DnR1koippQ");
+//        return inflater.inflate(R.layout.map_layout, container, false);
+//    }
+
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//        dialog = new BottomSheetDialog(getContext());
+//        destination_dialog = new BottomSheetDialog(getContext());
+//
+//        dialog.setContentView(R.layout.marker_dialog);
+//        destination_dialog.setContentView(R.layout.destination_dialog);
+//        v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+//
+//        initViews(view);
+////        refreshAll();
+//
+//        myLocBtn2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(FirebaseAuth.getInstance().getCurrentUser() != null){
+//                    animateLocation();
+//                }else{
+//                    Toast.makeText(getContext(), "Not available on guest mode.", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//        view_all_comments_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//        marker_comment_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+//                    if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+//                        if(!marker_comment_txt.getText().toString().equals("") && marker_comment_txt.getText().length() > 7){
+//
+//                            final String[] fullname = new String[1];
+//                            FirebaseDatabase.getInstance().getReference("Users")
+//                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                                    .addValueEventListener(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            dataSnapshot.getChildren();
+//                                            User user = dataSnapshot.getValue(User.class);
+//                                            fullname[0] = user.getUser_firstname()+" "+user.getUser_lastname();
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                        }
+//                                    });
+//                            final String[] publisherId = new String[1];
+//                            FirebaseDatabase.getInstance().getReference("Posts")
+//                                    .child(event_caption_txt.getText().toString())
+//                                    .addValueEventListener(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            dataSnapshot.getChildren();
+//                                            Event event = dataSnapshot.getValue(Event.class);
+//                                            publisherId[0] = event.getUser_id();
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                        }
+//                                    });
+//
+//                            final String d_date = (String) DateFormat.format("MMMM dd, yyyy", new Date());
+//                            final String d_time = (String) DateFormat.format("hh:mm:ss a", new Date());
+//                            final String date_time = (String) DateFormat.format("MMMM dd, yyyy hh:mm:ss a", new Date());
+//                            String postId = event_caption_txt.getText().toString();
+//
+//
+//                            Comment comment1 = new Comment(publisherId[0], postId, marker_comment_txt.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getUid(), fullname[0], d_date, d_time,date_time);
+//                            String id = FirebaseDatabase.getInstance().getReference("Comments").push().getKey();
+//                            FirebaseDatabase.getInstance().getReference("Comments").child(postId).child(id).setValue(comment1).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                @Override
+//                                public void onSuccess(Void aVoid) {
+//
+//                                    marker_comment_txt.setText("");
+//                                    Toast.makeText(getContext(), "Commented Successfully", Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//                        }else{
+//                            marker_comment_txt.setError("Please provide comment and make sure it is atleast 10 characters");
+//                        }
+//                    }else{
+//                        Toast.makeText(getContext(), "Not available in unverfied user.", Toast.LENGTH_LONG).show();
+//                    }
+//
+//                }else{
+//                    Toast.makeText(getContext(), "Not available in guest mode.", Toast.LENGTH_SHORT).show();
+//                }
+//
+//            }
+//        });
+//        myLocBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//               selectType();
+//            }
+//        });
+//        mapView.onCreate(savedInstanceState);
+//        mapView.getMapAsync(new OnMapReadyCallback() {
+//            @Override
+//            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+//                mMap = mapboxMap;
+//
+//                mapboxMap.setStyle(Style.TRAFFIC_DAY, new Style.OnStyleLoaded() {
+//
+//
+//                    @Override
+//                    public void onStyleLoaded(@NonNull Style style) {
+//
+//                        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+//                            myLocation();
+//                        }else{
+//                            guestLocation();
+//                        }
+//
+//                        loadAllMarkers();
+//                        callPermission();
+//                        enableLocationComponent();
+//                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+//                            displayUsers();
+//                        }
+//
+//                        mapStyle = style;
+//                    }
+//                });
+//            }
+//        });
+////        navigationMapRoute = new NavigationMapRoute(null, mapView, mMap);
+//
+//
+//    }
 
     private void selectType(){
         list = new String[]{"Night Mode Traffic", "Day Mode Traffic", "Normal Streets"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Map Type");
         builder.setSingleChoiceItems(list, -1, new DialogInterface.OnClickListener() {
             @Override
@@ -376,22 +517,22 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         dialog.show();
     }
 
-    private void initViews(View view){
-        mapView = view.findViewById(R.id.mapView);
-        myLocBtn = view.findViewById(R.id.my_loc);
-        myLocBtn2 = view.findViewById(R.id.my_loc2);
-        swipeRefreshLayout = view.findViewById(R.id.swipe);
-         status_mode = view.findViewById(R.id.status_mode_txt);
-         user_count = view.findViewById(R.id.user_count);
-         cons_count = view.findViewById(R.id.cons_count);
-         road_count = view.findViewById(R.id.road_count);
-         traffic_count = view.findViewById(R.id.traffic_count);
-         remove_route_btn = view.findViewById(R.id.remove_route_btn);
-         start_route_btn = view.findViewById(R.id.start_route);
-         dest_ad = view.findViewById(R.id.dest_ad);
-         dest_dis = view.findViewById(R.id.dest_dis);
-         dest_dur = view.findViewById(R.id.dest_dur);
-         route_info = view.findViewById(R.id.route_info);
+    private void initViews(){
+        mapView = findViewById(R.id.mapView);
+        myLocBtn = findViewById(R.id.my_loc);
+        myLocBtn2 = findViewById(R.id.my_loc2);
+        swipeRefreshLayout = findViewById(R.id.swipe);
+         status_mode = findViewById(R.id.status_mode_txt);
+         user_count = findViewById(R.id.user_count);
+         cons_count = findViewById(R.id.cons_count);
+         road_count = findViewById(R.id.road_count);
+         traffic_count = findViewById(R.id.traffic_count);
+         remove_route_btn = findViewById(R.id.remove_route_btn);
+         start_route_btn = findViewById(R.id.start_route);
+         dest_ad = findViewById(R.id.dest_ad);
+         dest_dis = findViewById(R.id.dest_dis);
+         dest_dur = findViewById(R.id.dest_dur);
+         route_info = findViewById(R.id.route_info);
          route_info.setVisibility(View.INVISIBLE);
 
          remove_route_btn.setVisibility(View.INVISIBLE);
@@ -400,6 +541,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
              public void onClick(View v) {
                  locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
                  locationComponent.setRenderMode(RenderMode.GPS);
+                 route_info.clearAnimation();
                  mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 2000);
              }
          });
@@ -427,8 +569,8 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         yesBtn = dialog.findViewById(R.id.yes_btn);
         noBtn = dialog.findViewById(R.id.no_btn);
 
-        dest_dur = view.findViewById(R.id.dest_dur);
-        dest_dis = view.findViewById(R.id.dest_dis);
+        dest_dur = findViewById(R.id.dest_dur);
+        dest_dis = findViewById(R.id.dest_dis);
 
         cmt_user_name = dialog.findViewById(R.id.cmt_user_id);
         cmt_msg = dialog.findViewById(R.id.cmt_msg);
@@ -511,13 +653,13 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     private void enableLocationComponent() {
 
         // Check if permissions are enabled and if not request
-        if (PermissionsManager.areLocationPermissionsGranted(getContext())) {
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
 
             // Get an instance of the component
             locationComponent = mMap.getLocationComponent();
 
             // Activate with options
-            locationComponent.activateLocationComponent(getContext(), mMap.getStyle());
+            locationComponent.activateLocationComponent(this, mMap.getStyle());
 
             // Enable to make component visible
             locationComponent.setLocationComponentEnabled(true);
@@ -540,7 +682,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
             permissionsManager = new PermissionsManager(this);
 
-            permissionsManager.requestLocationPermissions(getActivity());
+            permissionsManager.requestLocationPermissions(MapFragment.this);
 
         }
     }
@@ -674,7 +816,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             viewNewsfeedBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(getActivity(), SingleFeedActivity.class);
+                    Intent intent = new Intent(MapFragment.this, SingleFeedActivity.class);
                     intent.putExtra("PostID", post_id);
                     startActivity(intent);
                 }
@@ -683,7 +825,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             view_all_comments_btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final Intent intent = new Intent(getActivity(), CommentsActivity.class);
+                    final Intent intent = new Intent(MapFragment.this, CommentsActivity.class);
                     FirebaseDatabase.getInstance().getReference("Posts").child(post_id)
                             .addValueEventListener(new ValueEventListener() {
                                 @Override
@@ -706,14 +848,14 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             yesBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(getContext(), "You are not a verified user.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MapFragment.this, "You are not a verified user.", Toast.LENGTH_LONG).show();
                 }
             });
 
             noBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(getContext(), "You are not a verified user.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MapFragment.this, "You are not a verified user.", Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -850,7 +992,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
                 if(distance <= 50 && event[i].getEvent_status().equals("open")){
 
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(MapFragment.this);
 
                     if(event[i].getEvent_type().equals("Construction Area")){
                         builder.setContentTitle(event[i].getEvent_type())
@@ -860,7 +1002,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                 .setAutoCancel(true);
 
                         Notification notification = builder.build();
-                        NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
                         manager.notify(1, notification);
                         v.vibrate(200);
@@ -872,7 +1014,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                 .setAutoCancel(true);
 
                         Notification notification = builder.build();
-                        NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
                         manager.notify(2, notification);
                         v.vibrate(200);
@@ -884,7 +1026,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                                 .setAutoCancel(true);
 
                         Notification notification = builder.build();
-                        NotificationManager manager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
                         manager.notify(3, notification);
                         v.vibrate(200);
@@ -894,10 +1036,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             }
 
             markerOptions.setSnippet(event[i].getEvent_id());
-            IconFactory iconFactory = IconFactory.getInstance(getActivity());
-            Icon construction_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_construction_marker));
-            final Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_road_crash));
-            final Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_traffic_jam));
+            IconFactory iconFactory = IconFactory.getInstance(MapFragment.this);
+            Icon construction_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(MapFragment.this, R.drawable.ic_construction_marker));
+            final Icon roadcrash_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(MapFragment.this, R.drawable.ic_road_crash));
+            final Icon trafficjam_marker = iconFactory.fromBitmap(getBitmapFromVectorDrawable(MapFragment.this, R.drawable.ic_traffic_jam));
 
             switch(event[i].getEvent_type()){
                 case "Congestion":{
@@ -1010,10 +1152,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     }
 
     private void myLocation() {
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(MapFragment.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapFragment.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             callPermission();
         }else {
-            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
+            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapFragment.this);
 
             locationRequest = new LocationRequest();
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -1045,7 +1187,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             if (latLng1 != null) {
 
                 cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
-                final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                final Geocoder geocoder = new Geocoder(MapFragment.this, Locale.getDefault());
 
                     FirebaseDatabase.getInstance().getReference("Users")
                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -1074,10 +1216,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     }
 
     private void guestLocation(){
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(MapFragment.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapFragment.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             callPermission();
         }else {
-            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
+            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MapFragment.this);
 
             locationRequest = new LocationRequest();
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -1099,7 +1241,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             if (latLng1 != null) {
 
                 cameraPosition = new CameraPosition.Builder().target(latLng1).zoom(17).bearing(180).tilt(40).build();
-                final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                final Geocoder geocoder = new Geocoder(MapFragment.this, Locale.getDefault());
 
                 FirebaseDatabase.getInstance().getReference("Users")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -1125,7 +1267,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
     }
 
     private void callPermission(){
-        Permissions.check(getActivity()/*context*/, Manifest.permission.ACCESS_FINE_LOCATION, null, new PermissionHandler() {
+        Permissions.check(MapFragment.this/*context*/, Manifest.permission.ACCESS_FINE_LOCATION, null, new PermissionHandler() {
             @Override
             public void onGranted() {
                 if(FirebaseAuth.getInstance().getCurrentUser() != null){
@@ -1133,7 +1275,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                 }
 
                 Handler handler = new Handler();
-                final ProgressDialog dialog = new ProgressDialog(getActivity());
+                final ProgressDialog dialog = new ProgressDialog(MapFragment.this);
                 dialog.setMessage("Retrieving current location");
                 dialog.show();
                 handler.postDelayed(new Runnable() {
@@ -1163,12 +1305,13 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
         mapView.onStart();
 
     }
+//
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        mapView.onDestroy();
+//    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mapView.onDestroy();
-    }
 
     @Override
     public void onResume() {
@@ -1259,7 +1402,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
 
         }else{
-            Toast.makeText(getContext(), "You cannot use this feature yet.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MapFragment.this, "You cannot use this feature yet.", Toast.LENGTH_SHORT).show();
         }
         return false;
     }
@@ -1328,7 +1471,7 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                     mMap.removeMarker(destinationLocation);
                 }
 
-                final Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                final Geocoder geocoder = new Geocoder(MapFragment.this, Locale.getDefault());
 
                                 List<Address> addresses = null;
                                 try {
@@ -1344,17 +1487,17 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                     double rounded_km;
                     if(distance_rounded > 1000.0){
                          rounded_km = Math.round((currentRoute.distance() / 100.0) * 100.0)/100.0;
-                         dest_dis.setText("Distance: "+rounded_km+" km");
+                         dest_dis.setText(""+rounded_km+" km");
                          destinationLocation.setSnippet(destination_address+"\n"+"Travel time: "+currentRoute.duration()+"\n"+"Distance: "+rounded_km+" km");
                     }else{
                         destinationLocation.setSnippet(destination_address+"\n"+"Travel time: "+currentRoute.duration()+"\n"+"Distance: "+distance_rounded+" m");
-                        dest_dis.setText("Distance: "+distance_rounded+" m");
+                        dest_dis.setText(""+distance_rounded+" m");
                     }
 
                     dest_ad.setText(destination_address);
-                    dest_dur.setText("Travel Time: "+currentRoute.duration());
+                    dest_dur.setText(""+currentRoute.duration());
 
-                final ProgressDialog progressDialog = new ProgressDialog(getContext());
+                final ProgressDialog progressDialog = new ProgressDialog(MapFragment.this);
                 progressDialog.setMessage("Finding best route...");
                 progressDialog.show();
                 Handler handler = new Handler();
@@ -1362,9 +1505,11 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
                     @Override
                     public void run() {
                         progressDialog.dismiss();
-                        Toast.makeText(getContext(), "Route displayed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapFragment.this, "Route displayed!", Toast.LENGTH_SHORT).show();
                         remove_route_btn.setVisibility(View.VISIBLE);
                         route_info.setVisibility(View.VISIBLE);
+                        route_info.clearAnimation();
+                        route_info.setAnimation(fromBottom);
                     }
                 }, 1500);
 
@@ -1410,12 +1555,12 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int i=0;
-                IconFactory iconFactory = IconFactory.getInstance(getActivity());
-                Icon user_icon = iconFactory.fromBitmap(getBitmapFromVectorDrawable(getContext(), R.drawable.ic_user_marker));
+                IconFactory iconFactory = IconFactory.getInstance(MapFragment.this);
+                Icon user_icon = iconFactory.fromBitmap(getBitmapFromVectorDrawable(MapFragment.this, R.drawable.ic_user_marker));
                 for(DataSnapshot snapshot :dataSnapshot.getChildren() ) {
 
                     User user = snapshot.getValue(User.class);
-                    if(!user.getUser_id().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()) && user.isUser_isOnline()){
+                    if(!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(user.getUser_id()) && user.isUser_isOnline()){
 
                         if(user_marker[i] != null){
                             mMap.removeMarker(user_marker[i]);
@@ -1522,5 +1667,10 @@ public class MapFragment extends Fragment implements LocationEngineConductorList
 
                     }
                 });
+    }
+
+    public void initAnims(){
+        fromBottom = AnimationUtils.loadAnimation(this, R.anim.from_left);
+        fromRight = AnimationUtils.loadAnimation(this, R.anim.to_right);
     }
 }

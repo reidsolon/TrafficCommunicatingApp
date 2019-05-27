@@ -137,10 +137,16 @@ public class CommentsActivity extends AppCompatActivity {
         comment_txt = findViewById(R.id.comment_txt);
         recyclerView = findViewById(R.id.recyclerview);
     }
+// FOR TESTING //
 
-    public void addComment(){
+/////////////////
+    public String addComment(String cmt_publisher, String cmt_msg){
 
-
+        if(!cmt_publisher.equals("") && !cmt_msg.equals("")){
+            return "Comment Submitted.";
+        }else{
+            return "Comment not submitted.";
+        }
 
     }
 

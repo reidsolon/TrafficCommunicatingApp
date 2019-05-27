@@ -216,4 +216,11 @@
 
         </LinearLayout>
     </LinearLayout>
+    <Button
+        android:id="@+id/main_view_map"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/main_fragment_cameraholder"
+        android:layout_marginTop="14dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
 </RelativeLayout>
