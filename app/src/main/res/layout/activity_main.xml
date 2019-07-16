@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
     <RelativeLayout
-        android:background="#9111"
+        android:background="#D2E82526"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -38,12 +38,11 @@
                 android:layout_height="wrap_content">
                 <LinearLayout
                     android:gravity="center"
-                    android:background="#2fff"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:layout_height="70dp"
+                        android:layout_height="120dp"
                         android:src="@drawable/ic_trapiclogo32"/>
                 </LinearLayout>
             </LinearLayout>
@@ -63,24 +62,8 @@
                     android:textStyle="bold"
                     android:fontFamily="@font/mooka"
                     android:textColor="#fff"
-                    android:text="Traffic"
-                    android:textSize="40sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:textStyle="bold"
-                    android:fontFamily="@font/mooka"
-                    android:textColor="#fff"
-                    android:text="Communicating"
-                    android:textSize="40sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:textStyle="bold"
-                    android:fontFamily="@font/mooka"
-                    android:textColor="#fff"
-                    android:text="App"
-                    android:textSize="40sp"
+                    android:text="Traffic Communicating App"
+                    android:textSize="35sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -117,7 +100,16 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
                 <LinearLayout
-                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:background="#fff">
+
+                </LinearLayout>
+                <LinearLayout
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -128,6 +120,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Be a guest"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginTop="15dp"
+                    android:background="#fff">
+
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

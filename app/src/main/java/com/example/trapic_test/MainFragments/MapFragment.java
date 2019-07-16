@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Vibrator;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
@@ -145,6 +146,9 @@ public class MapFragment extends Activity implements LocationEngineConductorList
 
     private MapboxMap mMap;
 
+    //Text To Speech
+    private TextToSpeech tts;
+
     private double distance;
     double roundedDistance;
     double roundedKm;
@@ -160,14 +164,14 @@ public class MapFragment extends Activity implements LocationEngineConductorList
     private Event[] event = new Event[200];
     private User[] user = new User[200];
     private BottomSheetDialog dialog, destination_dialog;
-    private Button myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn, remove_route_btn, assist_btn, start_route_btn, view_all_comments_btn;
+    private Button view_newsfeed, myLocBtn, myLocBtn2, viewNewsfeedBtn, yesBtn, noBtn, marker_comment_btn, remove_route_btn, assist_btn, start_route_btn, view_all_comments_btn;
     private PermissionsManager permissionsManager;
     private LocationComponent locationComponent;
     private CameraPosition cameraPosition;
     private boolean event_status;
     private int i=0, user_count_num, user_i=0;
     private MarkerOptions markerOptions;
-    private String event_user_id, event_user_fullname;
+    private String event_user_id, event_user_fullname, route_message_voice;
     private Marker[] event_marker = new Marker[200];
     private Marker[] user_marker = new Marker[200];
     private HashMap<Marker, Event> map = new HashMap<Marker, Event>();
@@ -521,10 +525,16 @@ public class MapFragment extends Activity implements LocationEngineConductorList
         mapView = findViewById(R.id.mapView);
         myLocBtn = findViewById(R.id.my_loc);
         myLocBtn2 = findViewById(R.id.my_loc2);
-        swipeRefreshLayout = findViewById(R.id.swipe);
          status_mode = findViewById(R.id.status_mode_txt);
          user_count = findViewById(R.id.user_count);
          cons_count = findViewById(R.id.cons_count);
+         view_newsfeed = findViewById(R.id.view_newsfeed_btn);
+         view_newsfeed.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 finish();
+             }
+         });
          road_count = findViewById(R.id.road_count);
          traffic_count = findViewById(R.id.traffic_count);
          remove_route_btn = findViewById(R.id.remove_route_btn);
@@ -542,6 +552,7 @@ public class MapFragment extends Activity implements LocationEngineConductorList
                  locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
                  locationComponent.setRenderMode(RenderMode.GPS);
                  route_info.clearAnimation();
+                 route_start_speak();
                  mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 2000);
              }
          });
@@ -1342,6 +1353,10 @@ public class MapFragment extends Activity implements LocationEngineConductorList
     public void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        if(tts != null){
+            tts.stop();
+            tts.shutdown();
+        }
     }
 
     @Override
@@ -1508,6 +1523,7 @@ public class MapFragment extends Activity implements LocationEngineConductorList
                         Toast.makeText(MapFragment.this, "Route displayed!", Toast.LENGTH_SHORT).show();
                         remove_route_btn.setVisibility(View.VISIBLE);
                         route_info.setVisibility(View.VISIBLE);
+                        route_speak(dest_dis.getText().toString(), dest_dur.getText().toString());
                         route_info.clearAnimation();
                         route_info.setAnimation(fromBottom);
                     }
@@ -1672,5 +1688,34 @@ public class MapFragment extends Activity implements LocationEngineConductorList
     public void initAnims(){
         fromBottom = AnimationUtils.loadAnimation(this, R.anim.from_left);
         fromRight = AnimationUtils.loadAnimation(this, R.anim.to_right);
+    }
+    //ROUTE SUGGESTION SPEAK
+    private void route_speak(final String dis, final String dur){
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status == TextToSpeech.SUCCESS){
+                    int result = tts.setLanguage(Locale.ENGLISH);
+
+                    if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+
+                    }else{
+                        tts.setSpeechRate(0.7f);
+                        speak(dis, dur);
+                    }
+                }
+            }
+        });
+    }
+
+    private void speak(String dis, String dur){
+        String route_message_to_speak = "Here is your route. The distance is "+dis+" from you and expected " +
+                "time of arrival is "+dur;
+        tts.speak(route_message_to_speak, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    //ROUTE START SPEAK
+    private void route_start_speak(){
+        tts.speak("Have a safe trip!", TextToSpeech.QUEUE_FLUSH, null);
     }
 }

@@ -41,11 +41,28 @@
 
 
             <LinearLayout
+                android:orientation="vertical"
+                android:layout_above="@+id/tablayout_holder"
                 android:layout_width="match_parent"
-                android:layout_marginBottom="30dp"
-                android:gravity="center"
-                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/cam_holder"
+                android:gravity="end"
+                android:layout_marginEnd="5dp"
                 android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="50dp"
+                    android:gravity="center"
+                    android:background="@drawable/main_fragment_cameraholder"
+                    android:layout_height="50dp">
+                    <Button
+                        android:layout_above="@+id/post_link"
+                        android:id="@+id/main_view_map"
+                        android:background="@drawable/mapforbutton"
+                        android:layout_alignParentEnd="true"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
+
+                </LinearLayout>
                 <LinearLayout
                     android:id="@+id/post_link"
                     android:layout_width="70dp"
@@ -58,6 +75,7 @@
                         android:layout_height="60dp"
                         android:src="@drawable/trapic_logo"/>
                 </LinearLayout>
+
             </LinearLayout>
 
         </RelativeLayout>
@@ -79,9 +97,10 @@
         android:background="#fff"
         android:id="@+id/signout_section"
         android:weightSum="100"
+        android:gravity="center_vertical"
         android:paddingBottom="2dp"
         android:layout_width="match_parent"
-        android:layout_height="50dp">
+        android:layout_height="80dp">
 
         <LinearLayout
             android:weightSum="100"
@@ -101,6 +120,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <de.hdodenhof.circleimageview.CircleImageView
+                        app:civ_border_width="1dp"
+                        app:civ_border_color="#FF2A2A"
                         android:layout_width="40dp"
                         android:src="@drawable/profile_picture"
                         android:layout_height="40dp" />
@@ -109,6 +130,7 @@
 
             </RelativeLayout>
             <LinearLayout
+                android:gravity="center_vertical"
                 android:layout_weight="55"
                 android:orientation="vertical"
                 android:layout_marginStart="3dp"
@@ -116,7 +138,8 @@
                 android:layout_height="match_parent">
                 <TextView
                     android:textColor="#111"
-                    android:textSize="12sp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
                     android:id="@+id/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -216,11 +239,5 @@
 
         </LinearLayout>
     </LinearLayout>
-    <Button
-        android:id="@+id/main_view_map"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/main_fragment_cameraholder"
-        android:layout_marginTop="14dp"
-        android:layout_width="50dp"
-        android:layout_height="50dp" />
+
 </RelativeLayout>

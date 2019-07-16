@@ -296,10 +296,10 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                     if(dataSnapshot.getChildrenCount() > 1){
-                        view.setText(dataSnapshot.getChildrenCount()+" Reports");
+                        view.setText(dataSnapshot.getChildrenCount()+"");
                         report_num = dataSnapshot.getChildrenCount();
                     }else{
-                        view.setText(dataSnapshot.getChildrenCount()+" Report");
+                        view.setText(dataSnapshot.getChildrenCount()+"");
                         report_num = dataSnapshot.getChildrenCount();
                     }
 
@@ -319,10 +319,10 @@ public class NewsfeedAdapter extends RecyclerView.Adapter<NewsfeedAdapter.Newsfe
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                     if(dataSnapshot.getChildrenCount() > 1){
-                        view.setText(dataSnapshot.getChildrenCount()+" Thanks");
+                        view.setText(dataSnapshot.getChildrenCount()+"");
                         thank_num = dataSnapshot.getChildrenCount();
                     }else{
-                        view.setText(dataSnapshot.getChildrenCount()+" Thank");
+                        view.setText(dataSnapshot.getChildrenCount()+"");
                         thank_num = dataSnapshot.getChildrenCount();
                     }
 

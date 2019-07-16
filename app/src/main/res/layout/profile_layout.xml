@@ -189,7 +189,7 @@
 
     <LinearLayout
         android:id="@+id/img_container"
-        android:layout_marginTop="-140dp"
+        android:layout_marginTop="-110dp"
         android:gravity="center"
         android:layout_below="@+id/profile_header"
         android:layout_width="match_parent"

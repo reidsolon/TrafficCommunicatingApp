@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
@@ -48,11 +49,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class MainFragment extends AppCompatActivity {
+
+    private TextToSpeech tts;
     private TextView test, status_mode_txt, user_fullname, user_email, profile_btn, help_btn, feedback_btn, settings_btn, logout;
 
     private LinearLayout postLink,user_settings_btn, dialog_close_btn;
@@ -61,6 +66,7 @@ public class MainFragment extends AppCompatActivity {
     private DatabaseReference dbRefs;
     private BottomSheetDialog dialog1;
     private Button mapLink;
+    private String greeting_message;
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -74,6 +80,7 @@ public class MainFragment extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainfragment_layout);
+        greetings();
         init();
         loadUserInfo();
         checkStatus();
@@ -441,6 +448,10 @@ public class MainFragment extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(tts != null){
+            tts.stop();
+            tts.shutdown();
+        }
     }
 
     @Override
@@ -480,5 +491,30 @@ public class MainFragment extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference("Users")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("user_lat").removeValue();
+    }
+
+    private void greetings(){
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status == TextToSpeech.SUCCESS){
+                    int result = tts.setLanguage(Locale.ENGLISH);
+
+                    if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+
+                    }else{
+                        tts.setSpeechRate(1.0f);
+                        speak();
+                    }
+                }
+            }
+        });
+    }
+
+    private void speak(){
+
+
+        greeting_message = "Welcome to Trapic Application. I hope you have an amazing day! ";
+        tts.speak(greeting_message, TextToSpeech.QUEUE_FLUSH, null);
     }
 }
