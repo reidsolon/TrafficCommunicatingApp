@@ -4,5 +4,5 @@ The purpose of this project is to comply my capstone project. This is developed,
 TRAFFIC COMMUNICATING APPLICATION ( TRAPIC ) - 2019
 
 ![Test Image 7](https://github.com/reidsolon/corona_tracker/blob/master/readme_img/1.jpg)
-![Test Image 7](https://github.com/reidsolon/corona_tracker/blob/master/readme_img/1.jpg)
-![Test Image 7](https://github.com/reidsolon/corona_tracker/blob/master/readme_img/1.jpg)
+![Test Image 7](https://github.com/reidsolon/corona_tracker/blob/master/readme_img/2.jpg)
+![Test Image 7](https://github.com/reidsolon/corona_tracker/blob/master/readme_img/3.jpg)
